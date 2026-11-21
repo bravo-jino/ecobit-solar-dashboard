@@ -1,0 +1,907 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ECOBIT | 부산 정류장 태양광 지도</title>
+<style>
+:root{color-scheme:light;--forest:#10234b;--pine:#285fdb;--green:#285fdb;--light:#e6efff;--ink:#192c4e;--muted:#566882;--line:#dce5f4;--page:#f3f6fc;--gold:#ffcb6c}
+*{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font:14px/1.55 "Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif}h1,h2,h3,p{margin:0}h1,h2,h3{letter-spacing:-.045em}button,input,select{font:inherit;color:inherit}button,select{cursor:pointer}button{border:0;background:none}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #285fdb;outline-offset:2px}[hidden]{display:none!important}.shell{width:min(1450px,calc(100% - 56px));margin:auto}.mast{background:radial-gradient(ellipse at 76% 30%,#285fdb,var(--forest) 66%);color:white;padding:23px 0 65px}.brand{display:flex;align-items:center;gap:9px;font:800 21px system-ui;letter-spacing:.055em}.sun-logo{display:grid;place-items:center;background:#bfe4b8;color:#144334;border-radius:9px;width:31px;height:31px;font-size:22px}.head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-top:22px}.head h1{font-size:clamp(29px,4.3vw,51px);line-height:1.17;font-weight:800}.head p{margin-top:8px;color:#e1ecff}.stamp{font-size:12px;white-space:nowrap;border:1px solid #7596ec;border-radius:7px;padding:7px 10px;color:#eaf1ff}.main{margin-top:-39px;padding-bottom:32px}.summary{display:grid;grid-template-columns:repeat(3,1fr);background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 7px 22px #16356d12;overflow:hidden;margin-bottom:17px}.summary>div{padding:12px 19px}.summary>div+div{border-left:1px solid var(--line)}.summary span{font-size:12px;color:var(--muted)}.summary b{display:block;font:760 27px/1.26 system-ui;letter-spacing:-.045em;margin-top:3px}.summary small,.metrics small{font-size:.52em;color:var(--muted);margin-left:4px;letter-spacing:0}.layout{display:grid;grid-template-columns:minmax(0,1.58fr) minmax(340px,1fr);gap:16px;align-items:start}.card{border:1px solid var(--line);border-radius:15px;background:white;overflow:hidden;min-width:0}.pad{padding:14px 17px}.row{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap}.card h2{font-size:21px}.sub{color:var(--muted);font-size:12px}.filters{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}.filters input,.filters select,.control{border:1px solid #cbd8ee;border-radius:8px;background:#fff;min-width:0;padding:7px 9px}.filters input{width:100%}.control:hover,.tags button:hover{background:#edf3ff}.barline{border-bottom:1px solid var(--line)}.map{width:100%;aspect-ratio:1.52;min-height:350px;position:relative;background:#ccdfef;overflow:hidden;isolation:isolate}.map svg{width:100%;height:100%;position:absolute;inset:0;display:block;touch-action:none}.terrain{pointer-events:none}.district{stroke:#345a91;stroke-width:1.08;vector-effect:non-scaling-stroke;fill:#eaf2ff;fill-opacity:.62;cursor:pointer}.district:hover,.district:focus-visible{fill:#acc8fa;fill-opacity:.84;stroke:#285fdb;outline:none}.district.muted{fill:#ecf3fd;fill-opacity:.39;stroke:#728bb1;stroke-width:.75}.district.active{fill:#b3cbff;fill-opacity:.26;stroke:#285fdb;stroke-width:2.25}.map-text{font-family:inherit;font-size:13px;font-weight:800;paint-order:stroke;stroke:#f1f6ff;stroke-width:4;fill:#233d67;cursor:pointer}.map-text.detail{font-size:15px;pointer-events:none}.marker{fill:#285fdb;stroke:white;stroke-width:.72;cursor:pointer}.marker.analysis{fill:#203978;stroke:#fff}.marker:hover,.marker:focus-visible{stroke:#172c57;stroke-width:2;outline:none}.position{fill:#f5bb45;stroke:#152853;stroke-width:2.4;pointer-events:none}.map-label{font-size:12px;font-weight:800;fill:#1c3666;stroke:white;stroke-width:4;paint-order:stroke;pointer-events:none}.map-tools{position:absolute;top:10px;right:10px;display:grid;gap:4px}.map-tools button{background:#fff;border:1px solid #c3d3ed;border-radius:7px;width:34px;height:34px;font:bold 16px system-ui;box-shadow:0 2px 5px #17396b22}.north{position:absolute;bottom:10px;right:13px;pointer-events:none;color:#214b87;text-align:center;font:bold 12px system-ui}.legend{display:flex;gap:12px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:12px}.dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:#285fdb;margin-right:4px}.dot.detail{background:#203978}.dot.current{background:#f5bb45;border:1px solid #152853}.guide{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:9px 16px}.list-area{display:flex;flex-direction:column}.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}.tags button{border-radius:6px;background:#f0f5ff;border:1px solid #e1e9f8;font-size:12px;padding:4px 7px;white-space:nowrap}.tags button[aria-pressed=true]{background:#285fdb;color:white;border-color:#285fdb}.sort{min-width:0;border:1px solid #cbd8ee;border-radius:7px;background:#fff;padding:4px 6px;font-size:12px}.results{padding:0 13px;height:347px;overflow:auto}.result{width:100%;display:grid;grid-template-columns:66px minmax(90px,1fr) auto;align-items:center;gap:7px;text-align:left;padding:8px 4px;border-bottom:1px solid #e1e9f8}.result strong{display:block;font-size:13px;overflow-wrap:anywhere}.result.current,.result:hover{background:#eff4ff}.ars{font:750 16px system-ui;color:#285fdb;font-variant-numeric:tabular-nums;letter-spacing:.04em}.ars.empty{font-size:11px;letter-spacing:0;color:#62718b}.measure{font-size:11px;text-align:right;color:#4c5e7e;white-space:nowrap}.pagination{display:flex;justify-content:space-between;align-items:center;padding:8px 15px;border-top:1px solid var(--line);font-size:12px}.pagination button{border-radius:6px;background:#eaf1ff;padding:4px 8px}.pagination button:disabled,.map-tools button:disabled{opacity:.42;cursor:default}.insight{margin-top:16px}.detail-title{font-size:clamp(21px,3vw,30px)!important}.profile{display:grid;grid-template-columns:minmax(250px,.78fr) minmax(0,1fr);gap:20px}.badge{border-radius:5px;background:#e9f1ff;color:#274d99;padding:3px 7px;white-space:nowrap;font-size:12px;font-weight:700}.badge.detailed{background:#e8edff;color:#24479c}.idline{margin:5px 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.idline .ars{font-size:20px}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:13px 0 9px}.metrics div{background:#f0f5ff;padding:8px 7px;border-radius:7px;min-width:0}.metrics span{font-size:11px;color:var(--muted)}.metrics b{display:block;font:750 clamp(17px,2.1vw,24px)/1.2 system-ui;letter-spacing:-.045em;margin-top:3px;white-space:nowrap}.links{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.links a,.links button,.export{border:1px solid #cddbf2;border-radius:7px;padding:5px 8px;background:#f5f8ff;color:#234d9c;text-decoration:none;font-size:12px}.note{color:#5e4a2b;background:#f8f1df;font-size:12px;padding:6px 8px;border-radius:6px;margin-top:7px}.chart{border-left:1px solid var(--line);padding-left:18px}.bars{margin-top:8px;display:grid;grid-template-columns:repeat(12,1fr);gap:2px}.bars button{padding:0;min-width:0;text-align:center}.column{display:block;height:120px;position:relative;border-bottom:1px solid #cbd8ee;background:repeating-linear-gradient(0deg,transparent 0 29px,#e7edf8 29px 30px)}.column i{position:absolute;bottom:0;border-radius:3px 3px 0 0;left:17%;width:66%;background:#d9e6fc}.column .net{left:30%;width:40%;background:#4c78df}.bars button[aria-pressed=true] .net{background:#285fdb}.bars label{font-size:11px;cursor:pointer;color:var(--muted)}.chart-info{margin-top:7px;color:#40577e;font-size:12px}.foot{margin-top:15px;color:var(--muted);font-size:12px}.foot summary{cursor:pointer;color:#244c9a;font-weight:700}.foot ul{margin-top:8px;padding-left:20px}.foot a{color:#254da0}.empty-note{padding:12px;color:var(--muted)}.links a:hover,.links button:hover,.export:hover{background:#e8f0ff}
+@media(max-width:880px){.layout,.profile{grid-template-columns:1fr}.map{min-height:300px}.results{height:290px}.chart{border-left:0;border-top:1px solid var(--line);padding:12px 0 0}.head{align-items:start}}
+@media(max-width:560px){.shell{width:calc(100% - 20px)}.head{display:block}.stamp{display:inline-block;margin-top:8px}.summary>div{padding:9px 8px}.summary b{font-size:20px}.summary span{font-size:11px}.pad{padding:10px}.map{min-height:290px}.result{grid-template-columns:59px minmax(85px,1fr) auto}.head p{font-size:12px}.guide{padding:8px}.pagination{padding:6px 8px}.map-text{font-size:18px}.map-label{font-size:17px}}
+
+.brand{display:inline-flex;background:#fff;border-radius:10px;box-shadow:0 2px 12px #10234b25;padding:0 9px}
+.brand img{width:124px;height:58px;object-fit:contain;display:block}
+.head-actions{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.list-actions{display:flex;align-items:center;gap:6px}.list-actions .control{font-size:12px;padding:5px 8px;color:#285fdb}.model-toggle[aria-pressed=true]{background:#285fdb;color:#fff;border-color:#285fdb}.head-actions a{color:white;font-weight:700;text-underline-offset:3px}
+.terrain{filter:saturate(.55) hue-rotate(10deg)}
+.solar-section{margin-top:16px;scroll-margin-top:15px}
+.solar-header{display:flex;align-items:center;justify-content:space-between;gap:11px;flex-wrap:wrap}
+.scene-controls{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.scene-controls label{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)}
+.scene-controls input{width:86px;accent-color:#285fdb}
+.scene-controls .control{padding:4px 7px;font-size:12px}
+.solar-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(200px,275px)}
+.model-stage{position:relative;min-width:0;background:radial-gradient(ellipse at 78% 10%,#f7faff,#e1ebff 75%,#dbe8ff);overflow:hidden}
+.model-stage canvas{display:block;height:339px;width:100%;touch-action:none;cursor:grab}
+.model-stage canvas:active{cursor:grabbing}
+.drag-hint{position:absolute;bottom:12px;left:14px;background:#ffffffdf;border:1px solid #cfddf7;border-radius:7px;font-size:11px;color:#4d5f82;padding:5px 8px;pointer-events:none}
+.solar-info{border-left:1px solid var(--line);background:#f8faff;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:7px}
+#sunState{font-size:23px;line-height:1.25;letter-spacing:-.04em;color:#285fdb}
+#sunState.blocked{color:#8e4233}
+.scene-legend{display:flex;gap:9px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:9px;margin-top:6px;font-size:12px;color:var(--muted)}
+.scene-legend .scene-building{background:#7796c3}.scene-legend .scene-panel{background:#285fdb}.scene-legend .scene-sun{background:#e9ad2a}
+.solar-empty{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:#f8faff;color:var(--muted)}
+@media(max-width:650px){.solar-body{grid-template-columns:1fr}.solar-info{border-left:0;border-top:1px solid var(--line)}.model-stage canvas{height:268px}.head-actions{align-items:flex-start;margin-top:8px}.head-actions .stamp{margin-top:0}}
+
+.horizon-profile{border-top:1px solid var(--line);background:#f8faff}
+.horizon-profile h3{margin:0;font-size:17px}
+.horizon-profile .row{flex-wrap:wrap;gap:8px}
+#terrainCheck{color:#274e91;font-weight:650;line-height:1.45}
+#horizonChart{display:block;width:100%;height:130px;margin:7px 0 4px}
+#exportHorizon:disabled{opacity:.55;cursor:not-allowed}
+
+:root{--page:#f2f5f9;--rail:#10234b;--line:#e2e8f2}
+body{padding-left:164px}
+.rail{position:fixed;inset:0 auto 0 0;width:164px;z-index:12;background:var(--rail);padding:21px 12px;color:white}
+.rail nav{display:flex;flex-direction:column;gap:7px}
+.rail nav a{display:flex;align-items:center;gap:10px;color:#d9e6fc;text-decoration:none;border-radius:9px;padding:9px 10px;font-size:13px;font-weight:700;white-space:nowrap}
+.rail nav a span{display:grid;place-items:center;width:22px;height:22px;font-size:16px;line-height:1}
+.rail nav a:hover{background:#233d72;color:white}
+.rail nav a[aria-current]{background:#285fdb;color:white}
+.dashboard-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding:28px 0 17px}
+.dashboard-head h1{font-size:clamp(24px,3vw,36px);margin:0 0 4px;line-height:1.25;letter-spacing:-.045em}
+.data-date{font-size:12px;color:#566882;background:white;border:1px solid var(--line);border-radius:8px;padding:6px 9px;white-space:nowrap}
+.main{margin:0 auto;padding-bottom:24px}
+.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:0;background:none;border:0;box-shadow:none;border-radius:0;overflow:visible;margin-bottom:16px}
+.summary>div,.summary>div+div{border:1px solid var(--line);border-radius:12px;background:white;box-shadow:0 2px 6px #162a4809;padding:13px 15px;min-width:0}
+.summary>div:first-child{border-top:3px solid #285fdb;padding-top:11px}
+.summary span{margin-bottom:4px}
+.card{border-radius:14px;box-shadow:0 2px 10px #18305008}
+.layout{gap:14px;grid-template-columns:minmax(0,1.45fr) minmax(300px,1fr)}
+.map{max-height:490px}
+.solar-header{background:white}.marker.partial,.dot.partial{fill:#8098cb;background:#8098cb}
+.solar-section,.insight{margin-top:16px}
+.horizon-profile{background:#fff}
+.model-stage canvas{height:390px}
+#overview,#explore,#insight,#shadowScene,#method{scroll-margin-top:16px}
+@media(min-width:1350px){.shell{width:min(1510px,calc(100% - 48px))}}
+@media(max-width:1110px){.shell{width:calc(100% - 30px)}.layout{grid-template-columns:minmax(0,1.05fr) minmax(280px,1fr)}}
+@media(max-width:900px){body{padding-left:60px}.rail{width:60px;padding:10px 5px}.rail nav a{padding:8px 0;gap:0;justify-content:center;font-size:0}.rail nav a span{font-size:17px}.layout{grid-template-columns:1fr}}
+@media(max-width:600px){body{padding-left:0}.rail{position:sticky;top:0;width:100%;display:flex;gap:7px;align-items:center;padding:5px 7px;overflow:auto}.rail nav{flex-direction:row;gap:3px}.rail nav a{padding:4px 6px;font-size:11px}.rail nav a span{display:none}.shell{width:calc(100% - 20px)}.dashboard-head{display:block;padding:16px 0 10px}.data-date{display:inline-block;margin-top:7px}.summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.summary>div,.summary>div+div{padding:9px}.summary>div:first-child{padding-top:7px}.model-stage canvas{height:300px}#overview,#explore,#insight,#shadowScene,#method{scroll-margin-top:52px}}
+
+.dashboard-head{display:grid;grid-template-columns:minmax(166px,24%) minmax(0,1fr);align-items:stretch;gap:0;margin-top:23px;margin-bottom:16px;padding:0;background:#eaf0fb;border-radius:14px;overflow:hidden}
+.dashboard-intro{align-self:center;padding:20px 24px}
+.brand-section{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:#fff;padding:12px 16px}
+.brand-section a{display:block}
+.brand-section img{display:block;width:144px;max-width:100%;height:auto}
+.brand-section .data-date{padding:0;margin:0;border:0;background:none;font-size:11px;white-space:normal;text-align:center}
+.solar-playback{display:grid;grid-template-columns:auto minmax(115px,1fr) auto;align-items:center;gap:12px;padding:10px 16px;background:#f1f5fd;border-bottom:1px solid var(--line)}
+.solar-playback .control{display:inline-flex;justify-content:center;align-items:center;gap:7px;min-width:91px;background:#285fdb;border-color:#285fdb;color:#fff;font-weight:700;min-height:35px}
+.solar-playback .control:hover{background:#1f4db6}
+.solar-playback input{width:100%;min-width:0;margin:0;accent-color:#285fdb}
+.playback-time{color:#173b83;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.solar-playback :focus-visible{outline:2px solid #285fdb;outline-offset:3px}
+@media(max-width:600px){
+ .dashboard-head{grid-template-columns:minmax(99px,31%) minmax(0,1fr);margin-top:12px;margin-bottom:12px}
+ .dashboard-intro{padding:12px}
+ .dashboard-head h1{font-size:21px}
+ .brand-section{padding:8px;gap:4px}
+ .brand-section .data-date{font-size:10px}
+ .solar-playback{grid-template-columns:auto minmax(55px,1fr) auto;padding:8px 12px;gap:8px}
+ .solar-playback .control{min-width:78px}
+ .playback-time{font-size:12px}
+}
+
+.scene-pending{min-height:105px}
+.scene-pending strong,.empty-note strong{display:block;color:#173b83;margin-bottom:3px}
+.scene-pending a{text-decoration:none}
+#q{scroll-margin-top:60px}
+</style>
+</head>
+<body>
+
+<aside class="rail">
+ <nav aria-label="대시보드 탐색">
+  <a href="#overview"><span aria-hidden="true">⊞</span>개요</a>
+  <a href="#explore"><span aria-hidden="true">⌖</span>정류장 지도</a>
+  <a href="#insight"><span aria-hidden="true">▥</span>발전량</a>
+  <a href="#shadowScene"><span aria-hidden="true">☀</span>3D 음영</a>
+  <a href="#method"><span aria-hidden="true">ⓘ</span>자료 출처</a>
+ </nav>
+</aside>
+<header class="shell dashboard-head" id="overview">
+ <div class="brand-section">
+  <a href="#overview" aria-label="ECOBIT 대시보드 처음으로"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOoAAABtCAYAAACvIf0uAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAydpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDkuMS1jMDAyIDc5LmViYzgzMDYyNywgMjAyNS8wMi8xNy0yMDo0MTozOCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NTE4QzdCRUY5NDRBMTFGMDlGREVEM0U3MkU5RDI0MjMiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NTE4QzdCRUU5NDRBMTFGMDlGREVEM0U3MkU5RDI0MjMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIDI1LjEyIChXaW5kb3dzKSI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjc0OTc1MzZBNzY1MTExRjBBNjNCQUU1OEQ5RDJBNzdCIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjc0OTc1MzZCNzY1MTExRjBBNjNCQUU1OEQ5RDJBNzdCIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+JRwm6wAAIIJJREFUeNrs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" alt="ECOBIT" width="124" height="58"></a>
+  <span class="data-date">정류장 자료 기준 2026.11.09</span>
+ </div>
+ <div class="dashboard-intro"><h1>부산 정류장 태양광 지도</h1><p class="sub">정류장별 예상 발전량과 3D 태양 경로를 비교합니다.</p></div>
+</header>
+<main class="shell main">
+<section class="summary" aria-label="정류장 집계"><div><span>부산 버스 정류장 목록</span><b id="total"></b></div><div><span>5자리 공개 번호 확인</span><b id="withArs"></b></div><div><span>건물 음영 상세 분석</span><b id="withDetail"></b></div><div><span>3D 태양 경로</span><b id="with3D"></b></div></section>
+<div class="layout" id="explore">
+<section class="card" aria-labelledby="mapTitle"><div class="pad barline"><div class="row"><div><h2 id="mapTitle">부산 전체</h2><p class="sub" id="mapHint">지도나 오른쪽 목록에서 구·군을 선택하세요.</p></div><button type="button" class="control" id="reset">부산 전체 보기</button></div></div>
+<div class="map" id="map"><svg id="geo" viewBox="0 0 960 630" preserveAspectRatio="none" aria-label="부산 구군 및 정류장 지도"><g id="world"><image id="terrain" class="terrain"/><g id="areas"></g></g><g id="markers"></g><g id="labels"></g></svg>
+<div class="map-tools"><button type="button" id="zoomIn" title="지도 확대" aria-label="지도 확대">+</button><button type="button" id="zoomOut" title="지도 축소" aria-label="지도 축소">−</button></div><div class="north" aria-hidden="true">▲<br>N</div></div>
+<div class="guide"><div class="legend"><span><i class="dot"></i>지형 추정</span><span><i class="dot detail"></i>건물 포함</span><span><i class="dot partial"></i>일부 건물</span><span><i class="dot current"></i>선택 정류장</span></div><a class="sub" href="#insight" id="jumpDetail" hidden>선택 정류장의 발전량 보기 ↓</a><span class="sub" id="boundaryHint">구·군 경계는 탐색용</span></div>
+</section>
+<section class="card list-area" aria-labelledby="listTitle"><div class="pad barline"><div class="row"><h2 id="listTitle">정류장 찾기</h2><div class="list-actions"><button type="button" class="control" id="clearConditions" hidden>조건 초기화</button><button type="button" class="export" id="export">조회 결과 CSV</button></div></div>
+<div class="filters"><input id="q" type="search" aria-label="5자리 정류장 번호 또는 정류장명" placeholder="5자리 정류장 번호 또는 정류장명"><select id="model" aria-label="분석 유형"><option value="all">전체 유형</option><option value="detail">건물 포함 3D</option><option value="partial">일부 건물 3D</option><option value="terrain">지형 기반 3D</option></select></div>
+<div class="tags" id="districts" role="group" aria-label="구·군 선택"></div></div>
+<div class="pad row"><span id="resultCount" class="sub" aria-live="polite"></span><select id="order" class="sort" aria-label="정류장 정렬"><option value="ars">정류장 번호순</option><option value="name">정류장명순</option><option value="winter">겨울 발전량 낮은순</option></select></div>
+<div class="results" id="results" tabindex="0" aria-label="정류장 검색 결과"></div>
+<div class="pagination"><button type="button" id="back">이전</button><span id="page"></span><button type="button" id="next">다음</button></div></section>
+</div>
+<section class="card pad insight" id="insight" aria-label="정류장 발전량"><div id="pending" class="empty-note"><strong>정류장을 선택해 주세요</strong><p class="sub">정류장을 선택하면 연간·월별 발전량을 확인할 수 있습니다.</p></div>
+<div id="profile" class="profile" hidden>
+ <div><div class="row"><h2 id="stopTitle" class="detail-title"></h2><span class="badge" id="mode"></span></div>
+ <div id="stopMeta" class="idline"></div><p class="sub" id="stopCoords"></p><p class="sub" id="source"></p>
+ <div class="metrics"><div><span>연간 발전량</span><b id="annual"></b></div><div><span>겨울 일평균</span><b id="winter"></b></div><div><span>연간 음영 손실</span><b id="loss"></b></div></div>
+ <p class="note" id="siteNote"></p><div class="links"><a id="externalMap" target="_blank" rel="noopener">지도에서 위치 확인 ↗</a><a href="#shadowScene" id="sceneLink">3D 음영·태양 경로 ↓</a></div>
+ </div>
+ <div class="chart"><div class="row"><h3>월별 발전량 <small>(kWh)</small></h3><div class="legend"><span><i class="dot"></i>음영 반영</span><span><i class="dot" style="background:#d9e6fc"></i>무음영</span></div><select class="sort" id="power" aria-label="패널 정격 출력"><option value="1">60 W</option><option value="2">120 W</option></select></div>
+ <div class="bars" id="chart"></div><p class="chart-info" id="monthDetail"></p></div>
+</div></section>
+<section class="card solar-section" id="shadowScene" aria-labelledby="solarTitle">
+  <header class="pad barline solar-header">
+    <div><h2 id="solarTitle">3D 음영·태양 경로</h2><p class="sub" id="sceneStation" hidden></p></div>
+    <div class="scene-controls" id="sceneControls">
+      <button type="button" class="control model-toggle" id="detailToggle" aria-pressed="false">건물 포함만 보기</button>
+      <div class="scene-controls" id="siteSceneControls" hidden>
+      <label>기준 월 <select id="sceneMonth" class="sort"></select></label>
+      <label>시간(KST) <select id="sceneHour" class="sort"></select></label>
+      <label>시점 회전 <input type="range" id="orbit" min="-180" max="180" value="-28" step="1"></label>
+      <button type="button" class="control" id="resetOrbit">3D 보기 초기화</button>
+      </div>
+    </div>
+  </header>
+  <div id="scenePending" class="pad solar-empty scene-pending">
+    <div><strong>정류장을 선택해 주세요</strong><p class="sub">지도나 검색 결과에서 정류장을 선택하면 3D 음영과 태양 경로를 볼 수 있습니다.</p></div>
+    <a href="#explore" class="control" id="findStop">정류장 찾기 ↑</a>
+  </div>
+  <div class="solar-playback" id="scenePlayback" hidden>
+    <button type="button" class="control" id="playSun"><span aria-hidden="true">▶</span><span>재생</span></button>
+    <input type="range" id="sunTimeline" min="0" max="82800" step="1" value="43200" aria-label="태양 경로 재생 시간">
+    <span id="playbackTime" class="playback-time">12:32:30 KST</span>
+  </div>
+  <div class="solar-body" id="sceneBody" hidden>
+    <div class="model-stage"><canvas id="scene" aria-label="정류장 주변 3D 건물 모형과 태양 경로"></canvas><span class="drag-hint">드래그하여 회전</span></div>
+    <aside class="pad solar-info">
+      <span class="badge" id="sceneType"></span><span class="sub" id="solarDate"></span>
+      <strong id="sunState" aria-live="polite"></strong>
+      <span class="sub" id="sunAltitude"></span>
+      <span class="sub" id="terrainCheck" aria-live="polite"></span>
+      <div class="scene-legend">
+        <span><i class="dot scene-building"></i><span id="sceneObstacle">건물</span></span>
+        <span><i class="dot scene-panel"></i>패널 위치</span>
+        <span><i class="dot scene-sun"></i>태양 경로</span>
+      </div>
+      <p class="sub scene-note" id="sceneNote" hidden></p>
+    </aside>
+  </div>
+  <div class="pad horizon-profile">
+    <div class="row horizon-heading">
+      <div><h3>방위별 지형 차폐 고도</h3><p class="sub" id="horizonSummary"></p></div>
+      <button type="button" class="export" id="exportHorizon" title="현재 검색·필터 결과의 방위별 차폐 고도">지형 차폐 CSV</button>
+    </div>
+    <canvas id="horizonChart" hidden role="img" aria-label="북쪽 0도에서 시계 방향으로 표시한 지형 차폐 고도 그래프"></canvas>
+    <p class="sub" id="horizonExportScope" hidden></p>
+  </div>
+</section>
+<footer class="foot" id="method"><details><summary>자료 출처와 분석 기준</summary><ul>
+<li>정류장은 기존 전수 목록의 부산 ID를 기준으로 집계했습니다. 원천 자료는 <a href="https://www.data.go.kr/data/15067528/fileData.do">국토교통부 전국 버스정류장 위치정보</a>입니다. 목록에 공개 번호가 있는 경우 원본 5자리 문자열 그대로 표시합니다. CSV를 엑셀에서 불러올 때 정류장번호 열을 텍스트 형식으로 지정하면 선행 0이 유지됩니다. 타 지자체 ID 3건은 집계에서 제외했습니다.</li>
+<li>구·군은 통계청 SGIS <a href="https://github.com/statgarten/maps">2020년 시군구 지도</a>를 지리좌표에 맞춰 근사했습니다. 경계에서 120 m 이내의 바깥 좌표는 가까운 구·군에 배치했습니다. 부산 경계 밖으로 분류된 부산 버스 목록 항목은 ‘시 경계 밖’에서 검색할 수 있습니다.</li>
+<li>지형 추정은 Copernicus DEM GLO-30과 가까운 기준 정류장 30곳의 PVGIS ERA5 일사량·태양 위치를 사용한 1차 추정입니다. 정류장별 DSM 차폐는 약 90 m~15 km 범위에서 계산했습니다. 가까운 건물·가로수·승강장에 의한 음영은 상세 확인이 필요합니다.</li>
+<li>국토교통부 <a href="https://www.data.go.kr/data/15083092/fileData.do">GIS건물통합정보</a> 부산 원본(2026.11.09, 공공누리 제1유형)을 적용한 3D는 9,268개 정류장에서 볼 수 있습니다. 높이값을 사용할 수 있는 정류장 9,264곳의 발전량을 다시 계산했습니다. 건축물대장 높이 우선, 층수×3.2m 보완, 모두 미상인 건물은 윤곽만 표시합니다. 건물 바닥 고도는 DSM 주변 표고로 추정합니다. 건물의 지붕 세부 형상과 안뜰은 단순화했습니다. 계산 반경 400m, 건물 표시 약 250m, 방향 간격 2°입니다. 브이월드 부산 자료 밖 건물, 근거리 수목과 승강장은 모델 범위에 포함되지 않습니다. 일부 건물 3D는 자료가 확보된 건물의 차폐를 보여주고, 연간·월간 발전량에는 지형 모델을 사용합니다. 지형 기반 3D는 정류장 주변 약 300m의 지형과 2° 간격의 지형 차폐를 사용합니다. 모든 모델에서 수목·승강장에 의한 근거리 음영은 반영하지 않습니다. 태양 경로는 선택한 월의 15일, 매시 32분 30초(KST)를 기준으로 표시합니다. 모든 발전량은 2021.12~2022.11의 과거 기상 조건, 정남향·경사 30°·높이 3 m·출력계수 0.75를 가정했습니다. 겨울은 12~2월 90일 기준입니다. 28 Wh/일은 제품 소비량 비교 조건입니다.</li>
+</ul></details></footer>
+</main>
+<script type="application/json" id="payload"></script>
+<script src="./station-data.js"></script>
+<script type="application/octet-stream" id="terrainSceneData"></script>
+<script src="./terrain-data.js"></script>
+<script type="application/octet-stream" id="vworldData"></script>
+<script src="./building-data.js"></script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const data=JSON.parse($('payload').textContent);
+const keys=['id','name','lat','lon','ars','district','annual','winter','loss','detailed','edge','months','base','reference'];
+const stops=data.stops.map(row=>Object.fromEntries(keys.map((key,i)=>[key,row[i]])));
+const districts=data.districts;
+const districtsTotal=districts.map((_,i)=>stops.filter(s=>s.district===i).length);
+const outside=stops.filter(s=>s.district<0).length, lookup=new Map(stops.map(s=>[s.id,s]));
+const state={district:null,selection:null,power:1,month:0,page:0,view:null};
+const locale=new Intl.NumberFormat('ko-KR'), count=n=>locale.format(n);
+const decimal=(n,d=1)=>n.toLocaleString('ko-KR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const names=i=>i<0?'시 경계 밖':districts[i].name;
+const monthNames=[12,1,2,3,4,5,6,7,8,9,10,11];
+const pageSize=24;
+const ns='http://www.w3.org/2000/svg';
+const svgEl=(name,attrs={})=>{const n=document.createElementNS(ns,name);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));return n;};
+const putUnit=(id,value,unit)=>{const el=$ (id),small=document.createElement('small');el.textContent=value;small.textContent=unit;el.append(small);};
+putUnit('total',count(stops.length),'곳');
+putUnit('withArs',count(stops.filter(s=>s.ars).length),'곳');
+putUnit('withDetail',count(stops.filter(s=>s.detailed).length),'곳');
+putUnit('with3D',count(stops.length),'곳');
+let results=[];
+for(const [id,label] of [[null,'전체'],...districts.map((d,i)=>[i,d.name]),[-1,'시 경계 밖']]){
+ const b=document.createElement('button');b.textContent=label;b.dataset.district=id===null?'all':id;
+ b.addEventListener('click',()=>chooseDistrict(id));$('districts').append(b);
+}
+const cos=.8174, origin=[128.8,35.1];
+const point=(lon,lat)=>[(lon-origin[0])*cos*1600,(origin[1]-lat)*1600];
+const box=points=>[Math.min(...points.map(p=>p[0])),Math.min(...points.map(p=>p[1])),Math.max(...points.map(p=>p[0])),Math.max(...points.map(p=>p[1]))];
+const stopXY=new Map(stops.map(s=>[s.id,point(s.lon,s.lat)]));
+const poly=districts.map(d=>d.rings.map(r=>r.map(([lon,lat])=>point(lon,lat))));
+const regionBoxes=poly.map(rings=>box(rings.flat()));
+const allBox=box(poly.flat(2));
+const canvasW=960,canvasH=630;
+function fit(bounds,padding=36){
+ const [l,t,r,b]=bounds;
+ const width=Math.max(r-l,10),height=Math.max(b-t,10);
+ const factor=Math.min((canvasW-padding*2)/width,(canvasH-padding*2)/height);
+ return {k:factor,x:canvasW/2-(l+r)*factor/2,y:canvasH/2-(t+b)*factor/2};
+}
+const overall=fit(allBox,34);
+state.view={...overall};
+const [west,east,south,north]=data.terrain.bounds,[ix,iy]=point(west,north),[ax,ay]=point(east,south);
+for(const [key,value] of Object.entries({x:ix,y:iy,width:ax-ix,height:ay-iy,href:data.terrain.image,preserveAspectRatio:'none'}))$('terrain').setAttribute(key,value);
+const labelPositions={'강서구':[128.925,35.143],'금정구':[129.089,35.257],'기장군':[129.215,35.328],'남구':[129.092,35.119],'동구':[129.050,35.122],'동래구':[129.092,35.207],'부산진구':[129.044,35.162],'북구':[129.003,35.228],'사상구':[128.980,35.159],'사하구':[128.967,35.077],'서구':[129.011,35.107],'수영구':[129.113,35.145],'연제구':[129.084,35.182],'영도구':[129.070,35.071],'중구':[129.035,35.101],'해운대구':[129.164,35.197]};
+const paths=poly.map((rings,i)=>{
+ const d=rings.map(r=>'M'+r.map(([x,y])=>x.toFixed(2)+','+y.toFixed(2)).join('L')+'Z').join('');
+ const n=svgEl('path',{d,class:'district','fill-rule':'evenodd','data-district':i,tabindex:'0',role:'button','aria-label':districts[i].name+' '+count(districtsTotal[i])+'곳'});
+ const title=svgEl('title');title.textContent=districts[i].name+' · '+count(districtsTotal[i])+'곳';n.append(title);$('areas').append(n);return n;
+});
+const projected=([x,y])=>[state.view.x+x*state.view.k,state.view.y+y*state.view.k];
+function nearestSymbols(rows){
+ const occupied=new Set(), shown=[];
+ const ordered=[...rows].sort((a,b)=>Number(b.detailed)-Number(a.detailed)||Number(Boolean(b.ars))-Number(Boolean(a.ars)));
+ const px=$('map').clientWidth || 850, threshold=state.view.k<overall.k*1.6?7:4;
+ for(const stop of ordered){
+  const [x,y]=projected(stopXY.get(stop.id));
+  if(x < -5||y < -5||x > canvasW+5||y > canvasH+5)continue;
+  if(x<0||y<0)continue;
+  const key=Math.floor(x*px/canvasW/threshold)+','+Math.floor(y*px/canvasW/threshold);
+  if(occupied.has(key)&&stop.id!==state.selection)continue;
+  occupied.add(key);shown.push([stop,x,y]);
+ }
+ return shown;
+}
+function paintMap(){
+ $('world').setAttribute('transform','translate('+state.view.x+' '+state.view.y+') scale('+state.view.k+')');
+ const picked=lookup.get(state.selection), district=state.district;
+ paths.forEach((path,i)=>{
+  path.classList.toggle('active',district===i);
+  path.classList.toggle('muted',district!==null&&district!==i);
+ });
+ const show=!($('q').value.trim()==='' && district===null && !picked);
+ const marks=document.createDocumentFragment();
+ if(show){
+  for(const [s,x,y] of nearestSymbols(results)){
+   const kind=s.detailed?' analysis':data.partialScenes?.[s.id]?' partial':'';const spot=svgEl('circle',{cx:x,cy:y,r:kind?4.1:3.1,class:'marker'+kind,'data-stop':s.id});
+   const title=svgEl('title');title.textContent=(s.ars?s.ars+' · ':'')+s.name;spot.append(title);marks.append(spot);
+  }
+ }
+ const labels=document.createDocumentFragment();
+ for(const [i,d] of districts.entries()){
+  if(district!==null&&district!==i)continue;
+  const [x,y]=projected(point(...labelPositions[d.name]));
+  const text=svgEl('text',{x,y,'text-anchor':'middle',class:'map-text'+(district===i?' detail':''),'data-district':i});
+  text.textContent=d.name;labels.append(text);
+ }
+ if(picked){
+  const [x,y]=projected(stopXY.get(picked.id));
+  marks.append(svgEl('circle',{cx:x,cy:y,r:7.4,class:'position'}));
+  const marker=svgEl('text',{x:x>canvasW*.72?x-12:x+12,y:y-10,'text-anchor':x>canvasW*.72?'end':'start',class:'map-label'});
+  marker.textContent=(picked.ars?picked.ars+' · ':'')+picked.name;labels.append(marker);
+ }
+ $('markers').replaceChildren(marks);$('labels').replaceChildren(labels);
+ $('zoomOut').disabled=state.view.k<=overall.k*.65;
+ $('zoomIn').disabled=state.view.k>=overall.k*85;
+}
+function extentFor(district){
+ if(district===null)return allBox;
+ if(district>=0)return regionBoxes[district];
+ return box(stops.filter(s=>s.district<0).map(s=>stopXY.get(s.id)));
+}
+function chooseDistrict(district){
+ state.district=district;state.selection=null;state.page=0;
+ $('q').value=''; state.view=fit(extentFor(district),district===null?34:43);
+ refresh();
+}
+function selectStop(s,fromList=true){
+ state.selection=s.id;
+ if(fromList&&(state.district!==s.district)){
+  state.district=s.district;state.page=0;state.view=fit(extentFor(s.district),43);
+ }
+ if(fromList){
+  const p=stopXY.get(s.id),k=Math.max(state.view.k,overall.k*3.2);
+  state.view={k,x:canvasW/2-p[0]*k,y:canvasH/2-p[1]*k};
+ }
+ refresh(false);
+}
+function matchesModel(s,model){
+ const kind=s.detailed?'detail':data.partialScenes?.[s.id]?'partial':'terrain';
+ return model==='all'||model===kind;
+}
+function queryResults(){
+ const raw=$('q').value.trim(), q=raw.toLowerCase().replace(/\s/g,'');
+ const matchNumber=/^\d{5}$/.test(q), model=$('model').value, order=$('order').value;
+ return stops.filter(s=>(state.district===null||s.district===state.district)
+  && matchesModel(s,model)
+  && (!q||(matchNumber?s.ars===q:[s.ars,s.name,s.id].some(v=>v.toLowerCase().replace(/\s/g,'').includes(q)))))
+ .sort((a,b)=>{
+  if(order==='winter')return a.winter-b.winter||a.id.localeCompare(b.id);
+  if(order==='name')return a.name.localeCompare(b.name,'ko')||a.id.localeCompare(b.id);
+  return (a.ars||'99999').localeCompare(b.ars||'99999')||a.name.localeCompare(b.name,'ko')||a.id.localeCompare(b.id);
+ });
+}
+function renderList(resetScroll){
+ const frag=document.createDocumentFragment();
+ const slice=results.slice(state.page*pageSize,(state.page+1)*pageSize);
+ for(const s of slice){
+  const b=document.createElement('button');b.className='result'+(s.id===state.selection?' current':'');
+  b.dataset.stop=s.id;b.setAttribute('aria-pressed',String(s.id===state.selection));
+  const num=document.createElement('span');num.className='ars'+(s.ars?'':' empty');num.textContent=s.ars||'번호 미제공';
+  const middle=document.createElement('span'),title=document.createElement('strong'),temp=document.createElement('span');
+  title.textContent=s.name;temp.className='sub';temp.textContent=names(s.district)+' · '+s.id;middle.append(title,temp);
+  const measure=document.createElement('span');measure.className='measure';
+  measure.textContent=decimal(s.winter*state.power)+' Wh/일';
+  if(s.detailed){ const tag=document.createElement('span');tag.className='dot detail';tag.title='건물 음영 상세 분석';tag.setAttribute('aria-label','건물 음영 상세 분석');measure.prepend(tag); }
+  b.append(num,middle,measure);frag.append(b);
+ }
+ if(!slice.length){const p=document.createElement('p');p.className='empty-note';p.textContent='검색 조건에 맞는 정류장이 없습니다.';frag.append(p);}
+ $('results').replaceChildren(frag);if(resetScroll)$('results').scrollTop=0;
+ const n=results.length,max=Math.max(1,Math.ceil(n/pageSize));
+ $('resultCount').textContent=count(n)+'곳 · 겨울 일평균 '+state.power*60+' W 기준';
+ $('page').textContent=(state.page+1)+' / '+max;$('back').disabled=state.page<=0;$('next').disabled=state.page+1>=max;
+}
+function refresh(resetScroll=true){
+ results=queryResults();
+ $('exportHorizon').disabled=!results.length;
+ const model=$('model').value;
+ const filtered=state.district!==null||Boolean($('q').value.trim())||model!=='all';
+ $('clearConditions').hidden=!filtered;
+ $('detailToggle').setAttribute('aria-pressed',String(model==='detail'));
+ $('detailToggle').textContent=model==='detail'?'건물 포함 조건 해제':'건물 포함만 보기';
+ state.page=Math.min(state.page,Math.max(0,Math.ceil(results.length/pageSize)-1));
+ for(const button of $('districts').children)button.setAttribute('aria-pressed',String(button.dataset.district===String(state.district??'all')));
+ $('mapTitle').textContent=state.district===null?'부산 전체':names(state.district);
+ $('mapHint').textContent=state.district===null?'지도나 오른쪽 목록에서 구·군을 선택하세요.':
+   count(state.district<0?outside:districtsTotal[state.district])+'곳 · 지도에서 정류장을 살펴보세요.';
+ paintMap();renderList(resetScroll);drawProfile();
+}
+$('q').addEventListener('input',()=>{
+ state.district=null;state.selection=null;state.page=0;state.view={...overall};
+ const raw=$('q').value.trim();
+ if(/^\d{5}$/.test(raw)){
+  const found=stops.filter(s=>s.ars===raw&&matchesModel(s,$('model').value));
+  if(found.length===1){selectStop(found[0]);return;}
+ }
+ refresh();
+});
+function applyModelFilter(){
+ if(state.selection&&!queryResults().some(s=>s.id===state.selection))state.selection=null;
+ state.page=0;
+ refresh();
+}
+$('model').addEventListener('change',applyModelFilter);
+$('order').addEventListener('change',()=>{state.page=0;refresh();});
+$('results').addEventListener('click',e=>{const b=e.target.closest('button[data-stop]');if(b){selectStop(lookup.get(b.dataset.stop));[...$('results').children].find(n=>n.dataset.stop===b.dataset.stop)?.focus({preventScroll:true});}});
+function resetConditions(){
+ $('model').value='all';
+ $('order').value='ars';
+ chooseDistrict(null);
+}
+$('reset').addEventListener('click',resetConditions);
+$('clearConditions').addEventListener('click',()=>{
+ resetConditions();
+ $('q').focus();
+});
+$('back').addEventListener('click',()=>{state.page--;renderList(true);});
+$('next').addEventListener('click',()=>{state.page++;renderList(true);});
+function zoom(f,x=canvasW/2,y=canvasH/2){
+ const before=state.view.k, k=Math.max(overall.k*.65,Math.min(overall.k*85,before*f)),ratio=k/before;
+ state.view={k,x:x+(state.view.x-x)*ratio,y:y+(state.view.y-y)*ratio};paintMap();
+}
+$('zoomIn').addEventListener('click',()=>zoom(1.55));
+$('zoomOut').addEventListener('click',()=>zoom(1/1.55));
+let grab=null,suppress=false;
+$('geo').addEventListener('pointerdown',e=>{if(e.button!==0)return;grab={x:e.clientX,y:e.clientY,v:{...state.view},id:e.pointerId};suppress=false;});
+$('geo').addEventListener('pointermove',e=>{
+ if(!grab)return;
+ if(!suppress && Math.hypot(e.clientX-grab.x,e.clientY-grab.y)<6)return;
+ if(!suppress)$('geo').setPointerCapture(grab.id);
+ suppress=true;
+ const rect=$('geo').getBoundingClientRect();
+ state.view.x=grab.v.x+(e.clientX-grab.x)*canvasW/rect.width;
+ state.view.y=grab.v.y+(e.clientY-grab.y)*canvasH/rect.height;paintMap();
+});
+$('geo').addEventListener('pointerup',()=>{grab=null;if(suppress)setTimeout(()=>suppress=false,0);});
+$('geo').addEventListener('pointercancel',()=>{grab=null;suppress=false;});
+$('geo').addEventListener('click',e=>{
+ if(suppress)return;
+ const index=e.target.dataset.district;
+ if(e.target.dataset.stop){selectStop(lookup.get(e.target.dataset.stop),false);return;}
+ if(index!==undefined && Number(index)!==state.district)chooseDistrict(Number(index));
+});
+$('areas').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.dataset.district!==undefined){e.preventDefault();chooseDistrict(Number(e.target.dataset.district));}});
+new ResizeObserver(paintMap).observe($('map'));
+const barButtons=monthNames.map((m,i)=>{
+ const button=document.createElement('button'),track=document.createElement('span'),base=document.createElement('i'),net=document.createElement('i'),label=document.createElement('label');
+ track.className='column';net.className='net';label.textContent=m+'월';track.append(base,net);button.append(track,label);$('chart').append(button);
+ button.addEventListener('click',()=>{state.month=i;drawProfile();});return {button,base,net};
+});
+function drawProfile(){
+ renderSolarScene();
+ const s=lookup.get(state.selection);
+ jumpDetail.hidden=!s;
+ boundaryHint.hidden=Boolean(s);
+ $('pending').hidden=Boolean(s);$('profile').hidden=!s;
+ if(!s)return;
+ $('stopTitle').textContent=s.name;
+ $('mode').textContent=s.detailed?'건물 음영 포함':'지형 기반 추정';$('mode').classList.toggle('detailed',s.detailed);
+ const ars=document.createElement('strong'),tags=document.createElement('span');
+ ars.className='ars';ars.textContent=s.ars||'번호 미제공';tags.className='sub';
+ tags.textContent=(s.ars==='05718'?'부암역 방면 · ':'')+names(s.district)+' · '+s.id;$('stopMeta').replaceChildren(ars,tags);
+ $('stopCoords').textContent='위도 '+s.lat.toFixed(6)+' · 경도 '+s.lon.toFixed(6)+(s.edge&&s.district>=0?' · 경계 인접 배정':'');
+ const ref=lookup.get(s.reference);
+ const refDistance=ref?Math.round(Math.hypot((s.lon-ref.lon)*91000,(s.lat-ref.lat)*111000)):0;
+ $('source').textContent='일사량 기준 '+(ref?ref.name+(refDistance?' · 약 '+count(refDistance)+' m':''):'PVGIS ERA5');
+ putUnit('annual',decimal(s.annual*state.power),'kWh');putUnit('winter',decimal(s.winter*state.power),'Wh/일');putUnit('loss',decimal(s.loss),'%');
+ const balance=(s.winter*state.power)>=28?'겨울 평균이 28 Wh/일 기준 이상입니다.':'겨울 평균이 28 Wh/일 기준 미만입니다.';
+ $('siteNote').textContent=balance+(s.detailed?'':' 인근 건물·수목 음영은 현장 확인이 필요합니다.');
+ $('externalMap').href='https://www.google.com/maps?q='+s.lat+','+s.lon;
+ const limit=Math.max(...s.base)*1.07;
+ barButtons.forEach(({button,base,net},i)=>{
+  base.style.height=s.base[i]/limit*100+'%';net.style.height=s.months[i]/limit*100+'%';
+  button.setAttribute('aria-pressed',String(i===state.month));
+  button.title=monthNames[i]+'월 · 음영 반영 '+decimal(s.months[i]*state.power,2)+' kWh · 무음영 '+decimal(s.base[i]*state.power,2)+' kWh';
+  button.setAttribute('aria-label',button.title);
+ });
+ $('monthDetail').textContent=barButtons[state.month].button.title;
+}
+$('power').addEventListener('change',()=>{state.power=Number($('power').value);drawProfile();renderList(false);});
+$('export').addEventListener('click',()=>{
+ const header=['정류장번호(ARS)','내부ID','정류장명','구군','위도','경도','분석 유형','패널 W','연간 kWh','겨울 평균 Wh/일','연간 음영 손실 %','일사량 기준 ID',...monthNames.map(m=>m+'월 kWh')];
+ const rows=results.map(s=>[s.ars,s.id,s.name,names(s.district),s.lat,s.lon,s.detailed?'건물 음영 포함':'지형 추정',state.power*60,(s.annual*state.power).toFixed(3),(s.winter*state.power).toFixed(2),s.loss,s.reference,...s.months.map(x=>(x*state.power).toFixed(4))]);
+ const csv=[header,...rows].map(row=>row.map(value=>'"'+String(value).replaceAll('"','""')+'"').join(',')).join('\r\n');
+ const href=URL.createObjectURL(new Blob(['\ufeff',csv],{type:'text/csv;charset=utf-8'}));
+ const a=document.createElement('a');a.href=href;a.download='ECOBIT_Busan_Stops_'+state.power*60+'W.csv';a.click();setTimeout(()=>URL.revokeObjectURL(href),3000);
+});
+
+const canvas=$('scene'), orbit=$('orbit'), rad=Math.PI/180;
+let sceneTime=12;
+function currentScene(){
+ const id=state.selection, stop=lookup.get(id);
+ return stop?(viewVworld(stop)??data.scenes[id]??data.partialScenes?.[id]??terrainScene(stop)):null;
+}
+let vworld=null, vworldIndex=new Map(), vworldCache=null;
+async function loadVworld(){
+ const bytes=Uint8Array.from(atob($('vworldData').textContent),c=>c.charCodeAt(0));
+ const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+ const buffer=await new Response(stream).arrayBuffer();
+ const sizes=data.vworld.arrays;
+ let offset=0;
+ vworld={};
+ for(const [key,type] of [['coordinates',Int32Array],['rotation',Float32Array],['station_ground',Float32Array],
+  ['points',Int32Array],['polygons',Uint32Array],['roofs',Int16Array],['neighbors',Uint32Array],
+  ['offsets',Uint32Array],['marks',Uint16Array],['horizon',Uint8Array]]){
+  offset=Math.ceil(offset/4)*4;
+  vworld[key]=new type(buffer,offset,sizes[key]);
+  offset+=sizes[key]*type.BYTES_PER_ELEMENT;
+ }
+ vworldIndex=new Map(stops.map((s,i)=>[s.id,i]));
+}
+
+function viewVworld(stop){
+ const i=vworldIndex.get(stop.id);
+ if(!vworld||!data.vworld.ids[stop.id])return null;
+ if(vworldCache?.id===stop.id)return vworldCache;
+ const terrain=terrainScene(stop);
+ const angles=terrainProfile(stop.id).angles.map((a,j)=>Math.max(a,vworld.horizon[i*180+j]/2));
+ const sun=terrain.sun.map(month=>month.map(([alt,az])=>[alt,az,alt>0&&alt<=terrainObstruction(angles,az)]));
+ const x0=vworld.coordinates[2*i], y0=vworld.coordinates[2*i+1],z0=vworld.station_ground[i];
+ const a=vworld.rotation[i]*rad, ca=Math.cos(a),sa=Math.sin(a), meshes=[];
+ let missing=0;
+ for(let j=vworld.offsets[i];j<vworld.offsets[i+1];j++){
+  const b=vworld.neighbors[j], base=vworld.roofs[3*b]/10-z0,
+   h=vworld.roofs[3*b+1]/10,method=vworld.roofs[3*b+2];
+  const ring=[];
+  for(let k=vworld.polygons[b];k<vworld.polygons[b+1];k++){
+   const dx=(vworld.points[2*k]-x0)/10,dy=(vworld.points[2*k+1]-y0)/10;
+   ring.push([dx*ca-dy*sa,dx*sa+dy*ca]);
+  }
+  if(!method)missing++;
+  meshes.push([ring,base,h,method===1?'height':method===2?'floors':'unknown']);
+ }
+ return vworldCache={...terrain,id:stop.id,sun,meshes,angles,missing,registry:true,overlap:vworld.marks[3*i+2]};
+}
+
+
+const terrainRows=$('terrainSceneData').textContent;
+const terrainIndex=new Map(stops.map((s,index)=>[s.id,index]));
+const terrainBytesPerRow=422,terrainCharsPerRow=4*Math.ceil(terrainBytesPerRow/3);
+const horizonSamples=180,groundBytes=terrainBytesPerRow-horizonSamples;
+let terrainCache=null,horizonCache=null;
+
+function readTerrainBytes(id){
+ const start=terrainIndex.get(id)*terrainCharsPerRow;
+ return atob(terrainRows.slice(start,start+terrainCharsPerRow));
+}
+function readTerrainHorizon(bytes){
+ return Array.from({length:horizonSamples},(_,i)=>bytes.charCodeAt(groundBytes+i)/2);
+}
+function terrainProfile(id){
+ if(horizonCache?.id!==id){
+  const angles=readTerrainHorizon(readTerrainBytes(id));
+  const peak=Math.max(...angles);
+  horizonCache={id,angles,peak,bearing:angles.indexOf(peak)*2};
+ }
+ return horizonCache;
+}
+function terrainObstruction(angles,azimuth){
+ const step=azimuth/2, index=Math.floor(step)%horizonSamples, fraction=step-Math.floor(step);
+ return angles[index]*(1-fraction)+angles[(index+1)%horizonSamples]*fraction;
+}
+
+function sunPosition(month,time,lon,lat){
+ const year=month===12?2021:2022;
+ const minutes=Date.UTC(year,month-1,15,time-9,32,30)/60000;
+ const cycle=(angle,turn)=>((angle%turn)+turn)%turn;
+ const t=(2440587.5+minutes/1440-2451545)/36525;
+ const mean=cycle(280.46646+t*(36000.76983+t*.0003032),360);
+ const anomaly=(357.52911+t*(35999.05029-.0001537*t))*rad;
+ const ecc=.016708634-t*(.000042037+.0000001267*t);
+ const center=Math.sin(anomaly)*(1.914602-t*(.004817+.000014*t))+
+  Math.sin(2*anomaly)*(.019993-.000101*t)+Math.sin(3*anomaly)*.000289;
+ const omega=(125.04-1934.136*t)*rad;
+ const apparent=(mean+center-.00569-.00478*Math.sin(omega))*rad;
+ const eps=(23+(26+(21.448-t*(46.815+t*(.00059-t*.001813)))/60)/60+.00256*Math.cos(omega))*rad;
+ const dec=Math.asin(Math.sin(eps)*Math.sin(apparent)),y=Math.tan(eps/2)**2,l=mean*rad;
+ const correction=4/rad*(y*Math.sin(2*l)-2*ecc*Math.sin(anomaly)+4*ecc*y*Math.sin(anomaly)*Math.cos(2*l)
+  -.5*y*y*Math.sin(4*l)-1.25*ecc*ecc*Math.sin(2*anomaly));
+ const hour=(cycle(cycle(minutes,1440)+correction+lon*4,1440)/4-180)*rad, phi=lat*rad;
+ const sine=Math.sin(phi)*Math.sin(dec)+Math.cos(phi)*Math.cos(dec)*Math.cos(hour);
+ const altitude=Math.asin(Math.max(-1,Math.min(1,sine)))/rad;
+ const azimuth=cycle(Math.atan2(Math.sin(hour),Math.cos(hour)*Math.sin(phi)-Math.tan(dec)*Math.cos(phi))/rad+180,360);
+ return [altitude,azimuth];
+}
+
+function terrainScene(stop){
+ if(terrainCache?.id===stop.id)return terrainCache;
+ const bytes=readTerrainBytes(stop.id);
+ const stride=11,gridCells=stride**2;
+ const patch=Array.from({length:gridCells},(_,i)=>{
+  const unsigned=bytes.charCodeAt(i*2)+256*bytes.charCodeAt(i*2+1);
+  return (unsigned>=32768?unsigned-65536:unsigned)/10;
+ });
+ const horizon=readTerrainHorizon(bytes);
+ const sun=monthNames.map(month=>Array.from({length:24},(_,hour)=>{
+  const [altitude,azimuth]=sunPosition(month,hour,stop.lon,stop.lat);
+  const obstruction=terrainObstruction(horizon,azimuth);
+  return [altitude,azimuth,altitude>0&&altitude<=obstruction];
+ }));
+ terrainCache={id:stop.id,patch,stride,sun,meshes:[],overlap:0};
+ return terrainCache;
+}
+
+function drawTerrain(site,project,line){
+ const {patch,stride}=site;
+ const points=patch.map((z,i)=>project((i%stride-5)*30,(Math.floor(i/stride)-5)*30,z));
+ const faces=[];
+ const minimum=Math.min(...patch),span=Math.max(18,Math.max(...patch)-minimum);
+ for(let row=0;row<stride-1;row++){
+  for(let col=0;col<stride-1;col++){
+   const i=row*stride+col;
+   const corners=[i,i+1,i+stride+1,i+stride];
+   const vertices=corners.map(j=>points[j]);
+   const mean=corners.reduce((score,j)=>score+patch[j],0)/4;
+   const grade=(patch[i]-patch[i+stride+1])/span;
+   const light=81+10*(mean-minimum)/span+Math.max(-7,Math.min(7,grade*18));
+   const depth=vertices.reduce((mean,v)=>mean+v[2],0)/4;
+   faces.push([depth,vertices,'hsl(216 46% '+light+'%)']);
+  }
+ }
+ faces.sort((a,b)=>b[0]-a[0]);
+ for(const [,vertices,color] of faces)line(vertices,'#9db6df',.55,color);
+}
+monthNames.forEach((m,i)=>$('sceneMonth').add(new Option(m+'월',i)));
+for(let hour=0;hour<24;hour++)$('sceneHour').add(new Option(String(hour).padStart(2,'0')+':32',hour));
+const sunTimeline=$('sunTimeline'), playSun=$('playSun');
+const [playIcon,playLabel]=playSun.children;
+let playbackFrame=0, playbackKey='', finishedPlayback=false, resumePlayback=false;
+$('sceneHour').value=sceneTime;
+
+function setPlayback(playing){
+ if(!playing&&playbackFrame){cancelAnimationFrame(playbackFrame);playbackFrame=0;}
+ playIcon.textContent=playing?'Ⅱ':'▶';
+ playLabel.textContent=playing?'일시정지':finishedPlayback?'다시 재생':'재생';
+ for(const id of ['sunState','terrainCheck'])$(id).setAttribute('aria-live',playing?'off':'polite');
+}
+
+function daylightWindow(path){
+ const first=path.findIndex(point=>point[0]>0);
+ if(first<0)return null;
+ let last=first;
+ while(last<path.length-1&&path[last+1][0]>0)last++;
+ const horizonCrossing=(left,right)=>left-path[left][0]/(path[right][0]-path[left][0]);
+ return [first===0?first:horizonCrossing(first-1,first),
+         last===path.length-1?last:horizonCrossing(last,last+1)];
+}
+
+function changeSceneTime(time){
+ sceneTime=time;
+ $('sceneHour').value=Math.round(time);
+ drawScene();
+}
+
+playSun.addEventListener('click',()=>{
+ if(playbackFrame){setPlayback(false);return;}
+ const site=currentScene();
+ if(!site)return;
+ const bounds=daylightWindow(site.sun[state.month]);
+ if(!bounds)return;
+ const [start,end]=bounds;
+ const startingTime=!resumePlayback||finishedPlayback||sceneTime<start||sceneTime>=end?start:sceneTime;
+ finishedPlayback=false;
+ resumePlayback=true;
+ setPlayback(true);
+ changeSceneTime(startingTime);
+ const started=performance.now();
+ let lastDraw=started;
+ function animate(now){
+  const time=startingTime+(now-started)/1000;
+  if(time>=end){
+   finishedPlayback=true;
+   changeSceneTime(end);
+   setPlayback(false);
+   return;
+  }
+  if(now-lastDraw>=40){changeSceneTime(time);lastDraw=now;}
+  playbackFrame=requestAnimationFrame(animate);
+ }
+ playbackFrame=requestAnimationFrame(animate);
+});
+
+function sampleSceneSun(site,path){
+ const index=Math.floor(sceneTime),fraction=sceneTime-index;
+ const left=path[index];
+ if(!fraction)return left;
+ const right=path[index+1];
+ const altitude=left[0]+(right[0]-left[0])*fraction;
+ const azimuthDelta=(right[1]-left[1]+540)%360-180;
+ const azimuth=(left[1]+azimuthDelta*fraction+360)%360;
+ const angles=site.angles??(site.patch?terrainProfile(state.selection).angles:null);
+ const blocked=angles?altitude<=terrainObstruction(angles,azimuth):(fraction<.5?left[2]:right[2]);
+ return [altitude,azimuth,altitude>0&&blocked];
+}
+
+function renderSolarScene(){
+ const stop=lookup.get(state.selection);
+ for(const id of ['sceneStation','siteSceneControls','scenePlayback','sceneBody','horizonSummary','horizonChart','horizonExportScope'])$(id).hidden=!stop;
+ $('scenePending').hidden=Boolean(stop);
+ if(!stop){
+  playbackKey='';
+  finishedPlayback=false;
+  resumePlayback=false;
+  setPlayback(false);
+  $('sceneStation').textContent='';
+  return;
+ }
+ const model=currentScene();
+ const key=stop.id+':'+state.month;
+ if(playbackKey!==key){
+  playbackKey=key;
+  finishedPlayback=false;
+  resumePlayback=false;
+  setPlayback(false);
+ }
+ const label=(stop.ars?stop.ars+' · ':'')+stop.name;
+ $('sceneStation').textContent=label;
+ $('sceneMonth').value=state.month;
+ $('sceneType').textContent=model.registry?'브이월드 건물 3D':stop.detailed?'건물 포함 3D':model.partial?'일부 건물 3D':'지형 기반 3D';
+ $('sceneType').classList.toggle('detailed',stop.detailed);
+ $('sceneObstacle').textContent=stop.detailed||model.partial?'건물':'지형';
+ $('sceneNote').hidden=!model.registry&&stop.detailed&&!model.overlap;
+ $('sceneNote').textContent=model.registry
+  ?'브이월드 건물·지형 차폐'+(model.missing?' · 높이 미상 '+count(model.missing)+'동은 윤곽만 표시':'')+(model.overlap?' · 정류장 좌표와 겹치는 건물 '+model.overlap+'동 제외':'')
+  :model.partial?'확보한 건물만 3D와 시각별 차폐에 반영했습니다. 위쪽 발전량은 지형 기반입니다.':stop.detailed?'정류장 좌표와 겹치는 건물은 기존 음영 모델에서 제외됐습니다.':'지형만 반영한 직달광 추정입니다. 주변 건물·수목·승강장에 의한 차폐는 포함되지 않습니다.';
+ drawScene();
+}
+$('sceneMonth').addEventListener('change',()=>{state.month=Number($('sceneMonth').value);drawProfile();});
+function selectSceneTime(time){
+ finishedPlayback=false;
+ resumePlayback=true;
+ setPlayback(false);
+ changeSceneTime(time);
+}
+$('sceneHour').addEventListener('change',()=>selectSceneTime(Number($('sceneHour').value)));
+sunTimeline.addEventListener('input',()=>selectSceneTime(Number(sunTimeline.value)/3600));
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&playbackFrame)setPlayback(false);});
+orbit.addEventListener('input',drawScene);
+$('resetOrbit').addEventListener('click',()=>{
+ state.month=0;
+ finishedPlayback=false;
+ resumePlayback=false;
+ setPlayback(false);
+ sceneTime=12;
+ $('sceneHour').value=sceneTime;
+ orbit.value=-28;
+ drawProfile();
+});
+$('detailToggle').addEventListener('click',()=>{
+ const model=$('model');
+ const cancel=model.value==='detail';
+ model.value=cancel?'all':'detail';
+ applyModelFilter();
+ if(!cancel&&!results.length)chooseDistrict(null);
+ if(!cancel)$('q').focus();
+});
+$('findStop').addEventListener('click',()=>{
+ requestAnimationFrame(()=>$('q').focus());
+});
+let angleStart=null;
+canvas.addEventListener('pointerdown',e=>{
+ if(e.button!==0)return;
+ angleStart=[e.clientX,Number(orbit.value)];canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener('pointermove',e=>{
+ if(!angleStart)return;
+ orbit.value=((angleStart[1]+(e.clientX-angleStart[0])*.8+540)%360)-180;
+ drawScene();
+});
+canvas.addEventListener('lostpointercapture',()=>{angleStart=null;});
+new ResizeObserver(drawScene).observe(canvas);
+
+function drawScene(){
+ const site=currentScene(),w=canvas.clientWidth,h=canvas.clientHeight,dpr=Math.min(devicePixelRatio||1,2);
+ if(!site||!w||!h)return;
+ canvas.width=w*dpr;canvas.height=h*dpr;
+ const c=canvas.getContext('2d');c.scale(dpr,dpr);
+ const path=site.sun[state.month],sun=sampleSceneSun(site,path);
+ const offset=Math.round(sceneTime*3600);
+ const seconds=offset+1950;
+ const time=[Math.floor(seconds/3600),Math.floor(seconds/60)%60,seconds%60]
+  .map(part=>String(part).padStart(2,'0')).join(':');
+ sunTimeline.value=offset;
+ sunTimeline.setAttribute('aria-valuetext',time+' KST');
+ $('playbackTime').textContent=time+' KST';
+ const description=sun[0]<=0?'지평선 아래':sun[2]?'직달광 차폐':'직달광 통과';
+ $('solarDate').textContent=monthNames[state.month]+'월 15일 '+time+' KST';
+ $('sunState').textContent=site.patch&&!site.registry&&sun[0]>0?(sun[2]?'지형에 가림':'지형 차폐 없음'):description;
+ $('sunState').classList.toggle('blocked',sun[0]>0 && sun[2]);
+ $('sunAltitude').textContent='태양 고도 '+decimal(sun[0])+'° · 방위각 '+decimal(sun[1])+'°';
+ drawHorizonProfile(sun,site.angles,path);
+ const a=Number(orbit.value)*rad,ca=Math.cos(a),sa=Math.sin(a);
+ const bounds=[Infinity,Infinity,-Infinity,-Infinity];
+ function coordinates(x,y,z){
+  const depth=x*sa+y*ca;
+  return [x*ca-y*sa,-(depth*.48+z*.877),depth*.877-z*.48];
+ }
+ function fitPoint(x,y,z){
+  const [u,v]=coordinates(x,y,z);
+  bounds[0]=Math.min(bounds[0],u);bounds[1]=Math.min(bounds[1],v);
+  bounds[2]=Math.max(bounds[2],u);bounds[3]=Math.max(bounds[3],v);
+ }
+ for(const x of [-150,150])for(const y of [-150,150])fitPoint(x,y,0);
+ if(site.patch)site.patch.forEach((z,i)=>fitPoint((i%site.stride-5)*30,(Math.floor(i/site.stride)-5)*30,z));
+ for(const [ring,base,height] of site.meshes)for(const [x,y] of ring){fitPoint(x,y,base);fitPoint(x,y,base+height);}
+ for(const [a,b] of path)if(a>0)fitPoint(142*Math.cos(a*rad)*Math.sin(b*rad),142*Math.cos(a*rad)*Math.cos(b*rad),3+142*Math.sin(a*rad));
+ const scale=Math.min((w-38)/(bounds[2]-bounds[0]),(h-40)/(bounds[3]-bounds[1]));
+ const cx=(bounds[0]+bounds[2])/2,cy=(bounds[1]+bounds[3])/2;
+ function project(x,y,z){
+  const [u,v,d]=coordinates(x,y,z);
+  return [w/2+(u-cx)*scale,h/2+(v-cy)*scale,d];
+ }
+ function line(points,color,width=1,fill){
+  if(!points.length)return;
+  c.beginPath();points.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));
+  if(fill){c.closePath();c.fillStyle=fill;c.fill();}
+  c.lineWidth=width;c.strokeStyle=color;c.stroke();
+ }
+ function dot([x,y],radius,color){c.beginPath();c.arc(x,y,radius,0,Math.PI*2);c.fillStyle=color;c.fill();}
+ if(site.patch)drawTerrain(site,project,line);
+ else {
+ line([project(-150,-150,0),project(-150,150,0),project(150,150,0),project(150,-150,0)],'#b9cbed',1,'#e6efff');
+ for(let d=-150;d<=150;d+=25){
+  line([project(d,-150,0),project(d,150,0)],'#ccd9f3');
+  line([project(-150,d,0),project(150,d,0)],'#ccd9f3');
+ }
+ }
+ const faces=[];
+ for(const [ring,base,height,method] of site.meshes){
+  if(ring.length<3)continue;
+  if(method==='unknown'){line(ring.map(([x,y])=>project(x,y,base)),'#7794bf',1,'#e8edf6');continue;}
+  const top=ring.map(([x,y])=>project(x,y,base+height)),bottom=ring.map(([x,y])=>project(x,y,base));
+  const colors=method==='height'?['#5573a1','#afc5e7']:method==='floors'?['#7796c3','#bbceed']:['#93a9cd','#d1def0'];
+  const face=(pts,color)=>faces.push([pts.reduce((total,p)=>total+p[2],0)/pts.length,pts,color]);
+  for(let i=0;i<ring.length;i++){const j=(i+1)%ring.length;face([bottom[i],bottom[j],top[j],top[i]],colors[0]);}
+  face(top,colors[1]);
+ }
+ faces.sort((x,y)=>y[0]-x[0]);
+ for(const [,pts,color] of faces)line(pts,'#607da9',.35,color);
+ const sky=([alt,az])=>project(142*Math.cos(alt*rad)*Math.sin(az*rad),142*Math.cos(alt*rad)*Math.cos(az*rad),3+142*Math.sin(alt*rad));
+ line(path.filter(p=>p[0]>0).map(sky),'#b5781f',2);
+ const center=project(0,0,3);
+ if(sun[0]>0){
+  const target=sky(sun);c.setLineDash([5,4]);line([center,target],sun[2]?'#ab4d38':'#b7811d',2);c.setLineDash([]);
+  dot(target,8,'#fff9df');dot(target,5,'#d9931c');
+ }
+ dot(center,7,'#fdfdf9');dot(center,4,'#285fdb');
+ const [nx,ny]=project(0,150,site.patch?site.patch[115]:0);
+ c.fillStyle='#284d87';c.font='bold 12px system-ui';c.fillText('N',nx+4,ny+4);
+}
+
+const horizonCanvas=$('horizonChart');
+function drawHorizonProfile(sun,merged,path){
+ const id=state.selection,{angles,peak,bearing}=terrainProfile(id);
+ const obstruction=terrainObstruction(angles,sun[1]);
+ const visibility=sun[0]<=0?'해가 지평선 아래에 있음':sun[0]<=obstruction?'지형에 가림':'지형 차폐 없음';
+ $('terrainCheck').textContent='현재 방향의 지형 차폐 고도 '+decimal(obstruction)+'° · '+visibility;
+ $('horizonSummary').textContent='최대 '+decimal(peak)+'°'+(peak?' · 방위각 '+bearing+'°':'')+' · 2° 간격';
+ const filterCount=results.length;
+ $('horizonExportScope').textContent='북쪽 0°부터 시계 방향 · 진한 선은 건물 포함 차폐(해당 정류장) · 주황색 점은 현재 태양 고도, 점선은 방향 · CSV 내보내기 '+filterCount.toLocaleString()+'곳';
+ horizonCanvas.setAttribute('aria-label','지형 차폐 고도 그래프. '+$('horizonSummary').textContent+'. '+$('terrainCheck').textContent);
+ const w=horizonCanvas.clientWidth,h=horizonCanvas.clientHeight,dpr=Math.min(devicePixelRatio||1,2);
+ if(!w||!h)return;
+ horizonCanvas.width=w*dpr;horizonCanvas.height=h*dpr;
+ const c=horizonCanvas.getContext('2d');c.scale(dpr,dpr);
+ const left=34,right=w-28,top=10,bottom=h-23;
+ const mergedPeak=merged?Math.max(...merged):peak;
+ if(merged)$('horizonSummary').textContent+=' · 건물 포함 최대 '+decimal(mergedPeak)+'°';
+ const topAngle=Math.max(15,Math.ceil(Math.max(mergedPeak,...path.map(point=>point[0]))/15)*15);
+ const x=deg=>left+(right-left)*deg/360,y=deg=>bottom-(bottom-top)*deg/topAngle;
+ c.font='11px system-ui';
+ for(const value of [0,topAngle/3,2*topAngle/3,topAngle]){
+  const py=y(value);c.strokeStyle='#dce5f4';c.beginPath();c.moveTo(left,py);c.lineTo(right,py);c.stroke();
+  c.fillStyle='#566882';c.textAlign='right';c.fillText(value+'°',left-5,py+4);
+ }
+ for(const [value,label] of [[0,'북 0°'],[90,'동 90°'],[180,'남 180°'],[270,'서 270°'],[360,'북 360°']]){
+  c.textAlign=value===0?'left':value===360?'right':'center';
+  c.fillText(label,x(value),h-6);
+ }
+ function trace(){
+  c.moveTo(x(0),y(angles[0]));
+  for(let i=1;i<=horizonSamples;i++)c.lineTo(x(i*2),y(angles[i%horizonSamples]));
+ }
+ c.beginPath();trace();c.lineTo(right,bottom);c.lineTo(left,bottom);c.closePath();c.fillStyle='#dce8ff';c.fill();
+ c.beginPath();trace();c.strokeStyle='#285fdb';c.lineWidth=1.5;c.stroke();
+ if(merged){
+  c.beginPath();c.moveTo(left,y(merged[0]));
+  for(let i=1;i<=horizonSamples;i++)c.lineTo(x(i*2),y(merged[i%horizonSamples]));
+  c.strokeStyle='#10234b';c.lineWidth=1.5;c.stroke();
+ }
+ const sx=x(sun[1]);c.setLineDash([4,3]);c.strokeStyle='#ac6307';
+ c.beginPath();c.moveTo(sx,top);c.lineTo(sx,bottom);c.stroke();c.setLineDash([]);
+ if(sun[0]>0){
+  c.beginPath();c.arc(sx,y(sun[0]),5,0,2*Math.PI);
+  c.fillStyle='#ac6307';c.fill();c.strokeStyle='#fff';c.lineWidth=1.5;c.stroke();
+ }
+}
+new ResizeObserver(()=>drawScene()).observe(horizonCanvas);
+
+$('exportHorizon').addEventListener('click',()=>{
+ const header=['정류장번호(ARS)','내부ID','정류장명','구군','위도','경도',
+  ...Array.from({length:horizonSamples},(_,i)=>i*2+'° 차폐 고도(°)')];
+ const csvText=value=>'"'+String(value).replace(/"/g,'""')+'"';
+ const rows=results.map(s=>[s.ars,s.id,s.name,names(s.district),s.lat,s.lon].map(csvText).join(',')+','
+  +readTerrainHorizon(readTerrainBytes(s.id)).map(angle=>angle.toFixed(1)).join(','));
+ const href=URL.createObjectURL(new Blob(['\ufeff',header.map(csvText).join(','),'\r\n',rows.join('\r\n')],{type:'text/csv;charset=utf-8'}));
+ const file=document.createElement('a');file.href=href;file.download='ECOBIT_Terrain_Horizon.csv';
+ file.click();setTimeout(()=>URL.revokeObjectURL(href),1000);
+});
+
+const sections=['overview','explore','insight','shadowScene','method'];
+function syncNavigation(){
+ const key=location.hash.slice(1), active=sections.includes(key)?key:'overview';
+ for(const link of document.querySelectorAll('.rail nav a')){
+  if(link.hash==='#'+active)link.setAttribute('aria-current','location');
+  else link.removeAttribute('aria-current');
+ }
+}
+addEventListener('hashchange',syncNavigation);
+syncNavigation();
+refresh();
+loadVworld().then(refresh).catch(error=>{$('sceneNote').hidden=false;$('sceneNote').textContent='건물 데이터를 불러오지 못했습니다.';console.error(error);});
+</script>
+</body></html>
+
