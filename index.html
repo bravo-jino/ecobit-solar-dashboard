@@ -131,6 +131,19 @@ body{padding-left:164px}
 .battery-chart{display:block;width:100%;max-height:260px;border-radius:8px;background:#f8faff;font-size:12px}
 .battery-chart text{fill:#566882}
 .battery-method{margin-top:9px}
+.tree-scenario{min-width:0;margin:14px 0 0;padding:9px 12px 12px;border:1px solid var(--line);border-radius:8px;background:#f5f8ff}
+.tree-scenario legend{padding:0 5px;font-size:14px;font-weight:700;color:#173b83}
+.tree-roadview{margin-top:5px}
+.tree-roadview a{color:#285fdb;font-weight:700}
+.tree-fields{display:flex;flex-wrap:wrap;gap:7px 18px;margin-top:8px}
+.tree-fields label{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#284878}
+.tree-fields span{white-space:nowrap}
+.tree-fields input{width:66px}
+.tree-fields input:invalid{border-color:#a54531}
+.tree-comparison table{width:100%;margin-top:9px;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
+.tree-comparison th,.tree-comparison td{padding:7px 5px;border-bottom:1px solid var(--line);text-align:right}
+.tree-comparison th:first-child{text-align:left}
+.tree-comparison td:last-child{color:#173b83;font-weight:700}
 @media(max-width:600px){
  #battery{scroll-margin-top:52px}
  .battery-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -195,6 +208,25 @@ body{padding-left:164px}
  <p class="sub" id="consumptionHelp">정류장별 음영과 함께 현재 패널 출력·시스템 발전 효율 설정을 반영합니다.</p>
  <p class="empty-note" id="batteryPending">정류장을 선택하면 배터리 잔량과 전력 부족 여부를 확인할 수 있습니다.</p>
  <div id="batteryResults" hidden>
+  <fieldset class="tree-scenario">
+   <legend>가로수 음영 시나리오</legend>
+   <p class="sub" id="treeShadeHelp">실측값이 없으면 가정치를 입력하세요. 건물·지형 음영 반영 후의 발전량에서 추가로 줄어드는 비율입니다.</p>
+   <p class="sub tree-roadview"><a id="treeRoadview" target="_blank" rel="noopener noreferrer">정류장 주변 로드뷰 열기 ↗</a> · 촬영 날짜와 도로·보도 위치 차이를 확인하세요.</p>
+   <div class="tree-fields">
+    <label for="treeShadeLeafOn">5~10월 추가 손실 <span><input class="sort" id="treeShadeLeafOn" type="number" min="0" max="100" step="0.1" value="0" required aria-describedby="treeShadeHelp"> %</span></label>
+    <label for="treeShadeLeafOff">11~4월 추가 손실 <span><input class="sort" id="treeShadeLeafOff" type="number" min="0" max="100" step="0.1" value="0" required aria-describedby="treeShadeHelp"> %</span></label>
+   </div>
+  </fieldset>
+  <div class="tree-comparison" id="treeShadeComparison" hidden>
+   <table aria-label="가로수 손실 시나리오 적용 전후">
+    <thead><tr><th scope="col">비교 항목</th><th scope="col">기존 모델</th><th scope="col">가로수 손실 적용</th></tr></thead>
+    <tbody>
+     <tr><th scope="row">연간 발전량</th><td id="treeBaseAnnual"></td><td id="treeScenarioAnnual"></td></tr>
+     <tr><th scope="row">2년간 최저 잔량</th><td id="treeBaseMinimum"></td><td id="treeScenarioMinimum"></td></tr>
+     <tr><th scope="row">2년간 공급 부족 일수</th><td id="treeBaseShortage"></td><td id="treeScenarioShortage"></td></tr>
+    </tbody>
+   </table>
+  </div>
   <div class="battery-outcome" id="batteryOutcome" role="status" aria-live="polite"><strong id="batteryStatus"></strong><p id="batteryDetail"></p></div>
   <dl class="battery-metrics">
    <div><dt>1년 차 최저 잔량</dt><dd id="batteryMin"></dd></div>
@@ -207,7 +239,7 @@ body{padding-left:164px}
   </div>
   <svg id="batteryChart" class="battery-chart" viewBox="0 0 640 185" role="img" aria-label="1년 차와 2년 차의 일별 배터리 잔량"></svg>
  </div>
- <p class="sub battery-method">972.8 Wh 완충 상태에서 시작합니다. 12월부터 11월까지 월 합계 발전량을 해당 월의 일수로 나눠 매일 동일하게 적용하고, 같은 발전 패턴을 2년 차에 반복합니다. 실제 연속 흐림·시간대별 충방전·배터리 노화와 방전 제한은 반영하지 않은 예비 추정입니다.</p>
+ <p class="sub battery-method">972.8 Wh 완충 상태에서 시작합니다. 12월부터 11월까지 월 합계 발전량을 해당 월의 일수로 나눠 매일 동일하게 적용하고, 같은 발전 패턴을 2년 차에 반복합니다. 가로수 손실률을 입력하면 배터리 지표와 잔량 그래프는 적용 후 결과를 표시합니다. 실제 연속 흐림·시간대별 충방전·배터리 노화와 방전 제한은 반영하지 않은 예비 추정입니다.</p>
 </section>
 <section class="card solar-section" id="shadowScene" aria-labelledby="solarTitle">
   <header class="pad barline solar-header">
@@ -587,17 +619,46 @@ function drawBatteryChart(first,second){
  chart.replaceChildren(...children);
 }
 
+const treeShadeByStop=new Map();
+const noTreeShade=[0,0];
+const treeShadeInputs=[$('treeShadeLeafOn'),$('treeShadeLeafOff')];
+
+function batteryScenario(monthlyWh,dailyWh){
+ const first=simulateBatteryYear(monthlyWh,dailyWh,batteryCapacity);
+ const second=simulateBatteryYear(monthlyWh,dailyWh,first.charge);
+ return {first,second,shortages:first.shortageDays+second.shortageDays,
+  minimum:Math.min(first.minimum,second.minimum),annualWh:monthlyWh.reduce((total,energy)=>total+energy,0)};
+}
+
 function drawBattery(stop){
  $('batteryPending').hidden=Boolean(stop);
  $('batteryResults').hidden=!stop;
  $('batteryStation').hidden=!stop;
  if(!stop)return;
  const scale=generationScale(),dailyWh=state.dailyConsumption;
+ const rates=treeShadeByStop.get(stop.id)??noTreeShade;
+ treeShadeInputs.forEach((input,index)=>{
+  if(document.activeElement!==input)input.value=rates[index];
+ });
+ const hasTreeShade=rates.some(rate=>rate>0);
  const monthlyWh=stop.months.map(kWh=>kWh*scale*1000);
- const first=simulateBatteryYear(monthlyWh,dailyWh,batteryCapacity);
- const second=simulateBatteryYear(monthlyWh,dailyWh,first.charge);
- const shortages=first.shortageDays+second.shortageDays;
- const annualBalance=monthlyWh.reduce((total,energy)=>total+energy,0)-dailyWh*(first.trace.length-1);
+ const baseline=batteryScenario(monthlyWh,dailyWh);
+ const adjusted=hasTreeShade?batteryScenario(monthlyWh.map((wh,index)=>{
+  const month=monthNames[index];
+  const rate=rates[month>=5&&month<=10?0:1];
+  return wh*(1-rate/100);
+ }),dailyWh):baseline;
+ const {first,second,shortages,minimum,annualWh}=adjusted;
+ $('treeShadeComparison').hidden=!hasTreeShade;
+ if(hasTreeShade){
+  $('treeBaseAnnual').textContent=decimal(baseline.annualWh/1000,2)+' kWh';
+  $('treeScenarioAnnual').textContent=decimal(annualWh/1000,2)+' kWh';
+  $('treeBaseMinimum').textContent=decimal(baseline.minimum)+' Wh';
+  $('treeScenarioMinimum').textContent=decimal(minimum)+' Wh';
+  $('treeBaseShortage').textContent=count(baseline.shortages)+'일';
+  $('treeScenarioShortage').textContent=count(shortages)+'일';
+ }
+ const annualBalance=annualWh-dailyWh*(first.trace.length-1);
  const tolerance=1e-7;
  let level='normal',status='반복 운용 가능 추정',detail='같은 발전과 소비가 반복되는 조건에서 전력 부족이 발생하지 않습니다.';
  if(shortages){
@@ -608,11 +669,12 @@ function drawBattery(stop){
   level='low';
   status='장기 운용 시 배터리 소진 예상';
   detail='2년간 부족은 없지만, 1년 총 발전량이 총 소비량보다 적어 동일 조건이 지속되면 잔량이 고갈됩니다.';
- }else if(Math.min(first.minimum,second.minimum)<=tolerance){
+ }else if(minimum<=tolerance){
   level='low';
   status='전력 부족 없음 · 배터리 여유 없음';
   detail='일 단위 계산에서 소비량은 충당했지만, 배터리 잔량이 0 Wh에 도달했습니다.';
  }
+ $('treeRoadview').href='https://map.kakao.com/link/roadview/'+stop.lat+','+stop.lon;
  $('batteryStation').textContent=(stop.ars?stop.ars+' · ':'')+stop.name+' · '+state.power*60+' W · 효율 '+state.efficiency+'%';
  $('batteryOutcome').dataset.level=level;
  $('batteryStatus').textContent=status;
@@ -624,6 +686,20 @@ function drawBattery(stop){
  $('batteryChart').setAttribute('aria-label','일별 배터리 잔량. 1년 차 최저 '+decimal(first.minimum)+' Wh, 2년 차 최저 '+decimal(second.minimum)+' Wh. '+status);
  drawBatteryChart(first,second);
 }
+
+treeShadeInputs.forEach((input,index)=>{
+ input.addEventListener('input',()=>{
+  const stop=lookup.get(state.selection);
+  if(!stop||!input.validity.valid)return;
+  const rates=[...(treeShadeByStop.get(stop.id)??noTreeShade)];
+  rates[index]=input.valueAsNumber;
+  treeShadeByStop.set(stop.id,rates);
+  drawBattery(stop);
+ });
+ input.addEventListener('blur',()=>{
+  if(!input.validity.valid)input.value=(treeShadeByStop.get(state.selection)??noTreeShade)[index];
+ });
+});
 
 const consumptionInput=$('dailyConsumption');
 consumptionInput.addEventListener('input',()=>{
