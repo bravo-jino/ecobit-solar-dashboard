@@ -110,6 +110,33 @@ body{padding-left:164px}
 .efficiency-value{white-space:nowrap}
 .efficiency-value input{width:76px}
 .efficiency-value input:invalid{border-color:#a54531}
+#battery{scroll-margin-top:16px}
+.battery-heading{align-items:center;gap:8px 14px;flex-wrap:wrap}
+.battery-consumption{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#284878}
+.battery-consumption span{white-space:nowrap}
+.battery-consumption input{width:90px}
+.battery-consumption input:invalid{border-color:#a54531}
+#consumptionHelp{margin-top:5px}
+.battery-outcome{margin-top:12px;padding:10px 12px;border-radius:8px;background:#eaf2ff;color:#173b83}
+.battery-outcome p{margin:3px 0 0;font-size:12px}
+.battery-outcome[data-level="low"]{background:#fff3e4;color:#784319}
+.battery-outcome[data-level="shortage"]{background:#ffefea;color:#8d3327}
+.battery-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:10px 0 14px}
+.battery-metrics div{padding:9px 11px;border:1px solid var(--line);border-radius:8px;min-width:0}
+.battery-metrics dt{font-size:12px;color:var(--muted)}
+.battery-metrics dd{margin:4px 0 0;color:#173b83;font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+.battery-graph-heading{margin-bottom:5px}
+.battery-key{display:inline-block;width:15px;vertical-align:middle;margin-right:4px;border-top:2px solid #285fdb}
+.battery-key.next{border-top:2px dashed #08796f}
+.battery-chart{display:block;width:100%;max-height:260px;border-radius:8px;background:#f8faff;font-size:12px}
+.battery-chart text{fill:#566882}
+.battery-method{margin-top:9px}
+@media(max-width:600px){
+ #battery{scroll-margin-top:52px}
+ .battery-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .battery-chart{font-size:18px}
+ .battery-chart .extra-month{display:none}
+}
 </style>
 </head>
 <body>
@@ -120,6 +147,7 @@ body{padding-left:164px}
   <a href="#overview"><span aria-hidden="true">⊞</span>개요</a>
   <a href="#explore"><span aria-hidden="true">⌖</span>정류장 지도</a>
   <a href="#insight"><span aria-hidden="true">▥</span>발전량</a>
+  <a href="#battery"><span aria-hidden="true">▰</span>배터리</a>
   <a href="#shadowScene"><span aria-hidden="true">☀</span>3D 음영</a>
   <a href="#method"><span aria-hidden="true">ⓘ</span>자료 출처</a>
  </nav>
@@ -148,7 +176,7 @@ body{padding-left:164px}
  <div><div class="row"><h2 id="stopTitle" class="detail-title"></h2><span class="badge" id="mode"></span></div>
  <div id="stopMeta" class="idline"></div><p class="sub" id="stopCoords"></p><p class="sub" id="source"></p>
  <div class="metrics"><div><span>연간 발전량</span><b id="annual"></b></div><div><span>겨울 일평균</span><b id="winter"></b></div><div><span>연간 음영 손실</span><b id="loss"></b></div></div>
- <p class="note" id="siteNote"></p><div class="links"><a id="externalMap" target="_blank" rel="noopener">지도에서 위치 확인 ↗</a><a href="#shadowScene" id="sceneLink">3D 음영·태양 경로 ↓</a></div>
+ <p class="note" id="siteNote"></p><div class="links"><a id="externalMap" target="_blank" rel="noopener">지도에서 위치 확인 ↗</a><a href="#battery">배터리 시뮬레이션 ↓</a><a href="#shadowScene" id="sceneLink">3D 음영·태양 경로 ↓</a></div>
  </div>
  <div class="chart"><div class="row"><h3>월별 발전량 <small>(kWh)</small></h3><div class="legend"><span><i class="dot"></i>음영 반영</span><span><i class="dot" style="background:#d9e6fc"></i>무음영</span></div></div>
   <div class="generation-settings" role="group" aria-label="발전량 계산 설정">
@@ -159,6 +187,28 @@ body{padding-left:164px}
  <p class="sub chart-units">막대는 월 합계(kWh), 월 아래 숫자는 음영 반영 일평균(Wh/일)입니다.</p>
   <div class="bars" id="chart"></div><p class="chart-info" id="monthDetail"></p></div>
 </div></section>
+<section class="card pad insight battery-section" id="battery" aria-labelledby="batteryTitle">
+ <div class="row battery-heading">
+  <div><h2 id="batteryTitle">배터리 운영 시뮬레이션</h2><p class="sub" id="batteryStation" hidden></p></div>
+  <label class="battery-consumption" for="dailyConsumption">일일 소비량 <span><input class="sort" type="number" id="dailyConsumption" min="0" max="1000000" step="0.1" value="28" required aria-describedby="consumptionHelp"> Wh/일</span></label>
+ </div>
+ <p class="sub" id="consumptionHelp">정류장별 음영과 함께 현재 패널 출력·시스템 발전 효율 설정을 반영합니다.</p>
+ <p class="empty-note" id="batteryPending">정류장을 선택하면 배터리 잔량과 전력 부족 여부를 확인할 수 있습니다.</p>
+ <div id="batteryResults" hidden>
+  <div class="battery-outcome" id="batteryOutcome" role="status" aria-live="polite"><strong id="batteryStatus"></strong><p id="batteryDetail"></p></div>
+  <dl class="battery-metrics">
+   <div><dt>1년 차 최저 잔량</dt><dd id="batteryMin"></dd></div>
+   <div><dt>1년 차 말 잔량</dt><dd id="batteryEnd"></dd></div>
+   <div><dt>2년간 공급 부족 일수</dt><dd id="batteryShortage"></dd></div>
+   <div><dt>완충 후 발전 없이 운용</dt><dd id="batteryAutonomy"></dd></div>
+  </dl>
+  <div class="row battery-graph-heading"><h3>일별 배터리 잔량 <small>(Wh)</small></h3>
+   <div class="legend battery-legend"><span><i class="battery-key"></i>1년 차</span><span><i class="battery-key next"></i>2년 차</span></div>
+  </div>
+  <svg id="batteryChart" class="battery-chart" viewBox="0 0 640 185" role="img" aria-label="1년 차와 2년 차의 일별 배터리 잔량"></svg>
+ </div>
+ <p class="sub battery-method">972.8 Wh 완충 상태에서 시작합니다. 12월부터 11월까지 월 합계 발전량을 해당 월의 일수로 나눠 매일 동일하게 적용하고, 같은 발전 패턴을 2년 차에 반복합니다. 실제 연속 흐림·시간대별 충방전·배터리 노화와 방전 제한은 반영하지 않은 예비 추정입니다.</p>
+</section>
 <section class="card solar-section" id="shadowScene" aria-labelledby="solarTitle">
   <header class="pad barline solar-header">
     <div><h2 id="solarTitle">3D 음영·태양 경로</h2><p class="sub" id="sceneStation" hidden></p></div>
@@ -209,7 +259,7 @@ body{padding-left:164px}
 <li>정류장은 기존 전수 목록의 부산 ID를 기준으로 집계했습니다. 원천 자료는 <a href="https://www.data.go.kr/data/15067528/fileData.do">국토교통부 전국 버스정류장 위치정보</a>입니다. 목록에 공개 번호가 있는 경우 원본 5자리 문자열 그대로 표시합니다. CSV를 엑셀에서 불러올 때 정류장번호 열을 텍스트 형식으로 지정하면 선행 0이 유지됩니다. 타 지자체 ID 3건은 집계에서 제외했습니다.</li>
 <li>구·군은 통계청 SGIS <a href="https://github.com/statgarten/maps">2020년 시군구 지도</a>를 지리좌표에 맞춰 근사했습니다. 경계에서 120 m 이내의 바깥 좌표는 가까운 구·군에 배치했습니다. 부산 경계 밖으로 분류된 부산 버스 목록 항목은 ‘시 경계 밖’에서 검색할 수 있습니다.</li>
 <li>지형 추정은 Copernicus DEM GLO-30과 가까운 기준 정류장 30곳의 PVGIS ERA5 일사량·태양 위치를 사용한 1차 추정입니다. 정류장별 DSM 차폐는 약 90 m~15 km 범위에서 계산했습니다. 가까운 건물·가로수·승강장에 의한 음영은 상세 확인이 필요합니다.</li>
-<li>국토교통부 <a href="https://www.data.go.kr/data/15083092/fileData.do">GIS건물통합정보</a> 부산 원본(2026.11.09, 공공누리 제1유형)을 적용한 3D는 9,268개 정류장에서 볼 수 있습니다. 높이값을 사용할 수 있는 정류장 9,264곳의 발전량을 다시 계산했습니다. 건축물대장 높이 우선, 층수×3.2m 보완, 모두 미상인 건물은 윤곽만 표시합니다. 건물 바닥 고도는 DSM 주변 표고로 추정합니다. 건물의 지붕 세부 형상과 안뜰은 단순화했습니다. 계산 반경 400m, 건물 표시 약 250m, 방향 간격 2°입니다. 브이월드 부산 자료 밖 건물, 근거리 수목과 승강장은 모델 범위에 포함되지 않습니다. 일부 건물 3D는 자료가 확보된 건물의 차폐를 보여주고, 연간·월간 발전량에는 지형 모델을 사용합니다. 지형 기반 3D는 정류장 주변 약 300m의 지형과 2° 간격의 지형 차폐를 사용합니다. 모든 모델에서 수목·승강장에 의한 근거리 음영은 반영하지 않습니다. 태양 경로는 선택한 월의 15일, 매시 32분 30초(KST)를 기준으로 표시합니다. 모든 발전량은 2021.12~2022.11의 과거 기상 조건, 정남향·경사 30°·높이 3 m·시스템 발전 효율 75%를 기본으로 가정했습니다. 사용자가 입력한 효율은 기본값 대비 비율로 발전량에 적용합니다. 겨울은 12~2월 90일 기준입니다. 28 Wh/일은 제품 소비량 비교 조건입니다.</li>
+<li>국토교통부 <a href="https://www.data.go.kr/data/15083092/fileData.do">GIS건물통합정보</a> 부산 원본(2026.11.09, 공공누리 제1유형)을 적용한 3D는 9,268개 정류장에서 볼 수 있습니다. 높이값을 사용할 수 있는 정류장 9,264곳의 발전량을 다시 계산했습니다. 건축물대장 높이 우선, 층수×3.2m 보완, 모두 미상인 건물은 윤곽만 표시합니다. 건물 바닥 고도는 DSM 주변 표고로 추정합니다. 건물의 지붕 세부 형상과 안뜰은 단순화했습니다. 계산 반경 400m, 건물 표시 약 250m, 방향 간격 2°입니다. 브이월드 부산 자료 밖 건물, 근거리 수목과 승강장은 모델 범위에 포함되지 않습니다. 일부 건물 3D는 자료가 확보된 건물의 차폐를 보여주고, 연간·월간 발전량에는 지형 모델을 사용합니다. 지형 기반 3D는 정류장 주변 약 300m의 지형과 2° 간격의 지형 차폐를 사용합니다. 모든 모델에서 수목·승강장에 의한 근거리 음영은 반영하지 않습니다. 태양 경로는 선택한 월의 15일, 매시 32분 30초(KST)를 기준으로 표시합니다. 모든 발전량은 2021.12~2022.11의 과거 기상 조건, 정남향·경사 30°·높이 3 m·시스템 발전 효율 75%를 기본으로 가정했습니다. 사용자가 입력한 효율은 기본값 대비 비율로 발전량에 적용합니다. 겨울은 12~2월 90일 기준입니다. 일일 소비량의 기본값은 28 Wh/일입니다.</li>
 </ul></details></footer>
 </main>
 <script type="application/json" id="payload"></script>
@@ -228,7 +278,9 @@ const districts=data.districts;
 const districtsTotal=districts.map((_,i)=>stops.filter(s=>s.district===i).length);
 const outside=stops.filter(s=>s.district<0).length, lookup=new Map(stops.map(s=>[s.id,s]));
 const baselineEfficiency=75;
-const state={district:null,selection:null,power:1,efficiency:baselineEfficiency,month:0,page:0,view:null};
+const batteryCapacity=972.8, defaultDailyConsumption=28;
+const state={district:null,selection:null,power:1,efficiency:baselineEfficiency,
+ dailyConsumption:defaultDailyConsumption,month:0,page:0,view:null};
 const generationScale=()=>state.power*state.efficiency/baselineEfficiency;
 const locale=new Intl.NumberFormat('ko-KR'), count=n=>locale.format(n);
 const decimal=(n,d=1)=>n.toLocaleString('ko-KR',{minimumFractionDigits:d,maximumFractionDigits:d});
@@ -458,6 +510,7 @@ const barButtons=monthNames.map((m,i)=>{
 function drawProfile(){
  renderSolarScene();
  const s=lookup.get(state.selection);
+ drawBattery(s);
  jumpDetail.hidden=!s;
  boundaryHint.hidden=Boolean(s);
  $('pending').hidden=Boolean(s);$('profile').hidden=!s;
@@ -473,7 +526,8 @@ function drawProfile(){
  const refDistance=ref?Math.round(Math.hypot((s.lon-ref.lon)*91000,(s.lat-ref.lat)*111000)):0;
  $('source').textContent='일사량 기준 '+(ref?ref.name+(refDistance?' · 약 '+count(refDistance)+' m':''):'PVGIS ERA5');
  putUnit('annual',decimal(s.annual*scale),'kWh');putUnit('winter',decimal(s.winter*scale),'Wh/일');putUnit('loss',decimal(s.loss),'%');
- const balance=(s.winter*scale)>=28?'겨울 평균이 28 Wh/일 기준 이상입니다.':'겨울 평균이 28 Wh/일 기준 미만입니다.';
+ const enoughWinter=s.winter*scale>=state.dailyConsumption;
+ const balance='겨울 평균이 일일 소비량 '+state.dailyConsumption+' Wh/일 '+(enoughWinter?'이상입니다.':'미만입니다.');
  $('siteNote').textContent=balance+(s.detailed?'':' 인근 건물·수목 음영은 현장 확인이 필요합니다.');
  $('externalMap').href='https://www.google.com/maps?q='+s.lat+','+s.lon;
  const limit=Math.max(...s.base)*scale*1.07||1;
@@ -487,6 +541,101 @@ function drawProfile(){
  });
  $('monthDetail').textContent=barButtons[state.month].button.title;
 }
+function simulateBatteryYear(monthlyWh, dailyWh, initialCharge){
+ const tolerance=1e-7;
+ let charge=initialCharge,minimum=initialCharge,shortageDays=0,firstShortage=null;
+ const trace=[charge];
+ monthlyWh.forEach((energy,month)=>{
+  const dailyBalance=energy/daysByMonth[month]-dailyWh;
+  for(let day=1;day<=daysByMonth[month];day++){
+   const balance=charge+dailyBalance;
+   if(balance < -tolerance){
+    shortageDays++;
+    firstShortage??=monthNames[month]+'월 '+day+'일';
+   }
+   charge=Math.max(0,Math.min(batteryCapacity,balance));
+   minimum=Math.min(minimum,charge);
+   trace.push(charge);
+  }
+ });
+ return {charge,minimum,shortageDays,firstShortage,trace};
+}
+
+function drawBatteryChart(first,second){
+ const chart=$('batteryChart'), left=72,right=621,top=14,bottom=152;
+ const x=day=>left+(right-left)*day/(first.trace.length-1);
+ const y=charge=>bottom-(bottom-top)*charge/batteryCapacity;
+ const children=[];
+ for(const charge of [0,batteryCapacity/2,batteryCapacity]){
+  const level=y(charge);
+  children.push(svgEl('line',{x1:left,y1:level,x2:right,y2:level,stroke:'#dce5f4'}));
+  const label=svgEl('text',{x:left-8,y:level,'text-anchor':'end','dominant-baseline':'middle'});
+  label.textContent=decimal(charge,charge===0?0:1);
+  children.push(label);
+ }
+ let day=0;
+ daysByMonth.forEach((days,i)=>{
+  const label=svgEl('text',{x:x(day+days/2),y:175,'text-anchor':'middle',class:i%2?'extra-month':''});
+  label.textContent=monthNames[i]+'월';
+  children.push(label);
+  day+=days;
+ });
+ for(const [result,stroke,dash] of [[first,'#285fdb','none'],[second,'#08796f','5 4']]){
+  children.push(svgEl('polyline',{points:result.trace.map((charge,day)=>x(day).toFixed(2)+','+y(charge).toFixed(2)).join(' '),
+   fill:'none',stroke,'stroke-width':'2.2','stroke-dasharray':dash,'vector-effect':'non-scaling-stroke'}));
+ }
+ chart.replaceChildren(...children);
+}
+
+function drawBattery(stop){
+ $('batteryPending').hidden=Boolean(stop);
+ $('batteryResults').hidden=!stop;
+ $('batteryStation').hidden=!stop;
+ if(!stop)return;
+ const scale=generationScale(),dailyWh=state.dailyConsumption;
+ const monthlyWh=stop.months.map(kWh=>kWh*scale*1000);
+ const first=simulateBatteryYear(monthlyWh,dailyWh,batteryCapacity);
+ const second=simulateBatteryYear(monthlyWh,dailyWh,first.charge);
+ const shortages=first.shortageDays+second.shortageDays;
+ const annualBalance=monthlyWh.reduce((total,energy)=>total+energy,0)-dailyWh*(first.trace.length-1);
+ const tolerance=1e-7;
+ let level='normal',status='반복 운용 가능 추정',detail='같은 발전과 소비가 반복되는 조건에서 전력 부족이 발생하지 않습니다.';
+ if(shortages){
+  level='shortage';
+  status='전력 공급 부족 발생';
+  detail='첫 부족은 '+(first.firstShortage?'1년 차 '+first.firstShortage:'2년 차 '+second.firstShortage)+'입니다.';
+ }else if(annualBalance < -tolerance){
+  level='low';
+  status='장기 운용 시 배터리 소진 예상';
+  detail='2년간 부족은 없지만, 1년 총 발전량이 총 소비량보다 적어 동일 조건이 지속되면 잔량이 고갈됩니다.';
+ }else if(Math.min(first.minimum,second.minimum)<=tolerance){
+  level='low';
+  status='전력 부족 없음 · 배터리 여유 없음';
+  detail='일 단위 계산에서 소비량은 충당했지만, 배터리 잔량이 0 Wh에 도달했습니다.';
+ }
+ $('batteryStation').textContent=(stop.ars?stop.ars+' · ':'')+stop.name+' · '+state.power*60+' W · 효율 '+state.efficiency+'%';
+ $('batteryOutcome').dataset.level=level;
+ $('batteryStatus').textContent=status;
+ $('batteryDetail').textContent=detail;
+ $('batteryMin').textContent=decimal(first.minimum)+' Wh';
+ $('batteryEnd').textContent=decimal(first.charge)+' Wh';
+ $('batteryShortage').textContent=count(shortages)+'일';
+ $('batteryAutonomy').textContent=dailyWh?decimal(batteryCapacity/dailyWh)+'일':'소비량 0';
+ $('batteryChart').setAttribute('aria-label','일별 배터리 잔량. 1년 차 최저 '+decimal(first.minimum)+' Wh, 2년 차 최저 '+decimal(second.minimum)+' Wh. '+status);
+ drawBatteryChart(first,second);
+}
+
+const consumptionInput=$('dailyConsumption');
+consumptionInput.addEventListener('input',()=>{
+ const value=consumptionInput.valueAsNumber;
+ if(!consumptionInput.validity.valid||value===state.dailyConsumption)return;
+ state.dailyConsumption=value;
+ drawProfile();
+});
+consumptionInput.addEventListener('blur',()=>{
+ if(!consumptionInput.validity.valid)consumptionInput.value=state.dailyConsumption;
+});
+
 function renderGeneration(){
  drawProfile();
  renderList(false);
@@ -936,7 +1085,7 @@ $('exportHorizon').addEventListener('click',()=>{
  file.click();setTimeout(()=>URL.revokeObjectURL(href),1000);
 });
 
-const sections=['overview','explore','insight','shadowScene','method'];
+const sections=['overview','explore','insight','battery','shadowScene','method'];
 function syncNavigation(){
  const key=location.hash.slice(1), active=sections.includes(key)?key:'overview';
  for(const link of document.querySelectorAll('.rail nav a')){
