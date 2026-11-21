@@ -104,6 +104,12 @@ body{padding-left:164px}
 .bars .month-average{display:block;color:#173b83;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.25}
 .bars button[aria-pressed=true] .month-average{color:#285fdb}
 @media(max-width:650px){.bars{grid-template-columns:repeat(6,minmax(0,1fr));row-gap:12px}.column{height:85px}}
+.generation-settings{display:flex;align-items:center;gap:7px 16px;flex-wrap:wrap;margin-top:9px;padding:9px 10px;border-radius:8px;background:#eef4ff}
+.generation-settings label{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#284878}
+.generation-settings p{flex-basis:100%;margin:0}
+.efficiency-value{white-space:nowrap}
+.efficiency-value input{width:76px}
+.efficiency-value input:invalid{border-color:#a54531}
 </style>
 </head>
 <body>
@@ -144,7 +150,12 @@ body{padding-left:164px}
  <div class="metrics"><div><span>연간 발전량</span><b id="annual"></b></div><div><span>겨울 일평균</span><b id="winter"></b></div><div><span>연간 음영 손실</span><b id="loss"></b></div></div>
  <p class="note" id="siteNote"></p><div class="links"><a id="externalMap" target="_blank" rel="noopener">지도에서 위치 확인 ↗</a><a href="#shadowScene" id="sceneLink">3D 음영·태양 경로 ↓</a></div>
  </div>
- <div class="chart"><div class="row"><h3>월별 발전량 <small>(kWh)</small></h3><div class="legend"><span><i class="dot"></i>음영 반영</span><span><i class="dot" style="background:#d9e6fc"></i>무음영</span></div><select class="sort" id="power" aria-label="패널 정격 출력"><option value="1">60 W</option><option value="2">120 W</option></select></div>
+ <div class="chart"><div class="row"><h3>월별 발전량 <small>(kWh)</small></h3><div class="legend"><span><i class="dot"></i>음영 반영</span><span><i class="dot" style="background:#d9e6fc"></i>무음영</span></div></div>
+  <div class="generation-settings" role="group" aria-label="발전량 계산 설정">
+    <label>패널 정격 출력 <select class="sort" id="power" aria-label="패널 정격 출력"><option value="1">60 W</option><option value="2">120 W</option></select></label>
+    <label>시스템 발전 효율 <span class="efficiency-value"><input class="sort" type="number" id="efficiency" min="0" max="100" step="0.1" value="75" required aria-describedby="efficiencyHint"> <span aria-hidden="true">%</span></span></label>
+    <p class="sub" id="efficiencyHint">온도·배선·충전 등 손실을 한 번에 반영하는 보정값입니다. 기본 75% · 입력 범위 0~100%.</p>
+  </div>
  <p class="sub chart-units">막대는 월 합계(kWh), 월 아래 숫자는 음영 반영 일평균(Wh/일)입니다.</p>
   <div class="bars" id="chart"></div><p class="chart-info" id="monthDetail"></p></div>
 </div></section>
@@ -198,7 +209,7 @@ body{padding-left:164px}
 <li>정류장은 기존 전수 목록의 부산 ID를 기준으로 집계했습니다. 원천 자료는 <a href="https://www.data.go.kr/data/15067528/fileData.do">국토교통부 전국 버스정류장 위치정보</a>입니다. 목록에 공개 번호가 있는 경우 원본 5자리 문자열 그대로 표시합니다. CSV를 엑셀에서 불러올 때 정류장번호 열을 텍스트 형식으로 지정하면 선행 0이 유지됩니다. 타 지자체 ID 3건은 집계에서 제외했습니다.</li>
 <li>구·군은 통계청 SGIS <a href="https://github.com/statgarten/maps">2020년 시군구 지도</a>를 지리좌표에 맞춰 근사했습니다. 경계에서 120 m 이내의 바깥 좌표는 가까운 구·군에 배치했습니다. 부산 경계 밖으로 분류된 부산 버스 목록 항목은 ‘시 경계 밖’에서 검색할 수 있습니다.</li>
 <li>지형 추정은 Copernicus DEM GLO-30과 가까운 기준 정류장 30곳의 PVGIS ERA5 일사량·태양 위치를 사용한 1차 추정입니다. 정류장별 DSM 차폐는 약 90 m~15 km 범위에서 계산했습니다. 가까운 건물·가로수·승강장에 의한 음영은 상세 확인이 필요합니다.</li>
-<li>국토교통부 <a href="https://www.data.go.kr/data/15083092/fileData.do">GIS건물통합정보</a> 부산 원본(2026.11.09, 공공누리 제1유형)을 적용한 3D는 9,268개 정류장에서 볼 수 있습니다. 높이값을 사용할 수 있는 정류장 9,264곳의 발전량을 다시 계산했습니다. 건축물대장 높이 우선, 층수×3.2m 보완, 모두 미상인 건물은 윤곽만 표시합니다. 건물 바닥 고도는 DSM 주변 표고로 추정합니다. 건물의 지붕 세부 형상과 안뜰은 단순화했습니다. 계산 반경 400m, 건물 표시 약 250m, 방향 간격 2°입니다. 브이월드 부산 자료 밖 건물, 근거리 수목과 승강장은 모델 범위에 포함되지 않습니다. 일부 건물 3D는 자료가 확보된 건물의 차폐를 보여주고, 연간·월간 발전량에는 지형 모델을 사용합니다. 지형 기반 3D는 정류장 주변 약 300m의 지형과 2° 간격의 지형 차폐를 사용합니다. 모든 모델에서 수목·승강장에 의한 근거리 음영은 반영하지 않습니다. 태양 경로는 선택한 월의 15일, 매시 32분 30초(KST)를 기준으로 표시합니다. 모든 발전량은 2021.12~2022.11의 과거 기상 조건, 정남향·경사 30°·높이 3 m·출력계수 0.75를 가정했습니다. 겨울은 12~2월 90일 기준입니다. 28 Wh/일은 제품 소비량 비교 조건입니다.</li>
+<li>국토교통부 <a href="https://www.data.go.kr/data/15083092/fileData.do">GIS건물통합정보</a> 부산 원본(2026.11.09, 공공누리 제1유형)을 적용한 3D는 9,268개 정류장에서 볼 수 있습니다. 높이값을 사용할 수 있는 정류장 9,264곳의 발전량을 다시 계산했습니다. 건축물대장 높이 우선, 층수×3.2m 보완, 모두 미상인 건물은 윤곽만 표시합니다. 건물 바닥 고도는 DSM 주변 표고로 추정합니다. 건물의 지붕 세부 형상과 안뜰은 단순화했습니다. 계산 반경 400m, 건물 표시 약 250m, 방향 간격 2°입니다. 브이월드 부산 자료 밖 건물, 근거리 수목과 승강장은 모델 범위에 포함되지 않습니다. 일부 건물 3D는 자료가 확보된 건물의 차폐를 보여주고, 연간·월간 발전량에는 지형 모델을 사용합니다. 지형 기반 3D는 정류장 주변 약 300m의 지형과 2° 간격의 지형 차폐를 사용합니다. 모든 모델에서 수목·승강장에 의한 근거리 음영은 반영하지 않습니다. 태양 경로는 선택한 월의 15일, 매시 32분 30초(KST)를 기준으로 표시합니다. 모든 발전량은 2021.12~2022.11의 과거 기상 조건, 정남향·경사 30°·높이 3 m·시스템 발전 효율 75%를 기본으로 가정했습니다. 사용자가 입력한 효율은 기본값 대비 비율로 발전량에 적용합니다. 겨울은 12~2월 90일 기준입니다. 28 Wh/일은 제품 소비량 비교 조건입니다.</li>
 </ul></details></footer>
 </main>
 <script type="application/json" id="payload"></script>
@@ -216,7 +227,9 @@ const stops=data.stops.map(row=>Object.fromEntries(keys.map((key,i)=>[key,row[i]
 const districts=data.districts;
 const districtsTotal=districts.map((_,i)=>stops.filter(s=>s.district===i).length);
 const outside=stops.filter(s=>s.district<0).length, lookup=new Map(stops.map(s=>[s.id,s]));
-const state={district:null,selection:null,power:1,month:0,page:0,view:null};
+const baselineEfficiency=75;
+const state={district:null,selection:null,power:1,efficiency:baselineEfficiency,month:0,page:0,view:null};
+const generationScale=()=>state.power*state.efficiency/baselineEfficiency;
 const locale=new Intl.NumberFormat('ko-KR'), count=n=>locale.format(n);
 const decimal=(n,d=1)=>n.toLocaleString('ko-KR',{minimumFractionDigits:d,maximumFractionDigits:d});
 const names=i=>i<0?'시 경계 밖':districts[i].name;
@@ -343,6 +356,7 @@ function queryResults(){
  });
 }
 function renderList(resetScroll){
+ const scale=generationScale();
  const frag=document.createDocumentFragment();
  const slice=results.slice(state.page*pageSize,(state.page+1)*pageSize);
  for(const s of slice){
@@ -352,14 +366,14 @@ function renderList(resetScroll){
   const middle=document.createElement('span'),title=document.createElement('strong'),temp=document.createElement('span');
   title.textContent=s.name;temp.className='sub';temp.textContent=names(s.district)+' · '+s.id;middle.append(title,temp);
   const measure=document.createElement('span');measure.className='measure';
-  measure.textContent=decimal(s.winter*state.power)+' Wh/일';
+  measure.textContent=decimal(s.winter*scale)+' Wh/일';
   if(s.detailed){ const tag=document.createElement('span');tag.className='dot detail';tag.title='건물 음영 상세 분석';tag.setAttribute('aria-label','건물 음영 상세 분석');measure.prepend(tag); }
   b.append(num,middle,measure);frag.append(b);
  }
  if(!slice.length){const p=document.createElement('p');p.className='empty-note';p.textContent='검색 조건에 맞는 정류장이 없습니다.';frag.append(p);}
  $('results').replaceChildren(frag);if(resetScroll)$('results').scrollTop=0;
  const n=results.length,max=Math.max(1,Math.ceil(n/pageSize));
- $('resultCount').textContent=count(n)+'곳 · 겨울 일평균 '+state.power*60+' W 기준';
+ $('resultCount').textContent=count(n)+'곳 · 겨울 일평균 '+state.power*60+' W · 효율 '+state.efficiency+'% 기준';
  $('page').textContent=(state.page+1)+' / '+max;$('back').disabled=state.page<=0;$('next').disabled=state.page+1>=max;
 }
 function refresh(resetScroll=true){
@@ -454,28 +468,44 @@ function drawProfile(){
  ars.className='ars';ars.textContent=s.ars||'번호 미제공';tags.className='sub';
  tags.textContent=(s.ars==='05718'?'부암역 방면 · ':'')+names(s.district)+' · '+s.id;$('stopMeta').replaceChildren(ars,tags);
  $('stopCoords').textContent='위도 '+s.lat.toFixed(6)+' · 경도 '+s.lon.toFixed(6)+(s.edge&&s.district>=0?' · 경계 인접 배정':'');
+ const scale=generationScale();
  const ref=lookup.get(s.reference);
  const refDistance=ref?Math.round(Math.hypot((s.lon-ref.lon)*91000,(s.lat-ref.lat)*111000)):0;
  $('source').textContent='일사량 기준 '+(ref?ref.name+(refDistance?' · 약 '+count(refDistance)+' m':''):'PVGIS ERA5');
- putUnit('annual',decimal(s.annual*state.power),'kWh');putUnit('winter',decimal(s.winter*state.power),'Wh/일');putUnit('loss',decimal(s.loss),'%');
- const balance=(s.winter*state.power)>=28?'겨울 평균이 28 Wh/일 기준 이상입니다.':'겨울 평균이 28 Wh/일 기준 미만입니다.';
+ putUnit('annual',decimal(s.annual*scale),'kWh');putUnit('winter',decimal(s.winter*scale),'Wh/일');putUnit('loss',decimal(s.loss),'%');
+ const balance=(s.winter*scale)>=28?'겨울 평균이 28 Wh/일 기준 이상입니다.':'겨울 평균이 28 Wh/일 기준 미만입니다.';
  $('siteNote').textContent=balance+(s.detailed?'':' 인근 건물·수목 음영은 현장 확인이 필요합니다.');
  $('externalMap').href='https://www.google.com/maps?q='+s.lat+','+s.lon;
- const limit=Math.max(...s.base)*1.07;
+ const limit=Math.max(...s.base)*scale*1.07||1;
  barButtons.forEach(({button,base,net,average},i)=>{
-  base.style.height=s.base[i]/limit*100+'%';net.style.height=s.months[i]/limit*100+'%';
+  base.style.height=s.base[i]*scale/limit*100+'%';net.style.height=s.months[i]*scale/limit*100+'%';
   button.setAttribute('aria-pressed',String(i===state.month));
-  const dailyWh=s.months[i]*state.power*1000/daysByMonth[i];
+  const dailyWh=s.months[i]*scale*1000/daysByMonth[i];
   average.textContent=decimal(dailyWh);
-  button.title=monthNames[i]+'월 · 음영 반영 '+decimal(s.months[i]*state.power,2)+' kWh · 무음영 '+decimal(s.base[i]*state.power,2)+' kWh · 일평균 '+decimal(dailyWh)+' Wh/일';
+  button.title=monthNames[i]+'월 · 음영 반영 '+decimal(s.months[i]*scale,2)+' kWh · 무음영 '+decimal(s.base[i]*scale,2)+' kWh · 일평균 '+decimal(dailyWh)+' Wh/일';
   button.setAttribute('aria-label',button.title);
  });
  $('monthDetail').textContent=barButtons[state.month].button.title;
 }
-$('power').addEventListener('change',()=>{state.power=Number($('power').value);drawProfile();renderList(false);});
+function renderGeneration(){
+ drawProfile();
+ renderList(false);
+}
+$('power').addEventListener('change',()=>{state.power=Number($('power').value);renderGeneration();});
+const efficiencyInput=$('efficiency');
+efficiencyInput.addEventListener('input',()=>{
+ const value=efficiencyInput.valueAsNumber;
+ if(!efficiencyInput.validity.valid||value===state.efficiency)return;
+ state.efficiency=value;
+ renderGeneration();
+});
+efficiencyInput.addEventListener('blur',()=>{
+ if(!efficiencyInput.validity.valid)efficiencyInput.value=state.efficiency;
+});
 $('export').addEventListener('click',()=>{
- const header=['정류장번호(ARS)','내부ID','정류장명','구군','위도','경도','분석 유형','패널 W','연간 kWh','겨울 평균 Wh/일','연간 음영 손실 %','일사량 기준 ID',...monthNames.map(m=>m+'월 kWh')];
- const rows=results.map(s=>[s.ars,s.id,s.name,names(s.district),s.lat,s.lon,s.detailed?'건물 음영 포함':'지형 추정',state.power*60,(s.annual*state.power).toFixed(3),(s.winter*state.power).toFixed(2),s.loss,s.reference,...s.months.map(x=>(x*state.power).toFixed(4))]);
+ const scale=generationScale();
+ const header=['정류장번호(ARS)','내부ID','정류장명','구군','위도','경도','분석 유형','패널 W','연간 kWh','겨울 평균 Wh/일','연간 음영 손실 %','일사량 기준 ID',...monthNames.map(m=>m+'월 kWh'),'시스템 발전 효율 %'];
+ const rows=results.map(s=>[s.ars,s.id,s.name,names(s.district),s.lat,s.lon,s.detailed?'건물 음영 포함':'지형 추정',state.power*60,(s.annual*scale).toFixed(3),(s.winter*scale).toFixed(2),s.loss,s.reference,...s.months.map(x=>(x*scale).toFixed(4)),state.efficiency]);
  const csv=[header,...rows].map(row=>row.map(value=>'"'+String(value).replaceAll('"','""')+'"').join(',')).join('\r\n');
  const href=URL.createObjectURL(new Blob(['\ufeff',csv],{type:'text/csv;charset=utf-8'}));
  const a=document.createElement('a');a.href=href;a.download='ECOBIT_Busan_Stops_'+state.power*60+'W.csv';a.click();setTimeout(()=>URL.revokeObjectURL(href),3000);
