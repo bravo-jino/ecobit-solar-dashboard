@@ -190,7 +190,7 @@ body{padding-left:164px}
 <section class="card" aria-labelledby="mapTitle"><div class="pad barline"><div class="row"><div><h2 id="mapTitle">부산 전체</h2><p class="sub" id="mapHint">지도나 오른쪽 목록에서 구·군을 선택하세요.</p></div><button type="button" class="control" id="reset">부산 전체 보기</button></div></div>
 <div class="map" id="map"><div id="rasterMap" class="base-map raster-map" aria-hidden="true"></div><div id="baseMap" class="base-map vector-map" aria-hidden="true"></div><svg id="geo" viewBox="0 0 960 630" preserveAspectRatio="none" aria-label="부산 구군 및 정류장 지도"><g id="world"><image id="terrain" class="terrain"/><g id="areas"></g></g><g id="markers"></g><g id="labels"></g></svg>
 <div class="map-tools"><button type="button" id="zoomIn" title="지도 확대" aria-label="지도 확대">+</button><button type="button" id="zoomOut" title="지도 축소" aria-label="지도 축소">−</button></div><div class="north" aria-hidden="true">▲<br>N</div>
-<div class="map-credit" id="mapCredit" hidden><span id="vectorCredit"><a href="https://openfreemap.org/">OpenFreeMap</a> · © <a href="https://openmaptiles.org/">OpenMapTiles</a> · </span>© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a></div></div>
+<div class="map-credit" id="mapCredit" hidden><span id="vectorCredit" hidden><a href="https://openfreemap.org/">OpenFreeMap</a> · © <a href="https://openmaptiles.org/">OpenMapTiles</a> · </span>© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a></div></div>
 <div class="guide"><div class="legend"><span><i class="dot"></i>지형 추정</span><span><i class="dot detail"></i>건물 포함</span><span><i class="dot partial"></i>일부 건물</span><span><i class="dot current"></i>선택 정류장</span></div><a class="sub" href="#insight" id="jumpDetail" hidden>선택 정류장의 발전량 보기 ↓</a><span class="sub" id="boundaryHint">구·군 경계는 탐색용</span></div>
 </section>
 <section class="card list-area" aria-labelledby="listTitle"><div class="pad barline"><div class="row"><h2 id="listTitle">정류장 찾기</h2><div class="list-actions"><button type="button" class="control" id="clearConditions" hidden>조건 초기화</button><button type="button" class="export" id="export">조회 결과 CSV</button></div></div>
@@ -323,7 +323,7 @@ body{padding-left:164px}
 <footer class="foot" id="method"><details><summary>자료 출처와 분석 기준</summary><ul>
 <li>정류장은 기존 전수 목록의 부산 ID를 기준으로 집계했습니다. 원천 자료는 <a href="https://www.data.go.kr/data/15067528/fileData.do">국토교통부 전국 버스정류장 위치정보</a>입니다. 목록에 공개 번호가 있는 경우 원본 5자리 문자열 그대로 표시합니다. CSV를 엑셀에서 불러올 때 정류장번호 열을 텍스트 형식으로 지정하면 선행 0이 유지됩니다. 타 지자체 ID 3건은 집계에서 제외했습니다.</li>
 <li>2D 지도의 도로와 건물 윤곽은 OpenStreetMap 기반 OpenFreeMap 공개 벡터 타일을 표시합니다. 벡터 지도를 사용할 수 없으면 OpenStreetMap 공개 이미지 타일을 표시합니다. 타일의 건물 윤곽은 정류장 주변 위치 확인에 사용합니다.</li>
-<li>구·군은 통계청 SGIS <a href="https://github.com/statgarten/maps">2020년 시군구 지도</a>를 지리좌표에 맞춰 근사했습니다. 경계에서 120 m 이내의 바깥 좌표는 가까운 구·군에 배치했습니다. 부산 경계 밖으로 분류된 부산 버스 목록 항목은 ‘시 경계 밖’에서 검색할 수 있습니다.</li>
+<li>표시 경계와 정류장 구·군 분류는 <a href="https://www.openstreetmap.org/relation/2396450">OpenStreetMap 부산광역시 하위 행정구역</a>을 사용합니다. <a href="./busan-district-boundaries.js">구·군 경계 데이터</a> © OpenStreetMap contributors, <a href="https://www.openstreetmap.org/copyright">ODbL 1.0</a>. 2026.11.23 기준입니다. 경계에서 120 m 이내의 바깥 좌표는 가까운 구·군에 배치하고, 나머지는 ‘시 경계 밖’에 표시합니다. 초기 확대 범위는 육지 중심이며, 경계 데이터를 불러오지 못하면 통계청 SGIS 기반 기존 경계를 표시합니다.</li>
 <li>지형 추정은 Copernicus DEM GLO-30과 가까운 기준 정류장 30곳의 PVGIS ERA5 일사량·태양 위치를 사용한 1차 추정입니다. 정류장별 DSM 차폐는 약 90 m~15 km 범위에서 계산했습니다. 가까운 건물·가로수·승강장에 의한 음영은 상세 확인이 필요합니다.</li>
 <li>국토교통부 <a href="https://www.data.go.kr/data/15083092/fileData.do">GIS건물통합정보</a> 부산 원본(2026.11.09, 공공누리 제1유형)을 적용한 3D는 9,268개 정류장에서 볼 수 있습니다. 높이값을 사용할 수 있는 정류장 9,264곳의 발전량을 다시 계산했습니다. 건축물대장 높이를 우선 사용하고, 높이값이 없으면 층수×3.2m로 추정합니다. 건물 바닥 고도는 DSM 주변 표고로 추정합니다. 건물의 지붕 세부 형상과 안뜰은 단순화했습니다. 계산 반경 400m, 건물 표시 약 250m, 방향 간격 2°입니다. 브이월드 부산 자료 밖 건물, 근거리 수목과 승강장은 모델 범위에 포함되지 않습니다. 일부 건물 3D는 자료가 확보된 건물의 차폐를 보여주고, 연간·월간 발전량에는 지형 모델을 사용합니다. 지형 기반 3D는 정류장 주변 약 300m의 지형과 2° 간격의 지형 차폐를 사용합니다. 모든 모델에서 수목·승강장에 의한 근거리 음영은 반영하지 않습니다. 모든 발전량은 2021.12~2022.11의 과거 기상 조건, 정남향·경사 30°·높이 3 m·시스템 발전 효율 75%를 기본으로 가정했습니다. 사용자가 입력한 효율은 기본값 대비 비율로 발전량에 적용합니다. 겨울은 12~2월 90일 기준입니다. </li>
 <li>높이와 층수가 모두 미상인 건물은 지면에 윤곽만 표시하며 건물 차폐 계산에서 제외합니다.<span id="unknownBuildingNote" hidden></span></li>
@@ -333,6 +333,7 @@ body{padding-left:164px}
 </main>
 <script type="application/json" id="payload"></script>
 <script src="./station-data.js"></script>
+<script src="./busan-district-boundaries.js"></script>
 <script type="application/octet-stream" id="terrainSceneData"></script>
 <script src="./terrain-data.js"></script>
 <script type="application/octet-stream" id="vworldData"></script>
@@ -342,8 +343,49 @@ body{padding-left:164px}
 const $=id=>document.getElementById(id);
 const data=JSON.parse($('payload').textContent);
 const keys=['id','name','lat','lon','ars','district','annual','winter','loss','detailed','edge','months','base','reference'];
-const stops=data.stops.map(row=>Object.fromEntries(keys.map((key,i)=>[key,row[i]])));
 const districts=data.districts;
+const hasOsmBoundaries=typeof osmDistrictBoundaries!=='undefined'
+ &&districts.every(d=>osmDistrictBoundaries[d.name]?.rings.length);
+const districtRings=districts.map(d=>hasOsmBoundaries?osmDistrictBoundaries[d.name].rings:d.rings);
+const districtBounds=districtRings.map(rings=>{
+ let west=Infinity,south=Infinity,east=-Infinity,north=-Infinity;
+ for(const ring of rings)for(const [lon,lat] of ring){
+  west=Math.min(west,lon);south=Math.min(south,lat);
+  east=Math.max(east,lon);north=Math.max(north,lat);
+ }
+ return [west,south,east,north];
+});
+
+function assignDistrict(stop){
+ const {lon,lat}=stop,lonMetres=111320*Math.cos(lat*Math.PI/180),latMetres=111000;
+ let closest=-1,minimum=120**2;
+ for(const [i,[west,south,east,north]] of districtBounds.entries()){
+  if(lon<west-120/lonMetres||lon>east+120/lonMetres
+     ||lat<south-120/latMetres||lat>north+120/latMetres)continue;
+  let inside=false;
+  for(const ring of districtRings[i]){
+   for(let j=1;j<ring.length;j++){
+    const [a,b]=ring[j-1],[c,d]=ring[j];
+    if((b>lat)!==(d>lat)&&lon<(c-a)*(lat-b)/(d-b)+a)inside=!inside;
+    const x=(a-lon)*lonMetres,y=(b-lat)*latMetres;
+    const dx=(c-a)*lonMetres,dy=(d-b)*latMetres;
+    const length=dx*dx+dy*dy;
+    const t=length?Math.max(0,Math.min(1,-(x*dx+y*dy)/length)):0;
+    const distance=(x+t*dx)**2+(y+t*dy)**2;
+    if(distance<minimum){minimum=distance;closest=i;}
+   }
+  }
+  if(inside){stop.district=i;stop.edge=0;return;}
+ }
+ stop.district=closest;stop.edge=Number(closest>=0);
+}
+
+const stops=data.stops.map(row=>{
+ const stop=Object.fromEntries(keys.map((key,i)=>[key,row[i]]));
+ if(hasOsmBoundaries)assignDistrict(stop);
+ return stop;
+});
+if(hasOsmBoundaries)$('mapCredit').hidden=false;
 const districtsTotal=districts.map((_,i)=>stops.filter(s=>s.district===i).length);
 const outside=stops.filter(s=>s.district<0).length, lookup=new Map(stops.map(s=>[s.id,s]));
 const baselineEfficiency=75;
@@ -380,9 +422,10 @@ function coordinates(x,y){
 const tileZoom=k=>Math.log2(k*mercatorScale/512);
 const box=points=>[Math.min(...points.map(p=>p[0])),Math.min(...points.map(p=>p[1])),Math.max(...points.map(p=>p[0])),Math.max(...points.map(p=>p[1]))];
 const stopXY=new Map(stops.map(s=>[s.id,point(s.lon,s.lat)]));
-const poly=districts.map(d=>d.rings.map(r=>r.map(([lon,lat])=>point(lon,lat))));
-const regionBoxes=poly.map(rings=>box(rings.flat()));
-const allBox=box(poly.flat(2));
+const poly=districtRings.map(rings=>rings.map(ring=>ring.map(([lon,lat])=>point(lon,lat))));
+const landViewPoints=districts.map(d=>d.rings.flat().map(([lon,lat])=>point(lon,lat)));
+const regionBoxes=landViewPoints.map(points=>box(points));
+const allBox=box(landViewPoints.flat());
 let canvasW=mapFrame.clientWidth||960,canvasH=mapFrame.clientHeight||630;
 $('geo').setAttribute('viewBox','0 0 '+canvasW+' '+canvasH);
 function fit(bounds,padding=36){
@@ -424,7 +467,7 @@ const mercatorOrigin=[(origin[0]+180)/360,originY+.5];
 function showBaseMap(type){
  mapFrame.dataset.basemap=type;
  mapFrame.classList.toggle('has-basemap',Boolean(type));
- $('mapCredit').hidden=!type;
+ $('mapCredit').hidden=!type&&!hasOsmBoundaries;
  $('vectorCredit').hidden=type!=='vector';
 }
 
