@@ -782,7 +782,7 @@ function drawProfile(updateScene=true){
 }
 function simulateBatteryYear(monthlyWh,dailyWh,batteryCapacity,initialCharge){
  const tolerance=1e-7;
- let charge=initialCharge,minimum=initialCharge,shortageDays=0,firstShortage=null;
+ let charge=initialCharge,minimum=initialCharge,shortageDays=0,firstShortageDay=null;
  const trace=[charge];
  monthlyWh.forEach((energy,month)=>{
   const dailyBalance=energy/daysByMonth[month]-dailyWh;
@@ -790,14 +790,14 @@ function simulateBatteryYear(monthlyWh,dailyWh,batteryCapacity,initialCharge){
    const balance=charge+dailyBalance;
    if(balance < -tolerance){
     shortageDays++;
-    firstShortage??=monthNames[month]+'월 '+day+'일';
+    firstShortageDay??=trace.length;
    }
    charge=Math.max(0,Math.min(batteryCapacity,balance));
    minimum=Math.min(minimum,charge);
    trace.push(charge);
   }
  });
- return {charge,minimum,shortageDays,firstShortage,trace};
+ return {charge,minimum,shortageDays,firstShortageDay,trace};
 }
 
 function drawBatteryChart(first,second,batteryCapacity){
@@ -899,8 +899,9 @@ function drawBattery(stop,generation){
  let level='normal',status='반복 운용 가능 추정',detail='같은 발전과 소비가 반복되는 조건에서 전력 부족이 발생하지 않습니다.';
  if(shortages){
   level='shortage';
-  status='전력 공급 부족 발생';
-  detail='첫 부족은 '+(first.firstShortage?'1년 차 '+first.firstShortage:'2년 차 '+second.firstShortage)+'입니다.';
+  const firstDay=first.firstShortageDay??(first.trace.length-1+second.firstShortageDay);
+  status='전력 공급 부족 '+count(shortages)+'일';
+  detail='시뮬레이션 시작 후 '+count(firstDay)+'일 차에 처음 발생했습니다.';
  }else if(annualBalance < -tolerance){
   level='low';
   status='장기 운용 시 배터리 소진 예상';
