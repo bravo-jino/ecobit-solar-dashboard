@@ -102,7 +102,8 @@ body{padding-left:164px}
 #q{scroll-margin-top:60px}
 .base-map,.base-map canvas,.base-map .maplibregl-canvas-container{position:absolute;inset:0;pointer-events:none}
 .base-map{visibility:hidden}
-.has-basemap .base-map{visibility:visible}
+.has-basemap[data-basemap="vector"] .vector-map,.has-basemap[data-basemap="raster"] .raster-map{visibility:visible}
+.raster-map img{position:absolute;max-width:none;pointer-events:none;user-select:none}
 .has-basemap .terrain{visibility:hidden}
 .has-basemap .district{stroke:#456589;fill-opacity:.08}
 .has-basemap .district.muted{stroke:#7188a5;fill-opacity:0}
@@ -111,7 +112,7 @@ body{padding-left:164px}
 #geo,#areas .district:focus{outline:none}
 #areas .district:focus-visible{stroke:#285fdb;stroke-width:3;stroke-dasharray:5 3}
 
-.map-credit{flex-basis:100%;text-align:right}
+.map-credit{position:absolute;bottom:0;left:0;padding:3px 6px;border-radius:0 5px 0 0;background:#fffffff0;color:#263d60;font-size:10px;line-height:1.2}
 .map-credit a{color:inherit;text-decoration:underline}
 .chart-units{margin-top:6px}
 .bars .month-label{display:block;color:var(--muted);font-size:11px}
@@ -187,9 +188,10 @@ body{padding-left:164px}
 <section class="summary" aria-label="정류장 집계"><div><span>부산 버스 정류장 목록</span><b id="total"></b></div><div><span>5자리 공개 번호 확인</span><b id="withArs"></b></div><div><span>건물 음영 상세 분석</span><b id="withDetail"></b></div><div><span>3D 태양 경로</span><b id="with3D"></b></div></section>
 <div class="layout" id="explore">
 <section class="card" aria-labelledby="mapTitle"><div class="pad barline"><div class="row"><div><h2 id="mapTitle">부산 전체</h2><p class="sub" id="mapHint">지도나 오른쪽 목록에서 구·군을 선택하세요.</p></div><button type="button" class="control" id="reset">부산 전체 보기</button></div></div>
-<div class="map" id="map"><div id="baseMap" class="base-map" aria-hidden="true"></div><svg id="geo" viewBox="0 0 960 630" preserveAspectRatio="none" aria-label="부산 구군 및 정류장 지도"><g id="world"><image id="terrain" class="terrain"/><g id="areas"></g></g><g id="markers"></g><g id="labels"></g></svg>
-<div class="map-tools"><button type="button" id="zoomIn" title="지도 확대" aria-label="지도 확대">+</button><button type="button" id="zoomOut" title="지도 축소" aria-label="지도 축소">−</button></div><div class="north" aria-hidden="true">▲<br>N</div></div>
-<div class="guide"><div class="legend"><span><i class="dot"></i>지형 추정</span><span><i class="dot detail"></i>건물 포함</span><span><i class="dot partial"></i>일부 건물</span><span><i class="dot current"></i>선택 정류장</span></div><a class="sub" href="#insight" id="jumpDetail" hidden>선택 정류장의 발전량 보기 ↓</a><span class="sub" id="boundaryHint">구·군 경계는 탐색용</span><span class="sub map-credit" id="mapCredit" hidden><a href="https://openfreemap.org/">OpenFreeMap</a> · © <a href="https://openmaptiles.org/">OpenMapTiles</a> · © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a></span></div>
+<div class="map" id="map"><div id="rasterMap" class="base-map raster-map" aria-hidden="true"></div><div id="baseMap" class="base-map vector-map" aria-hidden="true"></div><svg id="geo" viewBox="0 0 960 630" preserveAspectRatio="none" aria-label="부산 구군 및 정류장 지도"><g id="world"><image id="terrain" class="terrain"/><g id="areas"></g></g><g id="markers"></g><g id="labels"></g></svg>
+<div class="map-tools"><button type="button" id="zoomIn" title="지도 확대" aria-label="지도 확대">+</button><button type="button" id="zoomOut" title="지도 축소" aria-label="지도 축소">−</button></div><div class="north" aria-hidden="true">▲<br>N</div>
+<div class="map-credit" id="mapCredit" hidden><span id="vectorCredit"><a href="https://openfreemap.org/">OpenFreeMap</a> · © <a href="https://openmaptiles.org/">OpenMapTiles</a> · </span>© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a></div></div>
+<div class="guide"><div class="legend"><span><i class="dot"></i>지형 추정</span><span><i class="dot detail"></i>건물 포함</span><span><i class="dot partial"></i>일부 건물</span><span><i class="dot current"></i>선택 정류장</span></div><a class="sub" href="#insight" id="jumpDetail" hidden>선택 정류장의 발전량 보기 ↓</a><span class="sub" id="boundaryHint">구·군 경계는 탐색용</span></div>
 </section>
 <section class="card list-area" aria-labelledby="listTitle"><div class="pad barline"><div class="row"><h2 id="listTitle">정류장 찾기</h2><div class="list-actions"><button type="button" class="control" id="clearConditions" hidden>조건 초기화</button><button type="button" class="export" id="export">조회 결과 CSV</button></div></div>
 <div class="filters"><input id="q" type="search" aria-label="5자리 정류장 번호 또는 정류장명" placeholder="5자리 정류장 번호 또는 정류장명"><select id="model" aria-label="분석 유형"><option value="all">전체 유형</option><option value="detail">건물 포함 3D</option><option value="partial">일부 건물 3D</option><option value="terrain">지형 기반 3D</option></select></div>
@@ -320,7 +322,7 @@ body{padding-left:164px}
 </section>
 <footer class="foot" id="method"><details><summary>자료 출처와 분석 기준</summary><ul>
 <li>정류장은 기존 전수 목록의 부산 ID를 기준으로 집계했습니다. 원천 자료는 <a href="https://www.data.go.kr/data/15067528/fileData.do">국토교통부 전국 버스정류장 위치정보</a>입니다. 목록에 공개 번호가 있는 경우 원본 5자리 문자열 그대로 표시합니다. CSV를 엑셀에서 불러올 때 정류장번호 열을 텍스트 형식으로 지정하면 선행 0이 유지됩니다. 타 지자체 ID 3건은 집계에서 제외했습니다.</li>
-<li>2D 지도의 도로와 건물 윤곽은 OpenStreetMap 기반 OpenFreeMap 공개 타일을 표시합니다. 타일의 건물 윤곽은 정류장 주변 위치 확인에 사용합니다.</li>
+<li>2D 지도의 도로와 건물 윤곽은 OpenStreetMap 기반 OpenFreeMap 공개 벡터 타일을 표시합니다. 벡터 지도를 사용할 수 없으면 OpenStreetMap 공개 이미지 타일을 표시합니다. 타일의 건물 윤곽은 정류장 주변 위치 확인에 사용합니다.</li>
 <li>구·군은 통계청 SGIS <a href="https://github.com/statgarten/maps">2020년 시군구 지도</a>를 지리좌표에 맞춰 근사했습니다. 경계에서 120 m 이내의 바깥 좌표는 가까운 구·군에 배치했습니다. 부산 경계 밖으로 분류된 부산 버스 목록 항목은 ‘시 경계 밖’에서 검색할 수 있습니다.</li>
 <li>지형 추정은 Copernicus DEM GLO-30과 가까운 기준 정류장 30곳의 PVGIS ERA5 일사량·태양 위치를 사용한 1차 추정입니다. 정류장별 DSM 차폐는 약 90 m~15 km 범위에서 계산했습니다. 가까운 건물·가로수·승강장에 의한 음영은 상세 확인이 필요합니다.</li>
 <li>국토교통부 <a href="https://www.data.go.kr/data/15083092/fileData.do">GIS건물통합정보</a> 부산 원본(2026.11.09, 공공누리 제1유형)을 적용한 3D는 9,268개 정류장에서 볼 수 있습니다. 높이값을 사용할 수 있는 정류장 9,264곳의 발전량을 다시 계산했습니다. 건축물대장 높이를 우선 사용하고, 높이값이 없으면 층수×3.2m로 추정합니다. 건물 바닥 고도는 DSM 주변 표고로 추정합니다. 건물의 지붕 세부 형상과 안뜰은 단순화했습니다. 계산 반경 400m, 건물 표시 약 250m, 방향 간격 2°입니다. 브이월드 부산 자료 밖 건물, 근거리 수목과 승강장은 모델 범위에 포함되지 않습니다. 일부 건물 3D는 자료가 확보된 건물의 차폐를 보여주고, 연간·월간 발전량에는 지형 모델을 사용합니다. 지형 기반 3D는 정류장 주변 약 300m의 지형과 2° 간격의 지형 차폐를 사용합니다. 모든 모델에서 수목·승강장에 의한 근거리 음영은 반영하지 않습니다. 모든 발전량은 2021.12~2022.11의 과거 기상 조건, 정남향·경사 30°·높이 3 m·시스템 발전 효율 75%를 기본으로 가정했습니다. 사용자가 입력한 효율은 기본값 대비 비율로 발전량에 적용합니다. 겨울은 12~2월 90일 기준입니다. </li>
@@ -414,8 +416,64 @@ function nearestSymbols(rows){
  }
  return shown;
 }
-let baseMap=null, lastCamera=null;
+let baseMap=null,lastCamera=null,rasterEnabled=false;
+const rasterTiles=new Map();
+const osmTileUrl='https://tile.openstreetmap.org';
+const mercatorOrigin=[(origin[0]+180)/360,originY+.5];
+
+function showBaseMap(type){
+ mapFrame.dataset.basemap=type;
+ mapFrame.classList.toggle('has-basemap',Boolean(type));
+ $('mapCredit').hidden=!type;
+ $('vectorCredit').hidden=type!=='vector';
+}
+
+function updateRasterMap(){
+ const {x,y,k}=state.view;
+ const z=Math.min(19,Math.max(0,Math.floor(tileZoom(k)+1)));
+ const tileCount=2**z,tileSize=k*mercatorScale/tileCount;
+ const left=x-mercatorOrigin[0]*k*mercatorScale,top=y-mercatorOrigin[1]*k*mercatorScale;
+ const firstX=Math.max(0,Math.floor(-left/tileSize)),lastX=Math.min(tileCount-1,Math.ceil((canvasW-left)/tileSize)-1);
+ const firstY=Math.max(0,Math.floor(-top/tileSize)),lastY=Math.min(tileCount-1,Math.ceil((canvasH-top)/tileSize)-1);
+ const visible=new Set(),raster=$('rasterMap');
+ let ready=false;
+ for(let row=firstY;row<=lastY;row++){
+  for(let column=firstX;column<=lastX;column++){
+   const key=z+'/'+column+'/'+row;
+   visible.add(key);
+   let tile=rasterTiles.get(key);
+   if(!tile){
+    tile=document.createElement('img');
+    tile.alt='';tile.draggable=false;
+    tile.onload=()=>{if(rasterEnabled&&tile.isConnected)showBaseMap('raster');};
+    tile.onerror=()=>{tile.hidden=true;};
+    rasterTiles.set(key,tile);
+    raster.append(tile);
+    tile.src=osmTileUrl+'/'+key+'.png';
+   }
+   tile.style.left=left+column*tileSize+'px';
+   tile.style.top=top+row*tileSize+'px';
+   tile.style.width=tile.style.height=Math.ceil(tileSize)+'px';
+   ready||=tile.complete&&tile.naturalWidth>0;
+  }
+ }
+ for(const [key,tile] of rasterTiles){
+  if(visible.has(key))continue;
+  tile.remove();rasterTiles.delete(key);
+ }
+ if(ready)showBaseMap('raster');
+ else showBaseMap('');
+}
+
+function startRasterMap(){
+ if(rasterEnabled)return;
+ rasterEnabled=true;
+ showBaseMap('');
+ updateRasterMap();
+}
+
 function syncBaseMap(){
+ if(rasterEnabled){updateRasterMap();return;}
  if(!baseMap)return;
  const {x,y,k}=state.view;
  const center=coordinates((canvasW/2-x)/k,(canvasH/2-y)/k);
@@ -425,14 +483,10 @@ function syncBaseMap(){
  baseMap.jumpTo(lastCamera);
 }
 
-function showBaseMap(show){
- mapFrame.classList.toggle('has-basemap',show);
- $('mapCredit').hidden=!show;
-}
-
 function loadBaseMap(){
  const library=document.createElement('script');
  library.src='https://cdn.jsdelivr.net/npm/maplibre-gl@5.12.0/dist/maplibre-gl.js';
+ library.onerror=startRasterMap;
  library.onload=()=>{
   try {
    baseMap=new maplibregl.Map({
@@ -441,13 +495,17 @@ function loadBaseMap(){
    });
    syncBaseMap();
    baseMap.on('idle',()=>{
+    if(rasterEnabled)return;
     const roadLayers=baseMap.getStyle().layers.filter(layer=>layer['source-layer']==='transportation').map(layer=>layer.id);
-    if(roadLayers.length&&baseMap.queryRenderedFeatures({layers:roadLayers}).length)showBaseMap(true);
+    if(roadLayers.length&&baseMap.queryRenderedFeatures({layers:roadLayers}).length)showBaseMap('vector');
    });
-   baseMap.on('webglcontextlost',()=>showBaseMap(false));
-  } catch(error) {
+   baseMap.on('error',event=>{
+    if(!mapFrame.classList.contains('has-basemap')&&(!baseMap.isStyleLoaded()||event.sourceId==='openmaptiles'))startRasterMap();
+   });
+   baseMap.on('webglcontextlost',startRasterMap);
+  } catch {
    baseMap=null;
-   console.warn('OpenFreeMap 배경을 사용할 수 없습니다.',error);
+   startRasterMap();
   }
  };
  document.head.append(library);
@@ -631,7 +689,7 @@ new ResizeObserver(()=>{
  const scale=Math.max(overall.k*.65,Math.min(overall.k*85,k));
  state.view=wasOverview?{...overall}:{k:scale,x:width/2-center[0]*scale,y:height/2-center[1]*scale};
  $('geo').setAttribute('viewBox','0 0 '+width+' '+height);
- baseMap?.resize();
+ if(!rasterEnabled)baseMap?.resize();
  paintMap();
 }).observe(mapFrame);
 const daysByMonth=monthNames.map(month=>new Date(Date.UTC(month===12?2021:2022,month,0)).getUTCDate());
