@@ -375,7 +375,7 @@ body{padding-left:164px}
   </div>
   <div class="pad horizon-profile">
     <div class="row horizon-heading">
-      <div><h3>방위별 지형 차폐 고도</h3><p class="sub" id="horizonSummary"></p></div>
+      <div><h3>방위별 차폐 고도</h3><p class="sub" id="horizonSummary"></p></div>
       <button type="button" class="export" id="exportHorizon" title="현재 검색·필터 결과의 방위별 차폐 고도">지형 차폐 CSV</button>
     </div>
     <canvas id="horizonChart" hidden role="img" aria-label="북쪽 0도에서 시계 방향으로 표시한 지형 차폐 고도 그래프"></canvas>
@@ -389,7 +389,7 @@ body{padding-left:164px}
 <li>지형 추정은 Copernicus DEM GLO-30과 가까운 기준 정류장 30곳의 PVGIS ERA5 일사량·태양 위치를 사용한 1차 추정입니다. 정류장별 DSM 차폐는 약 90 m~15 km 범위에서 계산했습니다. 가까운 건물·가로수·승강장에 의한 음영은 상세 확인이 필요합니다.</li>
 <li>국토교통부 <a href="https://www.data.go.kr/data/15083092/fileData.do">GIS건물통합정보</a> 부산 원본(2026.11.09, 공공누리 제1유형)을 적용한 3D는 9,268개 정류장에서 볼 수 있습니다. 높이값을 사용할 수 있는 정류장 9,264곳의 발전량을 다시 계산했습니다. 건축물대장 높이를 우선 사용하고, 높이값이 없으면 층수×3.2m로 추정합니다. 건물 바닥 고도는 DSM 주변 표고로 추정합니다. 건물의 지붕 세부 형상과 안뜰은 단순화했습니다. 계산 반경 400m, 건물 표시 약 250m, 방향 간격 2°입니다. 브이월드 부산 자료 밖 건물, 근거리 수목과 승강장은 모델 범위에 포함되지 않습니다. 일부 건물 3D는 자료가 확보된 건물의 차폐를 보여주고, 연간·월간 발전량에는 지형 모델을 사용합니다. 지형 기반 3D는 정류장 주변 약 300m의 지형과 2° 간격의 지형 차폐를 사용합니다. 모든 모델에서 수목·승강장에 의한 근거리 음영은 반영하지 않습니다. 모든 발전량은 2021.12~2022.11의 과거 기상 조건, 정남향·경사 30°·높이 3 m·시스템 발전 효율 75%를 기본으로 가정했습니다. 사용자가 입력한 효율은 기본값 대비 비율로 발전량에 적용합니다. 겨울은 12~2월 90일 기준입니다. </li>
 <li>교량·고가철도 음영은 <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors · ODbL</a>의 <a href="https://download.geofabrik.de/asia/south-korea.html">한국 지도 추출본</a>(2026.11.24 KST)에서 교량으로 표시된 도로·철도·보행교를 사용합니다. 청록색은 상판의 추정 폭입니다. <a href="./bridge-data.js">교량 모델 데이터</a>는 ODbL에 따라 제공합니다. 기본 밑면 높이는 도로교 6 m, 고가철도 8 m, 보행교 5 m로 추정합니다. 구조물 높이 보정은 정류장별로 저장되며, 시작·끝 높이로 경사를 만들고 차음벽이나 별도로 그린 역사·벽체도 계산에 넣습니다. 수동 추가 구조물은 직육면체 형태로 단순화합니다. 30분 간격의 월 대표일 직달광 변화로 기존 발전량을 보정하며, 버튼으로 교량 반영 전후를 비교할 수 있습니다.</li>
-<li>위치 보정은 같은 브라우저에 저장됩니다. 보정 위치에서 400 m 이내 건물 차폐를 다시 계산합니다. 지형 차폐는 원본 정류장의 모델을 사용하고, 패널 지면 높이는 주변 지형 격자에서 보간합니다. 보정 발전량은 월 대표일의 정남향 30° 패널에 입사하는 직달광 변화로 기존 월별 발전량을 보정한 추정치입니다. 목록 순위, 조회 결과 CSV 및 지형 차폐 CSV는 원본 모델 기준입니다.</li>
+<li>위치 보정은 같은 브라우저에 저장됩니다. 보정 위치에서 400 m 이내 건물 차폐를 다시 계산합니다. 지형 차폐는 원본 정류장의 모델을 사용하고, 패널 지면 높이는 주변 지형 격자에서 보간합니다. 보정 발전량은 월 대표일의 정남향 30° 패널에 입사하는 직달광 변화로 기존 월별 발전량을 보정한 추정치입니다. 위치·구조물을 보정한 정류장은 목록과 발전량 CSV에도 보정 결과를 표시합니다. 지형 차폐 CSV는 지형만 포함합니다.</li>
 <li>건물 윤곽 비교는 지도 위에 3D 모델의 GIS건물통합정보 외곽선을 표시합니다. 점선은 높이 미상, 주황색 면은 높이 또는 층수가 있는 경우이며, 범위 내 윤곽은 높이와 관계없이 표시합니다. 배경지도나 로드뷰의 시점과 원본 자료의 시점에 따라 차이가 날 수 있습니다.</li>
 <li>높이와 층수가 모두 미상인 건물은 지면에 윤곽만 표시하며 건물 차폐 계산에서 제외합니다.<span id="unknownBuildingNote" hidden></span></li>
 <li>태양 경로는 선택한 월의 15일을 기준으로 00:00~23:30(KST)을 30분 단위로 표시합니다. 기존 시각별 차폐 자료만 있는 모형은 가장 가까운 기존 계산 시각의 차폐 여부를 사용합니다.</li>
@@ -833,14 +833,22 @@ function matchesModel(s,model){
  const kind=s.detailed?'detail':data.partialScenes?.[s.id]?'partial':'terrain';
  return model==='all'||model===kind;
 }
+function editedOutput(s){
+ if(!structuresByStop.has(s.id)&&!savedLocations.has(s.id))return null;
+ const {monthlyWh,loss}=siteGeneration(s);
+ return {months:monthlyWh.map(wh=>wh/1000),annual:monthlyWh.reduce((a,b)=>a+b,0)/1000,
+  winter:monthlyWh.slice(0,3).reduce((a,b)=>a+b,0)/90,loss};
+}
 function queryResults(){
  const raw=$('q').value.trim(), q=raw.toLowerCase().replace(/\s/g,'');
  const matchNumber=/^\d{5}$/.test(q), model=$('model').value, order=$('order').value;
+ const winters=new Map();
+ function winter(s){if(!winters.has(s.id))winters.set(s.id,editedOutput(s)?.winter??s.winter*generationScale());return winters.get(s.id);}
  return stops.filter(s=>(state.district===null||s.district===state.district)
   && matchesModel(s,model)
   && (!q||(matchNumber?s.ars===q:[s.ars,s.name,s.id].some(v=>v.toLowerCase().replace(/\s/g,'').includes(q)))))
  .sort((a,b)=>{
-  if(order==='winter')return a.winter-b.winter||a.id.localeCompare(b.id);
+  if(order==='winter')return winter(a)-winter(b)||a.id.localeCompare(b.id);
   if(order==='name')return a.name.localeCompare(b.name,'ko')||a.id.localeCompare(b.id);
   return (a.ars||'99999').localeCompare(b.ars||'99999')||a.name.localeCompare(b.name,'ko')||a.id.localeCompare(b.id);
  });
@@ -856,7 +864,7 @@ function renderList(resetScroll){
   const middle=document.createElement('span'),title=document.createElement('strong'),temp=document.createElement('span');
   title.textContent=s.name;temp.className='sub';temp.textContent=names(s.district)+' · '+s.id;middle.append(title,temp);
   const measure=document.createElement('span');measure.className='measure';
-  measure.textContent=decimal(s.winter*scale)+' Wh/일';
+  measure.textContent=decimal(editedOutput(s)?.winter??s.winter*scale)+' Wh/일';
   if(s.detailed){ const tag=document.createElement('span');tag.className='dot detail';tag.title='건물 음영 상세 분석';tag.setAttribute('aria-label','건물 음영 상세 분석');measure.prepend(tag); }
   b.append(num,middle,measure);frag.append(b);
  }
@@ -1214,7 +1222,7 @@ $('resetSimulation').addEventListener('click',()=>{
 $('export').addEventListener('click',()=>{
  const scale=generationScale();
  const header=['정류장번호(ARS)','내부ID','정류장명','구군','위도','경도','분석 유형','패널 W','연간 kWh','겨울 평균 Wh/일','연간 음영 손실 %','일사량 기준 ID',...monthNames.map(m=>m+'월 kWh'),'시스템 발전 효율 %'];
- const rows=results.map(s=>[s.ars,s.id,s.name,names(s.district),s.lat,s.lon,s.detailed?'건물 음영 포함':'지형 추정',state.power*60,(s.annual*scale).toFixed(3),(s.winter*scale).toFixed(2),s.loss,s.reference,...s.months.map(x=>(x*scale).toFixed(4)),state.efficiency]);
+ const rows=results.map(s=>{const out=editedOutput(s),loc=savedLocations.get(s.id)??s;return [s.ars,s.id,s.name,names(s.district),loc.lat,loc.lon,s.detailed?'건물 음영 포함':'지형 추정',state.power*60,(out?.annual??s.annual*scale).toFixed(3),(out?.winter??s.winter*scale).toFixed(2),out?.loss??s.loss,s.reference,...(out?.months??s.months.map(x=>x*scale)).map(x=>x.toFixed(4)),state.efficiency]});
  const csv=[header,...rows].map(row=>row.map(value=>'"'+String(value).replaceAll('"','""')+'"').join(',')).join('\r\n');
  const href=URL.createObjectURL(new Blob(['\ufeff',csv],{type:'text/csv;charset=utf-8'}));
  const a=document.createElement('a');a.href=href;a.download='ECOBIT_Busan_Stops_'+state.power*60+'W.csv';a.click();setTimeout(()=>URL.revokeObjectURL(href),3000);
@@ -1731,6 +1739,26 @@ function infraSegments(stop,location){
  return decks;
 }
 
+// Intersect a horizontal bearing with the convex deck footprint, then project
+// both sloped faces into elevation angles as seen from the 3 m panel.
+function structureBands(decks,az){
+ const dx=Math.sin(az*rad),dy=Math.cos(az*rad),bands=[];
+ for(const deck of decks){
+  const {ring}=deck;
+  const near=insideFootprint(ring,0,0)?0:rayHit(ring,0,0,dx,dy);
+  if(near>buildingRadius)continue;
+  const far=insideFootprint(ring,dx*buildingRadius,dy*buildingRadius)?buildingRadius:
+   buildingRadius-rayHit(ring,dx*buildingRadius,dy*buildingRadius,-dx,-dy);
+  if(far<near-1e-6)continue;
+  const [gx,gy]=deck.gradient;
+  const angle=(d,h)=>Math.atan2(deck.base-3+d*(gx*dx+gy*dy)+h,d)/rad;
+  const low=Math.max(0,Math.min(angle(near,0),angle(far,0)));
+  const high=Math.max(angle(near,deck.height),angle(far,deck.height));
+  if(high>low)bands.push([low,high]);
+ }
+ return bands;
+}
+
 function bridgeBlocks(deck,alt,az){
  const dx=Math.sin(az*rad),dy=Math.cos(az*rad);
  const [gx,gy]=deck.gradient??[0,0];
@@ -1778,7 +1806,7 @@ function correctedScene(stop){
   Math.hypot(Math.max(deck.bounds[0],-deck.bounds[2],0),Math.max(deck.bounds[1],-deck.bounds[3],0))<=250)
   .map(deck=>[deck.ring,deck.base,deck.height,deck.role==='wall'||deck.way.custom?'barrier':'bridge',deck.gradient])]:model.meshes;
  return correctionCache={...model,meshes,locationKey:key,sun,monthly,moved:Boolean(adjusted&&vworld),
-  bridgeCount:new Set(decks.map(deck=>deck.id)).size};
+  decks,structureBands:null,bridgeCount:new Set(decks.map(deck=>deck.id)).size};
 }
 
 function drawTerrain(site,project,line){
@@ -1957,7 +1985,7 @@ function drawScene(){
  $('sunState').textContent=site.patch&&!site.registry&&!site.bridgeCount&&sun[0]>0?(sun[2]?'지형에 가림':'지형 차폐 없음'):description;
  $('sunState').classList.toggle('blocked',sun[0]>0 && sun[2]);
  $('sunAltitude').textContent='태양 고도 '+decimal(sun[0])+'° · 방위각 '+decimal(sun[1])+'°';
- drawHorizonProfile(sun,site.angles,path,site.bridgeCount);
+ drawHorizonProfile(sun,site.angles,path,site);
  const a=Number(orbit.value)*rad,ca=Math.cos(a),sa=Math.sin(a);
  const bounds=[Infinity,Infinity,-Infinity,-Infinity];
  function coordinates(x,y,z){
@@ -2010,7 +2038,10 @@ function drawScene(){
  faces.sort((x,y)=>y[0]-x[0]);
  for(const [,pts,color] of faces)line(pts,'#607da9',.35,color);
  const sky=([alt,az])=>project(142*Math.cos(alt*rad)*Math.sin(az*rad),142*Math.cos(alt*rad)*Math.cos(az*rad),3+142*Math.sin(alt*rad));
- line(path.filter(p=>p[0]>0).map(sky),'#b5781f',2);
+ for(let i=1;i<path.length;i++){
+  const prev=path[i-1],next=path[i];
+  if(prev[0]>0&&next[0]>0)line([sky(prev),sky(next)],next[2]?'#ab4d38':'#b5781f',2);
+ }
  const center=project(0,0,3);
  if(sun[0]>0){
   const target=sky(sun);c.setLineDash([5,4]);line([center,target],sun[2]?'#ab4d38':'#b7811d',2);c.setLineDash([]);
@@ -2022,7 +2053,10 @@ function drawScene(){
 }
 
 const horizonCanvas=$('horizonChart');
-function drawHorizonProfile(sun,merged,path,bridgeCount){
+function drawHorizonProfile(sun,merged,path,site){
+ const decks=site.decks??[];
+ const bands=site.structureBands??=Array.from({length:180},(_,i)=>structureBands(decks,i*2));
+ const peakDeck=Math.max(0,...bands.map(group=>Math.max(0,...group.map(b=>b[1]))));
  const id=state.selection,{angles,peak,bearing}=terrainProfile(id);
  const obstruction=terrainObstruction(angles,sun[1]);
  const aboveHorizon=sun[0]>0;
@@ -2032,8 +2066,12 @@ function drawHorizonProfile(sun,merged,path,bridgeCount){
   :'태양이 지평선 아래에 있어 직달광이 없습니다.';
  $('horizonSummary').textContent='최대 '+decimal(peak)+'°'+(peak?' · 방위각 '+bearing+'°':'')+' · 2° 간격';
  const filterCount=results.length;
- $('horizonExportScope').textContent='가로는 방위각, 세로는 고도입니다. 파란 선은 지형, 진한 선은 건물·지형 차폐 고도입니다. 주황색 태양 점이 차폐선보다 높으면 그 방향에서 직달광이 들어옵니다. 해가 지평선 아래일 때는 차폐선만 표시합니다. · CSV 대상 '+filterCount.toLocaleString()+'곳'+(bridgeCount?' · 교량 상판 차폐는 시간별 판정에 반영합니다.':'');
- horizonCanvas.setAttribute('aria-label','지형 차폐 고도 그래프. '+$('horizonSummary').textContent+'. '+$('terrainCheck').textContent);
+ if(decks.length){
+  $('horizonSummary').textContent+=' · 구조물 상단 최대 '+decimal(peakDeck)+'°';
+  if(aboveHorizon)$('terrainCheck').textContent+=' · '+(decks.some(d=>bridgeBlocks(d,sun[0],sun[1]))?'구조물에 가림':'구조물 직달광 통과');
+ }
+ $('horizonExportScope').textContent='파랑은 지형, 진한 선은 건물 포함 차폐선입니다. 청록색 띠는 구조물이 가리는 고도 범위입니다. 주황색 점은 현재 태양 위치입니다. 지형 차폐 CSV 대상 '+filterCount.toLocaleString()+'곳';
+ horizonCanvas.setAttribute('aria-label','방위별 차폐 고도. '+$('horizonSummary').textContent+'. '+$('terrainCheck').textContent);
  const w=horizonCanvas.clientWidth,h=horizonCanvas.clientHeight,dpr=Math.min(devicePixelRatio||1,2);
  if(!w||!h)return;
  horizonCanvas.width=w*dpr;horizonCanvas.height=h*dpr;
@@ -2041,7 +2079,7 @@ function drawHorizonProfile(sun,merged,path,bridgeCount){
  const left=34,right=w-28,top=10,bottom=h-23;
  const mergedPeak=merged?Math.max(...merged):peak;
  if(merged)$('horizonSummary').textContent+=' · 건물 포함 최대 '+decimal(mergedPeak)+'°';
- const topAngle=Math.max(15,Math.ceil(Math.max(mergedPeak,...path.map(point=>point[0]))/15)*15);
+ const topAngle=Math.max(15,Math.ceil(Math.max(peakDeck,mergedPeak,...path.map(point=>point[0]))/15)*15);
  const x=deg=>left+(right-left)*deg/360,y=deg=>bottom-(bottom-top)*deg/topAngle;
  c.font='11px "Pretendard Variable", system-ui';
  for(const value of [0,topAngle/3,2*topAngle/3,topAngle]){
@@ -2063,6 +2101,10 @@ function drawHorizonProfile(sun,merged,path,bridgeCount){
   for(let i=1;i<=horizonSamples;i++)c.lineTo(x(i*2),y(merged[i%horizonSamples]));
   c.strokeStyle='#10234b';c.lineWidth=1.5;c.stroke();
  }
+ c.fillStyle='rgba(19,139,116,.52)';
+ bands.forEach((group,i)=>{
+  for(const [lo,hi] of group)c.fillRect(x(i*2),y(hi),x(2)-x(0),Math.max(1,y(lo)-y(hi)));
+ });
  if(aboveHorizon){
   const sx=x(sun[1]);c.setLineDash([4,3]);c.strokeStyle='#ac6307';
   c.beginPath();c.moveTo(sx,top);c.lineTo(sx,bottom);c.stroke();c.setLineDash([]);
