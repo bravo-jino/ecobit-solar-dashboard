@@ -165,6 +165,24 @@ body{padding-left:164px}
  .battery-chart{font-size:18px}
  .battery-chart .extra-month{display:none}
 }
+.location-panel{padding:12px 16px;border-top:1px solid var(--line)}
+.location-panel .row,.location-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.location-panel .row{justify-content:space-between}
+.location-panel p{margin:5px 0 0}
+.location-panel a{color:var(--pine);padding:5px 0}
+.location-panel button[aria-pressed=true]{background:var(--light);color:var(--pine)}
+.location-tools{margin-top:9px;display:grid;gap:7px}
+.location-tools[hidden]{display:none}
+.location-fields{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.location-fields label{display:grid;gap:3px;font-size:12px;color:var(--muted)}
+.location-fields input{width:136px}
+.map.is-adjusting svg{cursor:crosshair}
+.analysis-building{fill:#d484261a;stroke:#a85907;stroke-width:1.5;vector-effect:non-scaling-stroke;pointer-events:none}
+.analysis-building.unknown{stroke-dasharray:4 2;fill:transparent}
+.analysis-bridge{fill:#08796f35;stroke:#08796f;stroke-width:1.6;vector-effect:non-scaling-stroke;pointer-events:none}
+.original-stop{fill:white;stroke:#294367;stroke-width:2;pointer-events:none}
+.adjusted-stop{fill:#285fdb;stroke:white;stroke-width:2.5;pointer-events:none}
+.location-line{stroke:#294367;stroke-width:1.5;stroke-dasharray:4 3;pointer-events:none}
 </style>
 </head>
 <body>
@@ -188,10 +206,29 @@ body{padding-left:164px}
 <section class="summary" aria-label="정류장 집계"><div><span>부산 버스 정류장 목록</span><b id="total"></b></div><div><span>5자리 공개 번호 확인</span><b id="withArs"></b></div><div><span>건물 음영 상세 분석</span><b id="withDetail"></b></div><div><span>3D 태양 경로</span><b id="with3D"></b></div></section>
 <div class="layout" id="explore">
 <section class="card" aria-labelledby="mapTitle"><div class="pad barline"><div class="row"><div><h2 id="mapTitle">부산 전체</h2><p class="sub" id="mapHint">지도나 오른쪽 목록에서 구·군을 선택하세요.</p></div><button type="button" class="control" id="reset">부산 전체 보기</button></div></div>
-<div class="map" id="map"><div id="rasterMap" class="base-map raster-map" aria-hidden="true"></div><div id="baseMap" class="base-map vector-map" aria-hidden="true"></div><svg id="geo" viewBox="0 0 960 630" preserveAspectRatio="none" aria-label="부산 구군 및 정류장 지도"><g id="world"><image id="terrain" class="terrain"/><g id="areas"></g></g><g id="markers"></g><g id="labels"></g></svg>
+<div class="map" id="map"><div id="rasterMap" class="base-map raster-map" aria-hidden="true"></div><div id="baseMap" class="base-map vector-map" aria-hidden="true"></div><svg id="geo" viewBox="0 0 960 630" preserveAspectRatio="none" aria-label="부산 구군 및 정류장 지도"><g id="world"><image id="terrain" class="terrain"/><g id="areas"></g><g id="analysisBuildings" aria-hidden="true"></g></g><g id="markers"></g><g id="labels"></g></svg>
 <div class="map-tools"><button type="button" id="zoomIn" title="지도 확대" aria-label="지도 확대">+</button><button type="button" id="zoomOut" title="지도 축소" aria-label="지도 축소">−</button></div><div class="north" aria-hidden="true">▲<br>N</div>
 <div class="map-credit" id="mapCredit" hidden><span id="vectorCredit" hidden><a href="https://openfreemap.org/">OpenFreeMap</a> · © <a href="https://openmaptiles.org/">OpenMapTiles</a> · </span>© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a></div></div>
 <div class="guide"><div class="legend"><span><i class="dot"></i>지형 추정</span><span><i class="dot detail"></i>건물 포함</span><span><i class="dot partial"></i>일부 건물</span><span><i class="dot current"></i>선택 정류장</span></div><a class="sub" href="#insight" id="jumpDetail" hidden>선택 정류장의 발전량 보기 ↓</a><span class="sub" id="boundaryHint">구·군 경계는 탐색용</span></div>
+<div class="location-panel" id="locationPanel" hidden>
+ <div class="row"><strong>정류장 분석 위치</strong><div class="location-actions">
+  <button type="button" class="control" id="adjustLocation" aria-expanded="false">정류장 위치 보정</button>
+  <button type="button" class="control" id="compareBuildings" aria-pressed="false" disabled>건물 윤곽 비교</button>
+  <button type="button" class="control" id="bridgeShade" aria-pressed="true">교량·고가철도 음영</button>
+  <a id="locationRoadview" target="_blank" rel="noopener">로드뷰 ↗</a>
+ </div></div>
+ <p class="sub" id="locationStatus" aria-live="polite"></p>
+ <p class="sub" id="buildingStatus" hidden></p><p class="sub" id="bridgeStatus" hidden></p>
+ <div class="location-tools" id="locationTools" hidden>
+  <p class="sub">쉘터 지붕이나 지주 위치를 지도에서 클릭하거나 좌표를 입력하세요. 원본 위치 반경 150 m 안에서 보정할 수 있습니다.</p>
+  <div class="location-fields"><label>위도<input id="adjustLat" class="sort" type="number" step="any"></label><label>경도<input id="adjustLon" class="sort" type="number" step="any"></label></div>
+  <div class="location-actions">
+   <button type="button" class="export" id="saveLocation">보정 적용</button>
+   <button type="button" class="control" id="cancelLocation">취소</button>
+   <button type="button" class="control" id="restoreLocation" hidden>원본 좌표로 복원</button>
+  </div>
+ </div>
+</div>
 </section>
 <section class="card list-area" aria-labelledby="listTitle"><div class="pad barline"><div class="row"><h2 id="listTitle">정류장 찾기</h2><div class="list-actions"><button type="button" class="control" id="clearConditions" hidden>조건 초기화</button><button type="button" class="export" id="export">조회 결과 CSV</button></div></div>
 <div class="filters"><input id="q" type="search" aria-label="5자리 정류장 번호 또는 정류장명" placeholder="5자리 정류장 번호 또는 정류장명"><select id="model" aria-label="분석 유형"><option value="all">전체 유형</option><option value="detail">건물 포함 3D</option><option value="partial">일부 건물 3D</option><option value="terrain">지형 기반 3D</option></select></div>
@@ -326,11 +363,16 @@ body{padding-left:164px}
 <li>표시 경계와 정류장 구·군 분류는 <a href="https://www.openstreetmap.org/relation/2396450">OpenStreetMap 부산광역시 하위 행정구역</a>을 사용합니다. <a href="./busan-district-boundaries.js">구·군 경계 데이터</a> © OpenStreetMap contributors, <a href="https://www.openstreetmap.org/copyright">ODbL 1.0</a>. 2026.11.23 기준입니다. 경계에서 120 m 이내의 바깥 좌표는 가까운 구·군에 배치하고, 나머지는 ‘시 경계 밖’에 표시합니다. 초기 확대 범위는 육지 중심이며, 경계 데이터를 불러오지 못하면 통계청 SGIS 기반 기존 경계를 표시합니다.</li>
 <li>지형 추정은 Copernicus DEM GLO-30과 가까운 기준 정류장 30곳의 PVGIS ERA5 일사량·태양 위치를 사용한 1차 추정입니다. 정류장별 DSM 차폐는 약 90 m~15 km 범위에서 계산했습니다. 가까운 건물·가로수·승강장에 의한 음영은 상세 확인이 필요합니다.</li>
 <li>국토교통부 <a href="https://www.data.go.kr/data/15083092/fileData.do">GIS건물통합정보</a> 부산 원본(2026.11.09, 공공누리 제1유형)을 적용한 3D는 9,268개 정류장에서 볼 수 있습니다. 높이값을 사용할 수 있는 정류장 9,264곳의 발전량을 다시 계산했습니다. 건축물대장 높이를 우선 사용하고, 높이값이 없으면 층수×3.2m로 추정합니다. 건물 바닥 고도는 DSM 주변 표고로 추정합니다. 건물의 지붕 세부 형상과 안뜰은 단순화했습니다. 계산 반경 400m, 건물 표시 약 250m, 방향 간격 2°입니다. 브이월드 부산 자료 밖 건물, 근거리 수목과 승강장은 모델 범위에 포함되지 않습니다. 일부 건물 3D는 자료가 확보된 건물의 차폐를 보여주고, 연간·월간 발전량에는 지형 모델을 사용합니다. 지형 기반 3D는 정류장 주변 약 300m의 지형과 2° 간격의 지형 차폐를 사용합니다. 모든 모델에서 수목·승강장에 의한 근거리 음영은 반영하지 않습니다. 모든 발전량은 2021.12~2022.11의 과거 기상 조건, 정남향·경사 30°·높이 3 m·시스템 발전 효율 75%를 기본으로 가정했습니다. 사용자가 입력한 효율은 기본값 대비 비율로 발전량에 적용합니다. 겨울은 12~2월 90일 기준입니다. </li>
+<li>교량·고가철도 음영은 <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors · ODbL</a>의 <a href="https://download.geofabrik.de/asia/south-korea.html">한국 지도 추출본</a>(2026.11.24 KST)에서 교량으로 표시된 도로·철도·보행교를 사용합니다. 청록색은 상판의 추정 폭입니다. <a href="./bridge-data.js">교량 모델 데이터</a>는 ODbL에 따라 제공합니다. 이번 자료의 지상고는 도로교 6 m, 고가철도 8 m, 보행교 5 m로 추정하고, 교각·차음벽·지상 선로는 별도로 모델링하지 않습니다. 30분 간격의 월 대표일 직달광 변화로 기존 발전량을 보정하며, 버튼으로 교량 반영 전후를 비교할 수 있습니다.</li>
+<li>위치 보정은 같은 브라우저에 저장됩니다. 보정 위치에서 400 m 이내 건물 차폐를 다시 계산합니다. 지형 차폐는 원본 정류장의 모델을 사용하고, 패널 지면 높이는 주변 지형 격자에서 보간합니다. 보정 발전량은 월 대표일의 정남향 30° 패널에 입사하는 직달광 변화로 기존 월별 발전량을 보정한 추정치입니다. 목록 순위, 조회 결과 CSV 및 지형 차폐 CSV는 원본 모델 기준입니다.</li>
+<li>건물 윤곽 비교는 지도 위에 3D 모델의 GIS건물통합정보 외곽선을 표시합니다. 점선은 높이 미상, 주황색 면은 높이 또는 층수가 있는 경우이며, 범위 내 윤곽은 높이와 관계없이 표시합니다. 배경지도나 로드뷰의 시점과 원본 자료의 시점에 따라 차이가 날 수 있습니다.</li>
 <li>높이와 층수가 모두 미상인 건물은 지면에 윤곽만 표시하며 건물 차폐 계산에서 제외합니다.<span id="unknownBuildingNote" hidden></span></li>
 <li>태양 경로는 선택한 월의 15일을 기준으로 00:00~23:30(KST)을 30분 단위로 표시합니다. 기존 시각별 차폐 자료만 있는 모형은 가장 가까운 기존 계산 시각의 차폐 여부를 사용합니다.</li>
 <li>배터리 용량 기본값은 972.8 Wh, 일일 소비량은 28 Wh/일입니다. 연속 흐림, 시간대별 충방전, 배터리 노화와 방전 제한은 반영하지 않습니다. 조회 결과 CSV는 정류장별 추가 손실과 월별 직접 입력값을 적용하기 전의 모델 값을 내보냅니다.</li>
 </ul></details></footer>
 </main>
+<script type="application/octet-stream" id="bridgeData"></script>
+<script src="./bridge-data.js"></script>
 <script type="application/json" id="payload"></script>
 <script src="./station-data.js"></script>
 <script src="./busan-district-boundaries.js"></script>
@@ -422,6 +464,135 @@ function coordinates(x,y){
 const tileZoom=k=>Math.log2(k*mercatorScale/512);
 const box=points=>[Math.min(...points.map(p=>p[0])),Math.min(...points.map(p=>p[1])),Math.max(...points.map(p=>p[0])),Math.max(...points.map(p=>p[1]))];
 const stopXY=new Map(stops.map(s=>[s.id,point(s.lon,s.lat)]));
+const locationKey='ecobit-busan-stop-locations-v1', locationLimit=150;
+let savedLocations=new Map(), locationDraft=null, compareOutlines=false, locationSelection=null;
+let bridgeEnabled=true;
+let locationMessage='', modelLoading=true;
+try {
+ for(const [id,location] of Object.entries(JSON.parse(localStorage.getItem(locationKey)??'{}'))){
+  const stop=lookup.get(id);
+  if(stop&&validLocation(stop,location))savedLocations.set(id,location);
+ }
+} catch {}
+function stopOffset(stop,location){
+ const factor=Math.PI/180, phi=stop.lat*factor, sin=Math.sin(phi);
+ const eccentricity=.00669437999014, scale=Math.sqrt(1-eccentricity*sin*sin);
+ const east=6378137/scale*Math.cos(phi), north=6378137*(1-eccentricity)/scale**3;
+ return [(location.lon-stop.lon)*factor*east,(location.lat-stop.lat)*factor*north];
+}
+function offsetLocation(stop,east,north){
+ const [lonDegree,latDegree]=stopOffset(stop,{lon:stop.lon+1,lat:stop.lat+1});
+ return {lon:stop.lon+east/lonDegree,lat:stop.lat+north/latDegree};
+}
+function validLocation(stop,location){
+ return location&&Number.isFinite(location.lon)&&Number.isFinite(location.lat)
+   &&Math.hypot(...stopOffset(stop,location))<=locationLimit;
+}
+function selectedLocation(stop){return savedLocations.get(stop.id)??stop;}
+function locationLine(stop,location){
+ return '위도 '+location.lat.toFixed(6)+' · 경도 '+location.lon.toFixed(6)
+  +' · 원본에서 '+decimal(Math.hypot(...stopOffset(stop,location)))+' m';
+}
+function locationPanel(){
+ const stop=lookup.get(state.selection);
+ if(locationSelection!==state.selection){
+  locationSelection=state.selection;
+  locationDraft=null;
+  locationMessage='';
+ }
+ $('locationPanel').hidden=!stop;
+ if(!stop){
+  mapFrame.classList.remove('is-adjusting');
+  return;
+ }
+ const adjusted=savedLocations.get(stop.id);
+ const confirmed=adjusted??stop;
+ const preview=locationDraft?.point??confirmed;
+ const editing=Boolean(locationDraft);
+ $('locationTools').hidden=!editing;
+ $('adjustLocation').setAttribute('aria-expanded',String(editing));
+ $('compareBuildings').disabled=!vworld;
+ $('compareBuildings').setAttribute('aria-pressed',String(compareOutlines));
+ $('restoreLocation').hidden=!adjusted;
+ $('saveLocation').disabled=!validLocation(stop,locationDraft?.point);
+ $('buildingStatus').hidden=!compareOutlines;
+ $('bridgeShade').setAttribute('aria-pressed',String(bridgeEnabled));
+ const bridges=infraSegments(stop,preview);
+ $('bridgeStatus').hidden=!bridgeEnabled||!bridges.length;
+ if(bridgeEnabled&&bridges.length)$('bridgeStatus').textContent='청록색은 주변 교량·고가철도 상판입니다. 상판 폭과 지상고는 추정값을 포함합니다.';
+ if(compareOutlines)$('buildingStatus').textContent='주황색 윤곽은 3D 분석에 사용하는 건물 데이터입니다. 점선은 높이 미상입니다.';
+ $('locationStatus').textContent=locationMessage||(editing?'후보 위치 · '+locationLine(stop,preview)
+  :adjusted?'보정 위치 · '+locationLine(stop,adjusted)+' · 빈 원은 원본 위치':'공공데이터 원본 위치');
+ $('locationRoadview').href='https://map.kakao.com/link/roadview/'+preview.lat+','+preview.lon;
+ mapFrame.classList.toggle('is-adjusting',editing);
+}
+function setLocationDraft(stop,location,fromMap){
+ if(!validLocation(stop,location)){
+  locationMessage='원본에서 150 m 이내의 위치를 선택하세요.';
+  if(!fromMap)locationDraft.point=null;
+ }else{
+  locationDraft.point=location;
+  locationMessage='';
+  if(fromMap){
+   $('adjustLat').value=location.lat.toFixed(7);
+   $('adjustLon').value=location.lon.toFixed(7);
+  }
+ }
+ paintMap();
+}
+$('adjustLocation').addEventListener('click',()=>{
+ const stop=lookup.get(state.selection);
+ if(!stop)return;
+ if(locationDraft){$('cancelLocation').click();return;}
+ locationDraft={point:selectedLocation(stop)};
+ const {lat,lon}=locationDraft.point;
+ $('adjustLat').value=lat.toFixed(7);
+ $('adjustLon').value=lon.toFixed(7);
+ const [x,y]=point(lon,lat);
+ const k=Math.max(state.view.k,512*2**17/mercatorScale);
+ state.view={k,x:canvasW/2-x*k,y:canvasH/2-y*k};
+ locationMessage='';
+ paintMap();
+});
+for(const id of ['adjustLat','adjustLon'])$(id).addEventListener('input',()=>{
+ const stop=lookup.get(state.selection);
+ if(stop&&locationDraft)setLocationDraft(stop,{lat:$('adjustLat').valueAsNumber,lon:$('adjustLon').valueAsNumber},false);
+});
+$('bridgeShade').addEventListener('click',()=>{
+ bridgeEnabled=!bridgeEnabled;
+ refresh(false);
+});
+$('compareBuildings').addEventListener('click',()=>{
+ compareOutlines=!compareOutlines;
+ if(compareOutlines&&state.view.k<512*2**15/mercatorScale){
+  const stop=lookup.get(state.selection);
+  const location=locationDraft?.point??selectedLocation(stop);
+  const [x,y]=point(location.lon,location.lat), k=512*2**16/mercatorScale;
+  state.view={k,x:canvasW/2-x*k,y:canvasH/2-y*k};
+ }
+ paintMap();
+});
+function applyLocation(location){
+ const stop=lookup.get(state.selection);
+ if(!stop)return;
+ if(location&&!validLocation(stop,location))return;
+ if(location&&Math.hypot(...stopOffset(stop,location))>.02)savedLocations.set(stop.id,location);
+ else savedLocations.delete(stop.id);
+ locationDraft=null;
+ locationMessage='';
+ try{localStorage.setItem(locationKey,JSON.stringify(Object.fromEntries(savedLocations)));}
+ catch{locationMessage='이 탭에 적용했습니다. 브라우저 설정 때문에 다시 열 때 복원되지 않습니다.';}
+ refresh(false);
+ $('adjustLocation').focus({preventScroll:true});
+}
+$('saveLocation').addEventListener('click',()=>{if(locationDraft?.point)applyLocation(locationDraft.point);});
+$('restoreLocation').addEventListener('click',()=>applyLocation(null));
+$('cancelLocation').addEventListener('click',()=>{
+ locationDraft=null;
+ locationMessage='';
+ paintMap();
+ $('adjustLocation').focus({preventScroll:true});
+});
 const poly=districtRings.map(rings=>rings.map(ring=>ring.map(([lon,lat])=>point(lon,lat))));
 const landViewPoints=districts.map(d=>d.rings.flat().map(([lon,lat])=>point(lon,lat)));
 const regionBoxes=landViewPoints.map(points=>box(points));
@@ -556,6 +727,7 @@ function loadBaseMap(){
 
 function paintMap(){
  syncBaseMap();
+ locationPanel();
  $('world').setAttribute('transform','translate('+state.view.x+' '+state.view.y+') scale('+state.view.k+')');
  const picked=lookup.get(state.selection), district=state.district;
  paths.forEach((path,i)=>{
@@ -570,6 +742,7 @@ function paintMap(){
    const title=svgEl('title');title.textContent=(s.ars?s.ars+' · ':'')+s.name;spot.append(title);marks.append(spot);
   }
  }
+ paintBuildingOutlines(picked);
  const labels=document.createDocumentFragment();
  for(const [i,d] of districts.entries()){
   if(district!==null&&district!==i)continue;
@@ -578,8 +751,14 @@ function paintMap(){
   text.textContent=d.name;labels.append(text);
  }
  if(picked){
-  const [x,y]=projected(stopXY.get(picked.id));
-  marks.append(svgEl('circle',{cx:x,cy:y,r:7.4,class:'position'}));
+  const location=locationDraft?.point??selectedLocation(picked);
+  const [x,y]=projected(point(location.lon,location.lat));
+  if(location!==picked||locationDraft){
+   const [ox,oy]=projected(stopXY.get(picked.id));
+   marks.append(svgEl('line',{x1:ox,y1:oy,x2:x,y2:y,class:'location-line'}),
+    svgEl('circle',{cx:ox,cy:oy,r:5,class:'original-stop'}),
+    svgEl('circle',{cx:x,cy:y,r:7,class:'adjusted-stop'}));
+  }else marks.append(svgEl('circle',{cx:x,cy:y,r:7.4,class:'position'}));
   const marker=svgEl('text',{x:x>canvasW*.72?x-12:x+12,y:y-10,'text-anchor':x>canvasW*.72?'end':'start',class:'map-label'});
   marker.textContent=(picked.ars?picked.ars+' · ':'')+picked.name;labels.append(marker);
  }
@@ -602,7 +781,8 @@ function selectStop(s,fromList=true){
  if(fromList&&(state.district!==s.district)){
   state.district=s.district;state.page=0;state.view=fit(extentFor(s.district),43);
  }
- const [x,y]=stopXY.get(s.id);
+ const location=selectedLocation(s);
+ const [x,y]=point(location.lon,location.lat);
  const detailScale=512*2**16/mercatorScale;
  const k=Math.max(state.view.k,detailScale);
  if(fromList||k>state.view.k)state.view={k,x:canvasW/2-x*k,y:canvasH/2-y*k};
@@ -715,6 +895,13 @@ $('geo').addEventListener('pointerup',()=>{grab=null;if(suppress)setTimeout(()=>
 $('geo').addEventListener('pointercancel',()=>{grab=null;suppress=false;});
 $('geo').addEventListener('click',e=>{
  if(suppress)return;
+ if(locationDraft){
+  const rect=$('geo').getBoundingClientRect();
+  const {x,y,k}=state.view;
+  const [lon,lat]=coordinates(((e.clientX-rect.left)*canvasW/rect.width-x)/k,((e.clientY-rect.top)*canvasH/rect.height-y)/k);
+  setLocationDraft(lookup.get(state.selection),{lon,lat},true);
+  return;
+ }
  const index=e.target.dataset.district;
  if(e.target.dataset.stop){selectStop(lookup.get(e.target.dataset.stop),false);return;}
  if(index!==undefined && Number(index)!==state.district)chooseDistrict(Number(index));
@@ -747,6 +934,7 @@ function drawProfile(updateScene=true){
  if(updateScene)renderSolarScene();
  const s=lookup.get(state.selection);
  const generation=s?siteGeneration(s):null;
+ const adjusted=s&&savedLocations.get(s.id);
  drawBattery(s,generation);
  jumpDetail.hidden=!s;
  boundaryHint.hidden=Boolean(s);
@@ -757,18 +945,24 @@ function drawProfile(updateScene=true){
  const ars=document.createElement('strong'),tags=document.createElement('span');
  ars.className='ars';ars.textContent=s.ars||'번호 미제공';tags.className='sub';
  tags.textContent=(s.ars==='05718'?'부암역 방면 · ':'')+names(s.district)+' · '+s.id;$('stopMeta').replaceChildren(ars,tags);
- $('stopCoords').textContent='위도 '+s.lat.toFixed(6)+' · 경도 '+s.lon.toFixed(6)+(s.edge&&s.district>=0?' · 경계 인접 배정':'');
+ $('stopCoords').textContent=adjusted?'보정 좌표 · '+locationLine(s,adjusted):'위도 '+s.lat.toFixed(6)+' · 경도 '+s.lon.toFixed(6)+(s.edge&&s.district>=0?' · 경계 인접 배정':'');
  const ref=lookup.get(s.reference);
  const refDistance=ref?Math.round(Math.hypot((s.lon-ref.lon)*91000,(s.lat-ref.lat)*111000)):0;
  $('source').textContent='일사량 기준 '+(ref?ref.name+(refDistance?' · 약 '+count(refDistance)+' m':''):'PVGIS ERA5');
  const {reference,monthlyWh}=generation;
  const winterWh=monthlyWh.slice(0,3).reduce((sum,wh)=>sum+wh,0)/daysByMonth.slice(0,3).reduce((sum,days)=>sum+days,0);
  const annualWh=monthlyWh.reduce((sum,wh)=>sum+wh,0);
- putUnit('annual',decimal(annualWh/1000),'kWh');putUnit('winter',decimal(winterWh),'Wh/일');putUnit('loss',decimal(s.loss),'%');
+ putUnit('annual',decimal(annualWh/1000),'kWh');putUnit('winter',decimal(winterWh),'Wh/일');putUnit('loss',decimal(generation.loss),'%');
  const enoughWinter=winterWh>=state.dailyConsumption;
  const balance='겨울 평균이 일일 소비량 '+state.dailyConsumption+' Wh/일 '+(enoughWinter?'이상입니다.':'미만입니다.');
- $('siteNote').textContent=balance+(s.detailed?'':' 인근 건물·수목 음영은 현장 확인이 필요합니다.');
- $('externalMap').href='https://www.google.com/maps?q='+s.lat+','+s.lon;
+ $('siteNote').textContent=balance+(adjusted?(generation.locationEstimate
+  ?' 보정 위치의 건물 차폐를 반영한 발전량 추정치입니다.'
+  :modelLoading?' 건물 데이터를 불러오는 동안 원본 발전량을 표시합니다.'
+  :' 활용 가능한 높이 자료 범위에서는 원본 발전량을 표시합니다.')
+  :generation.locationEstimate?' 교량·고가철도 상판 음영 추정을 포함했습니다.'
+  :s.detailed?'':' 인근 건물·수목 음영은 현장 확인이 필요합니다.');
+ const location=adjusted??s;
+ $('externalMap').href='https://www.google.com/maps?q='+location.lat+','+location.lon;
  const limit=Math.max(...reference,...monthlyWh)*1.07||1;
  barButtons.forEach(({button,base,net,average},i)=>{
   base.style.height=reference[i]/limit*100+'%';net.style.height=monthlyWh[i]/limit*100+'%';
@@ -849,7 +1043,13 @@ const monthlyInputs=monthNames.map((month,index)=>{
 
 function siteGeneration(stop){
  const scale=generationScale()*1000;
- const baseline=stop.months.map(kWh=>kWh*scale);
+ const corrected=correctedScene(stop);
+ const modeled=corrected?.monthly;
+ const baseline=(modeled??stop.months).map(kWh=>kWh*scale);
+ const reference=stop.base.map(kWh=>kWh*scale);
+ const baselineTotal=baseline.reduce((sum,value)=>sum+value,0);
+ const referenceTotal=reference.reduce((sum,value)=>sum+value,0);
+ const loss=modeled&&referenceTotal?100*(1-baselineTotal/referenceTotal):stop.loss;
  const rates=treeShadeByStop.get(stop.id)??defaultTreeShade;
  const overrides=monthlyOverridesByStop.get(stop.id);
  const monthlyWh=baseline.map((wh,index)=>{
@@ -858,7 +1058,7 @@ function siteGeneration(stop){
   const month=monthNames[index];
   return wh*(1-rates[month>=5&&month<=10?0:1]/100);
  });
- return {reference:stop.base.map(kWh=>kWh*scale),baseline,monthlyWh,rates,overrides,
+ return {reference,baseline,monthlyWh,rates,overrides,loss,locationEstimate:Boolean(modeled),
   modified:rates.some(rate=>rate>0)||Boolean(overrides?.some(value=>value!=null))};
 }
 
@@ -911,7 +1111,8 @@ function drawBattery(stop,generation){
   status='전력 부족 없음 · 배터리 여유 없음';
   detail='일 단위 계산에서 소비량은 충당했지만, 배터리 잔량이 0 Wh에 도달했습니다.';
  }
- $('treeRoadview').href='https://map.kakao.com/link/roadview/'+stop.lat+','+stop.lon;
+ const location=selectedLocation(stop);
+ $('treeRoadview').href='https://map.kakao.com/link/roadview/'+location.lat+','+location.lon;
  $('batteryStation').textContent=(stop.ars?stop.ars+' · ':'')+stop.name+' · '+state.power*60+' W · 효율 '+state.efficiency+'%';
  $('batteryOutcome').dataset.level=level;
  $('batteryStatus').textContent=status;
@@ -981,6 +1182,10 @@ let sceneTime=720, legacySceneCache=null;
 function currentScene(){
  const id=state.selection, stop=lookup.get(id);
  if(!stop)return null;
+ return correctedScene(stop)??baseScene(stop);
+}
+function baseScene(stop){
+ const id=stop.id;
  const registry=viewVworld(stop);
  if(registry)return registry;
  const model=data.scenes[id]??data.partialScenes?.[id];
@@ -1105,6 +1310,244 @@ function terrainScene(stop){
  return terrainCache;
 }
 
+let buildingBounds=null, nearbyCache=null, correctionCache=null;
+const buildingRadius=400;
+
+function buildingMap(stop){
+ if(nearbyCache?.id===stop.id)return nearbyCache;
+ if(!buildingBounds){
+  const count=vworld.polygons.length-1;
+  buildingBounds=new Int32Array(count*4);
+  for(let i=0;i<count;i++){
+   let west=Infinity,south=Infinity,east=-Infinity,north=-Infinity;
+   for(let k=vworld.polygons[i];k<vworld.polygons[i+1];k++){
+    const x=vworld.points[2*k],y=vworld.points[2*k+1];
+    west=Math.min(west,x);south=Math.min(south,y);
+    east=Math.max(east,x);north=Math.max(north,y);
+   }
+   buildingBounds.set([west,south,east,north],4*i);
+  }
+ }
+ const i=vworldIndex.get(stop.id);
+ const x0=vworld.coordinates[2*i], y0=vworld.coordinates[2*i+1];
+ const z0=vworld.station_ground[i], a=vworld.rotation[i]*rad, ca=Math.cos(a),sa=Math.sin(a);
+ const radius=10*(buildingRadius+locationLimit+2), buildings=[];
+ for(let b=0;b<buildingBounds.length/4;b++){
+  const offset=b*4;
+  if(buildingBounds[offset]>x0+radius||buildingBounds[offset+2]<x0-radius||
+     buildingBounds[offset+1]>y0+radius||buildingBounds[offset+3]<y0-radius)continue;
+  const ring=[];
+  for(let k=vworld.polygons[b];k<vworld.polygons[b+1];k++){
+   const dx=(vworld.points[2*k]-x0)/10, dy=(vworld.points[2*k+1]-y0)/10;
+   ring.push([dx*ca-dy*sa,dx*sa+dy*ca]);
+  }
+  if(ring.length<3)continue;
+  const method=vworld.roofs[3*b+2];
+  buildings.push({ring,bounds:box(ring),base:vworld.roofs[3*b]/10-z0,
+   height:vworld.roofs[3*b+1]/10,method:method===1?'height':method===2?'floors':'unknown'});
+ }
+ return nearbyCache={id:stop.id,buildings};
+}
+
+function withinBuildingRadius(bounds,x,y){
+ const [west,south,east,north]=bounds;
+ return Math.hypot(Math.max(west-x,x-east,0),Math.max(south-y,y-north,0))<=buildingRadius;
+}
+
+let paintedOutlineKey='';
+function paintBuildingOutlines(stop){
+ const layer=$('analysisBuildings');
+ const location=stop&&(locationDraft?.point??selectedLocation(stop));
+ const show=location&&compareOutlines&&vworld&&tileZoom(state.view.k)>=15;
+ const showBridges=location&&bridgeEnabled&&tileZoom(state.view.k)>=15;
+ const key=show||showBridges?[stop.id,location.lat,location.lon,show,showBridges].join(':'):'';
+ if(key===paintedOutlineKey){
+  if(compareOutlines&&stop&&!show)$('buildingStatus').textContent='건물 윤곽을 보려면 지도를 확대하세요.';
+  return;
+ }
+ paintedOutlineKey=key;
+ if(!key){layer.replaceChildren();return;}
+ const [east,north]=stopOffset(stop,location);
+ const pathByMethod={known:[],unknown:[]};
+ for(const b of show?buildingMap(stop).buildings:[]){
+  if(!withinBuildingRadius(b.bounds,east,north))continue;
+  const points=b.ring.map(([x,y])=>{
+   const ll=offsetLocation(stop,x,y);
+   return point(ll.lon,ll.lat).map(n=>n.toFixed(4)).join(',');
+  });
+  pathByMethod[b.method==='unknown'?'unknown':'known'].push('M'+points.join('L')+'Z');
+ }
+ const outlines=Object.entries(pathByMethod).filter(([,paths])=>paths.length)
+  .map(([method,paths])=>svgEl('path',{d:paths.join(''),class:'analysis-building '+method}));
+ if(showBridges)for(const deck of infraSegments(stop,location)){
+  const coordinates=deck.ring.map(([x,y])=>{
+   const ll=offsetLocation(stop,x+east,y+north);
+   return point(ll.lon,ll.lat).map(n=>n.toFixed(4)).join(',');
+  });
+  outlines.push(svgEl('path',{d:'M'+coordinates.join('L')+'Z',class:'analysis-bridge'}));
+ }
+ layer.replaceChildren(...outlines);
+}
+
+function insideFootprint(ring,x,y){
+ let inside=false;
+ for(let i=0,j=ring.length-1;i<ring.length;j=i++){
+  const [a,b]=ring[j],[c,d]=ring[i];
+  if((b>y)!==(d>y)&&x<(c-a)*(y-b)/(d-b)+a)inside=!inside;
+ }
+ return inside;
+}
+
+function rayHit(ring,x,y,dx,dy){
+ let near=Infinity;
+ for(let i=0,j=ring.length-1;i<ring.length;j=i++){
+  const [a,b]=ring[j],[c,d]=ring[i], ex=c-a,ey=d-b;
+  const cross=dx*ey-dy*ex;
+  if(Math.abs(cross)<1e-10)continue;
+  const ax=a-x,ay=b-y;
+  const along=(ax*dy-ay*dx)/cross;
+  const distance=(ax*ey-ay*ex)/cross;
+  if(along>=0&&along<=1&&distance>=0)near=Math.min(near,distance);
+ }
+ return near;
+}
+
+function groundAt(patch,x,y){
+ const a=Math.max(0,Math.min(10,5+x/30)), b=Math.max(0,Math.min(10,5+y/30));
+ const col=Math.min(9,Math.floor(a)), row=Math.min(9,Math.floor(b));
+ const i=row*11+col, u=a-col,v=b-row;
+ return (1-v)*((1-u)*patch[i]+u*patch[i+1])+v*((1-u)*patch[i+11]+u*patch[i+12]);
+}
+
+function buildingViewAt(stop,location,buildings,terrain,move){
+ const [x,y]=stopOffset(stop,location);
+ const ground=groundAt(terrain.patch,x,y)-terrain.patch[60];
+ const angles=[...terrainProfile(stop.id).angles];
+ const meshes=[];
+ let overlap=0,missing=0,known=0;
+ for(const building of buildings){
+  const {ring,base,height,method,bounds}=building;
+  if(!withinBuildingRadius(bounds,x,y))continue;
+  const contains=insideFootprint(ring,x,y);
+  if(contains)overlap++;
+  if(move&&Math.hypot(Math.max(bounds[0]-x,x-bounds[2],0),Math.max(bounds[1]-y,y-bounds[3],0))<=250){
+   meshes.push([ring.map(([u,v])=>[u-x,v-y]),base-ground,height,method]);
+  }
+  if(method==='unknown'){missing++;continue;}
+  if(contains&&!move)continue;
+  known++;
+  const rise=base+height-ground-3;
+  if(rise<=0)continue;
+  if(contains){
+   angles.fill(90);
+   continue;
+  }
+  for(let i=0;i<angles.length;i++){
+   const az=i*2*rad, distance=rayHit(ring,x,y,Math.sin(az),Math.cos(az));
+   if(distance<=buildingRadius)angles[i]=Math.max(angles[i],Math.atan2(rise,distance)/rad);
+  }
+ }
+ const patch=move?terrain.patch.map((_,i)=>
+  groundAt(terrain.patch,x+(i%11-5)*30,y+(Math.floor(i/11)-5)*30)-ground-terrain.patch[60]):terrain.patch;
+ return {angles,patch,overlap,missing,known,meshes};
+}
+
+function modeledSun(location,angles,blocks=()=>false){
+ return monthNames.map(month=>Array.from({length:sceneSampleCount},(_,i)=>{
+  const [alt,az]=sunPosition(month,i*sceneStep,location.lon,location.lat);
+  return [alt,az,alt>0&&(alt<=terrainObstruction(angles,az)||blocks(alt,az))];
+ }));
+}
+
+function transmittedDirect(path){
+ let allowed=0,total=0;
+ for(const [alt,az,blocked] of path){
+  if(alt<=0)continue;
+  const incidence=Math.sin(alt*rad)*Math.cos(30*rad)+Math.cos(alt*rad)*Math.sin(30*rad)*Math.cos((az-180)*rad);
+  const weight=Math.max(0,incidence)*Math.sin(alt*rad);
+  total+=weight;
+  if(!blocked)allowed+=weight;
+ }
+ return total?allowed/total:0;
+}
+
+let infraWays=[], deckCache=null;
+async function loadInfra(){
+ const packed=$('bridgeData').textContent.trim();
+ if(!packed)throw new Error('Bridge data missing');
+ const bytes=Uint8Array.from(atob(packed),c=>c.charCodeAt(0));
+ const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+ infraWays=JSON.parse(await new Response(stream).text()).map(([id,kind,width,clearance,thickness,estimate,points])=>
+  ({id,width,clearance,thickness,points,bounds:box(points)}));
+ deckCache=null;
+ correctionCache=null;
+ refresh(false);
+}
+function infraSegments(stop,location){
+ const key=[stop.id,location.lat,location.lon].join(':');
+ if(deckCache?.key===key)return deckCache.decks;
+ const offset=stopOffset(stop,location);
+ const radius=buildingRadius+20, dkLat=radius/110000, dkLon=radius/90000;
+ const decks=[];
+ for(const way of infraWays){
+  const [west,south,east,north]=way.bounds;
+  if(west>location.lon+dkLon||east<location.lon-dkLon||south>location.lat+dkLat||north<location.lat-dkLat)continue;
+  const points=way.points.map(([lon,lat])=>stopOffset(stop,{lon,lat}).map((v,i)=>v-offset[i]));
+  for(let j=1;j<points.length;j++){
+   const [x,y]=points[j-1],[u,v]=points[j], length=Math.hypot(u-x,v-y);
+   if(length<.3)continue;
+   const margin=way.width/2;
+   const dx=-(v-y)*margin/length,dy=(u-x)*margin/length;
+   const ring=[[x+dx,y+dy],[u+dx,v+dy],[u-dx,v-dy],[x-dx,y-dy]],bounds=box(ring);
+   if(!withinBuildingRadius(bounds,0,0))continue;
+   decks.push({id:way.id,ring,base:way.clearance,height:way.thickness,bounds});
+  }
+ }
+ deckCache={key,decks};
+ return decks;
+}
+
+function bridgeBlocks(deck,alt,az){
+ const slope=Math.tan(alt*rad), rise=deck.base-3;
+ const from=Math.max(0,rise/slope), to=Math.min(buildingRadius,(rise+deck.height)/slope);
+ if(from>to)return false;
+ const dx=Math.sin(az*rad),dy=Math.cos(az*rad);
+ const startX=from*dx,startY=from*dy;
+ return insideFootprint(deck.ring,startX,startY)||rayHit(deck.ring,startX,startY,dx,dy)<=to-from;
+}
+
+function correctedScene(stop){
+ const adjusted=savedLocations.get(stop.id);
+ const location=adjusted??stop;
+ const decks=bridgeEnabled?infraSegments(stop,location):[];
+ if(!decks.length&&(!adjusted||!vworld))return null;
+ const key=[stop.id,location.lat,location.lon,bridgeEnabled,Boolean(vworld)].join(':');
+ if(correctionCache?.locationKey===key)return correctionCache;
+ const terrain=terrainScene(stop);
+ const source=baseScene(stop);
+ let model={...source};
+ let baselineSun=source.sun;
+ if(adjusted&&vworld){
+  const {buildings}=buildingMap(stop);
+  const previous=buildingViewAt(stop,stop,buildings,terrain,false);
+  const moved=buildingViewAt(stop,location,buildings,terrain,true);
+  baselineSun=modeledSun(stop,previous.angles);
+  model={...terrain,...moved,sun:modeledSun(location,moved.angles),registry:true};
+ }
+ const bridgeIsBlocked=(alt,az)=>decks.some(deck=>bridgeBlocks(deck,alt,az));
+ const sun=decks.length?model.sun.map(month=>month.map(([alt,az,blocked])=>
+  [alt,az,blocked||(alt>0&&bridgeIsBlocked(alt,az))])):model.sun;
+ const monthly=(model.known||decks.length)?stop.months.map((value,i)=>{
+  const change=transmittedDirect(sun[i])-transmittedDirect(baselineSun[i]);
+  return change===0?value:Math.max(0,Math.min(Math.max(value,stop.base[i]),value+stop.base[i]*change));
+ }):null;
+ const meshes=decks.length?[...model.meshes,...decks.filter(deck=>
+  Math.hypot(Math.max(deck.bounds[0],-deck.bounds[2],0),Math.max(deck.bounds[1],-deck.bounds[3],0))<=250)
+  .map(deck=>[deck.ring,deck.base,deck.height,'bridge'])]:model.meshes;
+ return correctionCache={...model,meshes,locationKey:key,sun,monthly,moved:Boolean(adjusted&&vworld),
+  bridgeCount:new Set(decks.map(deck=>deck.id)).size};
+}
+
 function drawTerrain(site,project,line){
  const {patch,stride}=site;
  const points=patch.map((z,i)=>project((i%stride-5)*30,(Math.floor(i/stride)-5)*30,z));
@@ -1196,7 +1639,7 @@ function renderSolarScene(){
   return;
  }
  const model=currentScene();
- const key=stop.id+':'+state.month;
+ const key=stop.id+':'+state.month+':'+(model.locationKey??'original');
  if(playbackKey!==key){
   playbackKey=key;
   finishedPlayback=false;
@@ -1206,13 +1649,17 @@ function renderSolarScene(){
  const label=(stop.ars?stop.ars+' · ':'')+stop.name;
  $('sceneStation').textContent=label;
  $('sceneMonth').value=state.month;
- $('sceneType').textContent=model.registry?'브이월드 건물 3D':stop.detailed?'건물 포함 3D':model.partial?'일부 건물 3D':'지형 기반 3D';
+ $('sceneType').textContent=model.moved?'보정 위치 3D':model.bridgeCount?'교량·고가철도 포함 3D':model.registry?'브이월드 건물 3D':stop.detailed?'건물 포함 3D':model.partial?'일부 건물 3D':'지형 기반 3D';
  $('sceneType').classList.toggle('detailed',stop.detailed);
- $('sceneObstacle').textContent=stop.detailed||model.partial?'건물':'지형';
+ $('sceneObstacle').textContent=model.bridgeCount?'교량·고가 포함':model.registry||stop.detailed||model.partial?'건물':'지형';
  $('unknownBuildingNote').hidden=!model.missing;
  if(model.missing)$('unknownBuildingNote').textContent=' 선택 정류장 주변 높이 미상 건물 '+count(model.missing)+'동.';
- $('sceneNote').hidden=(model.registry||stop.detailed)&&!model.overlap;
- $('sceneNote').textContent=model.registry
+ $('sceneNote').hidden=!model.locationKey&&(model.registry||stop.detailed)&&!model.overlap;
+ $('sceneNote').textContent=model.locationKey
+  ?[model.moved?'보정 좌표에서 건물 차폐를 계산했습니다. 지형 차폐는 원본 기준입니다.':'',
+    model.bridgeCount?'교량·고가철도 '+count(model.bridgeCount)+'개 구간의 상판을 계산에 포함했습니다. 청록색 상판은 추정 높이·폭을 포함합니다.':'',
+    model.moved&&model.overlap?'현재 위치가 건물 윤곽 '+count(model.overlap)+'동과 겹칩니다. 패널이 실제로 지붕 위에 있다면 높이 3 m 가정과 함께 확인하세요.':''].filter(Boolean).join(' ')
+  :model.registry
   ?'정류장 좌표와 겹치는 건물 '+count(model.overlap)+'동을 제외했습니다.'
   :model.partial?'확보한 건물만 3D와 시각별 차폐에 반영했습니다. 위쪽 발전량은 지형 기반입니다.':stop.detailed?'정류장 좌표와 겹치는 건물은 기존 음영 모델에서 제외됐습니다.':'지형만 반영한 직달광 추정입니다. 주변 건물·수목·승강장에 의한 차폐는 포함되지 않습니다.';
  drawScene();
@@ -1274,10 +1721,10 @@ function drawScene(){
  $('playbackTime').textContent=time+' KST';
  const description=sun[0]<=0?'지평선 아래':sun[2]?'직달광 차폐':'직달광 통과';
  $('solarDate').textContent=monthNames[state.month]+'월 15일 '+time+' KST';
- $('sunState').textContent=site.patch&&!site.registry&&sun[0]>0?(sun[2]?'지형에 가림':'지형 차폐 없음'):description;
+ $('sunState').textContent=site.patch&&!site.registry&&!site.bridgeCount&&sun[0]>0?(sun[2]?'지형에 가림':'지형 차폐 없음'):description;
  $('sunState').classList.toggle('blocked',sun[0]>0 && sun[2]);
  $('sunAltitude').textContent='태양 고도 '+decimal(sun[0])+'° · 방위각 '+decimal(sun[1])+'°';
- drawHorizonProfile(sun,site.angles,path);
+ drawHorizonProfile(sun,site.angles,path,site.bridgeCount);
  const a=Number(orbit.value)*rad,ca=Math.cos(a),sa=Math.sin(a);
  const bounds=[Infinity,Infinity,-Infinity,-Infinity];
  function coordinates(x,y,z){
@@ -1319,7 +1766,7 @@ function drawScene(){
   if(ring.length<3)continue;
   if(method==='unknown'){line(ring.map(([x,y])=>project(x,y,base)),'#7794bf',1,'#e8edf6');continue;}
   const top=ring.map(([x,y])=>project(x,y,base+height)),bottom=ring.map(([x,y])=>project(x,y,base));
-  const colors=method==='height'?['#5573a1','#afc5e7']:method==='floors'?['#7796c3','#bbceed']:['#93a9cd','#d1def0'];
+  const colors=method==='bridge'?['#2a7767','#a5d6cb']:method==='height'?['#5573a1','#afc5e7']:method==='floors'?['#7796c3','#bbceed']:['#93a9cd','#d1def0'];
   const face=(pts,color)=>faces.push([pts.reduce((total,p)=>total+p[2],0)/pts.length,pts,color]);
   for(let i=0;i<ring.length;i++){const j=(i+1)%ring.length;face([bottom[i],bottom[j],top[j],top[i]],colors[0]);}
   face(top,colors[1]);
@@ -1339,7 +1786,7 @@ function drawScene(){
 }
 
 const horizonCanvas=$('horizonChart');
-function drawHorizonProfile(sun,merged,path){
+function drawHorizonProfile(sun,merged,path,bridgeCount){
  const id=state.selection,{angles,peak,bearing}=terrainProfile(id);
  const obstruction=terrainObstruction(angles,sun[1]);
  const aboveHorizon=sun[0]>0;
@@ -1349,7 +1796,7 @@ function drawHorizonProfile(sun,merged,path){
   :'태양이 지평선 아래에 있어 직달광이 없습니다.';
  $('horizonSummary').textContent='최대 '+decimal(peak)+'°'+(peak?' · 방위각 '+bearing+'°':'')+' · 2° 간격';
  const filterCount=results.length;
- $('horizonExportScope').textContent='가로는 방위각, 세로는 고도입니다. 파란 선은 지형, 진한 선은 건물·지형 차폐 고도입니다. 주황색 태양 점이 차폐선보다 높으면 그 방향에서 직달광이 들어옵니다. 해가 지평선 아래일 때는 차폐선만 표시합니다. · CSV 대상 '+filterCount.toLocaleString()+'곳';
+ $('horizonExportScope').textContent='가로는 방위각, 세로는 고도입니다. 파란 선은 지형, 진한 선은 건물·지형 차폐 고도입니다. 주황색 태양 점이 차폐선보다 높으면 그 방향에서 직달광이 들어옵니다. 해가 지평선 아래일 때는 차폐선만 표시합니다. · CSV 대상 '+filterCount.toLocaleString()+'곳'+(bridgeCount?' · 교량 상판 차폐는 시간별 판정에 반영합니다.':'');
  horizonCanvas.setAttribute('aria-label','지형 차폐 고도 그래프. '+$('horizonSummary').textContent+'. '+$('terrainCheck').textContent);
  const w=horizonCanvas.clientWidth,h=horizonCanvas.clientHeight,dpr=Math.min(devicePixelRatio||1,2);
  if(!w||!h)return;
@@ -1412,7 +1859,23 @@ addEventListener('hashchange',syncNavigation);
 syncNavigation();
 refresh();
 loadBaseMap();
-loadVworld().then(refresh).catch(error=>{$('sceneNote').hidden=false;$('sceneNote').textContent='건물 데이터를 불러오지 못했습니다.';console.error(error);});
+loadInfra().catch(error=>{
+ $('bridgeShade').disabled=true;
+ $('bridgeStatus').hidden=false;
+ $('bridgeStatus').textContent='교량·고가철도 데이터를 불러오지 못했습니다.';
+ console.error(error);
+});
+loadVworld().then(()=>{
+ modelLoading=false;
+ refresh();
+}).catch(error=>{
+ modelLoading=false;
+ vworld=null;
+ refresh();
+ $('sceneNote').hidden=false;
+ $('sceneNote').textContent='건물 데이터를 불러오지 못했습니다.';
+ console.error(error);
+});
 </script>
 </body></html>
 
