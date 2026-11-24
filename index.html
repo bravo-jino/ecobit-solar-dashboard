@@ -1918,7 +1918,7 @@ function renderSolarScene(){
  $('sceneNote').hidden=!model.locationKey&&(model.registry||stop.detailed)&&!model.overlap;
  $('sceneNote').textContent=model.locationKey
   ?[model.moved?'보정 좌표에서 건물 차폐를 계산했습니다. 지형 차폐는 원본 기준입니다.':'',
-    model.bridgeCount?'교량·고가철도 및 사용자가 추가한 구조물 '+count(model.bridgeCount)+'개 구간을 음영 계산에 포함했습니다. 입력한 높이와 기본 추정값을 사용합니다.':'',
+    model.bridgeCount?'교량·고가철도 및 사용자가 추가한 구조물 '+count(model.bridgeCount)+'개 구간을 음영 계산에 포함했습니다. 3D 점선은 패널 지면 기준면에서 상판 밑면까지의 높이입니다. 보정한 상판은 진한 청록색 테두리로 표시합니다.':'',
     model.moved&&model.overlap?'현재 위치가 건물 윤곽 '+count(model.overlap)+'동과 겹칩니다. 패널이 실제로 지붕 위에 있다면 높이 3 m 가정과 함께 확인하세요.':''].filter(Boolean).join(' ')
   :model.registry
   ?'정류장 좌표와 겹치는 건물 '+count(model.overlap)+'동을 제외했습니다.'
@@ -2037,6 +2037,33 @@ function drawScene(){
  }
  faces.sort((x,y)=>y[0]-x[0]);
  for(const [,pts,color] of faces)line(pts,'#607da9',.35,color);
+ const edits=structuresByStop.get(state.selection);
+ let marker=null;
+ for(const deck of site.decks??[]){
+  if(deck.role!=='body')continue;
+  const [x,y]=deck.ring[0], distance=Math.hypot(x,y);
+  if(distance>250)continue;
+  const edited=edits?.has(String(deck.id))??false;
+  const rank=(structureOpen&&String(deck.id)===structureId?0:edited?1:2)*1000+distance;
+  if(!marker||rank<marker.rank)marker={deck,x,y,rank,edited};
+  if(edited){
+   const surface=deck.ring.map(([u,v])=>project(u,v,deck.base+deck.gradient[0]*u+deck.gradient[1]*v+deck.height));
+   line([...surface,surface[0]],'#007064',1.6);
+  }
+ }
+ if(marker){
+  const {deck,x,y,edited}=marker;
+  const z=deck.base+deck.gradient[0]*x+deck.gradient[1]*y;
+  const foot=project(x,y,0),basePoint=project(x,y,z);
+  c.setLineDash([3,3]);line([foot,basePoint],'#06685f',2);c.setLineDash([]);
+  dot(foot,2.5,'#06685f');dot(basePoint,3,'#06685f');
+  const text=(edited?'보정':'추정')+' · 밑면 '+decimal(z)+' m';
+  c.font='bold 12px "Pretendard Variable", system-ui';
+  const width=c.measureText?.(text)?.width||100;
+  const tx=Math.max(3,Math.min(w-width-12,basePoint[0]+6)),ty=Math.max(17,Math.min(h-4,basePoint[1]-5));
+  c.fillStyle='#fff';c.fillRect(tx-3,ty-13,width+7,17);
+  c.textAlign='left';c.fillStyle='#055c53';c.fillText(text,tx,ty);
+ }
  const sky=([alt,az])=>project(142*Math.cos(alt*rad)*Math.sin(az*rad),142*Math.cos(alt*rad)*Math.cos(az*rad),3+142*Math.sin(alt*rad));
  for(let i=1;i<path.length;i++){
   const prev=path[i-1],next=path[i];
