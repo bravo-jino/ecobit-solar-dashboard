@@ -181,6 +181,18 @@ body{padding-left:164px}
 .analysis-building.unknown{stroke-dasharray:4 2;fill:transparent}
 .analysis-bridge.unverified{fill:#a96c1620;stroke:#936216;stroke-dasharray:5 3}
 .analysis-bridge{fill:#08796f35;stroke:#08796f;stroke-width:1.6;vector-effect:non-scaling-stroke;pointer-events:none}
+.analysis-tree{fill:#2d8a4e38;stroke:#1e6b3a;stroke-width:1.3;vector-effect:non-scaling-stroke;pointer-events:none}
+.filters{grid-template-columns:minmax(110px,1fr) auto auto}
+@media(max-width:600px){.filters{grid-template-columns:1fr}}
+.tree-badge{display:inline-flex;align-items:center;border-radius:5px;padding:2px 7px;font-size:12px;font-weight:700;white-space:nowrap}
+.tree-risk-3{background:#fbeee9;color:#8f3224;border:1px solid #ecc6bc}
+.tree-risk-2{background:#fdf5e2;color:#7c5213;border:1px solid #e9d4a6}
+.tree-risk-1{background:#ebf5ee;color:#1f6138;border:1px solid #c3e2cc}
+.tree-risk-0{background:#eef2f8;color:#566882;border:1px solid #d5dfee}
+.dot.tree-high{background:#b8442f}
+.dot.tree-warn{background:#c4861e}
+.scene-legend .scene-tree{background:#3a8752}
+#sunState.tree-blocked{color:#236b3c}
 #structureEditor{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
 #structureSelect{max-width:100%;width:100%}
 .structure-title{font-size:13px;color:var(--ink)}
@@ -224,10 +236,11 @@ body{padding-left:164px}
   <button type="button" class="control" id="compareBuildings" aria-pressed="false" disabled>건물 윤곽 비교</button>
   <button type="button" class="control" id="editStructures" aria-expanded="false">구조물 높이 보정</button>
   <button type="button" class="control" id="bridgeShade" aria-pressed="true">교량·고가철도 음영</button>
+  <button type="button" class="control" id="treeShadeToggle" aria-pressed="true">수목 음영(위성)</button>
   <a id="locationRoadview" target="_blank" rel="noopener">로드뷰 ↗</a>
  </div></div>
  <p class="sub" id="locationStatus" aria-live="polite"></p>
- <p class="sub" id="buildingStatus" hidden></p><p class="sub" id="bridgeStatus" hidden></p>
+ <p class="sub" id="buildingStatus" hidden></p><p class="sub" id="bridgeStatus" hidden></p><p class="sub" id="treeStatus" hidden></p>
  <section id="structureEditor" hidden aria-label="구조물 높이 보정">
   <div class="row"><p class="sub" id="structureHelp"></p><button type="button" class="control" id="drawStructure">역사·벽체 추가</button></div>
   <select id="structureSelect" class="sort" aria-label="교량·고가철도 구간"></select>
@@ -257,7 +270,7 @@ body{padding-left:164px}
 </div>
 </section>
 <section class="card list-area" aria-labelledby="listTitle"><div class="pad barline"><div class="row"><h2 id="listTitle">정류장 찾기</h2><div class="list-actions"><button type="button" class="control" id="clearConditions" hidden>조건 초기화</button><button type="button" class="export" id="export">조회 결과 CSV</button></div></div>
-<div class="filters"><input id="q" type="search" aria-label="5자리 정류장 번호 또는 정류장명" placeholder="5자리 정류장 번호 또는 정류장명"><select id="model" aria-label="분석 유형"><option value="all">전체 유형</option><option value="detail">건물 포함 3D</option><option value="partial">일부 건물 3D</option><option value="terrain">지형 기반 3D</option></select></div>
+<div class="filters"><input id="q" type="search" aria-label="5자리 정류장 번호 또는 정류장명" placeholder="5자리 정류장 번호 또는 정류장명"><select id="model" aria-label="분석 유형"><option value="all">전체 유형</option><option value="detail">건물 포함 3D</option><option value="partial">일부 건물 3D</option><option value="terrain">지형 기반 3D</option></select><select id="treeFilter" aria-label="수목 음영 필터"><option value="all">수목 전체</option><option value="safe">수목 주의·높음 제외</option><option value="risk">수목 주의·높음만</option><option value="high">수목 높음만</option><option value="none">수목 미감지</option></select></div>
 <div class="tags" id="districts" role="group" aria-label="구·군 선택"></div></div>
 <div class="pad row"><span id="resultCount" class="sub" aria-live="polite"></span><select id="order" class="sort" aria-label="정류장 정렬"><option value="ars">정류장 번호순</option><option value="name">정류장명순</option><option value="winter">겨울 발전량 낮은순</option></select></div>
 <div class="results" id="results" tabindex="0" aria-label="정류장 검색 결과"></div>
@@ -266,7 +279,7 @@ body{padding-left:164px}
 <section class="card pad insight" id="insight" aria-label="정류장 발전량"><div id="pending" class="empty-note"><strong>정류장을 선택해 주세요</strong><p class="sub">정류장을 선택하면 연간·월별 발전량을 확인할 수 있습니다.</p></div>
 <div id="profile" class="profile" hidden>
  <div><div class="row"><h2 id="stopTitle" class="detail-title"></h2><span class="badge" id="mode"></span></div>
- <div id="stopMeta" class="idline"></div><p class="sub" id="stopCoords"></p><p class="sub" id="source"></p>
+ <div id="stopMeta" class="idline"></div><p class="sub" id="stopCoords"></p><p class="sub" id="source"></p><p class="sub" id="treeDetail" hidden></p>
  <div class="metrics"><div><span>연간 발전량</span><b id="annual"></b></div><div><span>겨울 일평균</span><b id="winter"></b></div><div><span>모델 음영 손실</span><b id="loss"></b></div></div>
  <p class="note" id="siteNote"></p><div class="links"><a id="externalMap" target="_blank" rel="noopener">지도에서 위치 확인 ↗</a><a href="#battery">발전·배터리 시뮬레이션 ↓</a><a href="#shadowScene" id="sceneLink">3D 음영·태양 경로 ↓</a></div>
  </div>
@@ -368,6 +381,7 @@ body{padding-left:164px}
       <span class="sub" id="terrainCheck" aria-live="polite"></span>
       <div class="scene-legend">
         <span><i class="dot scene-building"></i><span id="sceneObstacle">건물</span></span>
+        <span><i class="dot scene-tree"></i>수목(위성 추정)</span>
         <span><i class="dot scene-panel"></i>패널 위치</span>
         <span><i class="dot scene-sun"></i>태양 경로</span>
       </div>
@@ -394,11 +408,14 @@ body{padding-left:164px}
 <li>건물 윤곽 비교는 지도 위에 3D 모델의 GIS건물통합정보 외곽선을 표시합니다. 점선은 높이 미상, 주황색 면은 높이 또는 층수가 있는 경우이며, 범위 내 윤곽은 높이와 관계없이 표시합니다. 배경지도나 로드뷰의 시점과 원본 자료의 시점에 따라 차이가 날 수 있습니다.</li>
 <li>높이와 층수가 모두 미상인 건물은 지면에 윤곽만 표시하며 건물 차폐 계산에서 제외합니다.<span id="unknownBuildingNote" hidden></span></li>
 <li>태양 경로는 선택한 월의 15일을 기준으로 00:00~23:30(KST)을 30분 단위로 표시합니다. 기존 시각별 차폐 자료만 있는 모형은 가장 가까운 기존 계산 시각의 차폐 여부를 사용합니다.</li>
+<li>수목(가로수·주변 수관) 음영 추정은 <a href="https://registry.opendata.aws/dataforgood-fb-forests/">Meta &amp; World Resources Institute(WRI) Canopy Height Maps v2 (DINOv3, 약 1 m 해상도)</a> 공개 데이터(CC BY 4.0)를 <a href="./scripts/build_tree_data.py">전수 자동화 스크립트</a>로 추출한 <a href="./tree-data.js">수목 모델 데이터</a>를 사용합니다. 정류장 반경 30 m 내 패널 높이(3 m) 초과 수관의 2° 방위별 차폐 고도와 반경 28 m 내 수관 클러스터를 계산합니다. ‘수목 음영(위성)’을 켜면 지형·건물·교량에 가리지 않은 직달광 중 수목 차폐 고도 이하 구간에 계절별 차폐율(5~10월 착엽기 75%, 11~4월 낙엽기 35%)을 적용해 발전량을 보정합니다. 원천 위성영상(주로 2018~2019년, 부산 일부 구역은 3~4월 촬영) 특성상 신설·전정 가로수나 3월 낙엽기 소형 가로수는 누락될 수 있으므로 최종 후보지는 로드뷰와 현장 확인이 필요합니다.</li>
 <li>배터리 용량 기본값은 972.8 Wh, 일일 소비량은 28 Wh/일입니다. 연속 흐림, 시간대별 충방전, 배터리 노화와 방전 제한은 반영하지 않습니다. 조회 결과 CSV는 정류장별 추가 손실과 월별 직접 입력값을 적용하기 전의 모델 값을 내보냅니다.</li>
 </ul></details></footer>
 </main>
 <script type="application/octet-stream" id="bridgeData"></script>
 <script src="./bridge-expanded.js"></script>
+<script type="application/octet-stream" id="treeData"></script>
+<script src="./tree-data.js"></script>
 <script type="application/json" id="payload"></script>
 <script src="./station-data.js"></script>
 <script src="./busan-district-boundaries.js"></script>
@@ -492,7 +509,7 @@ const box=points=>[Math.min(...points.map(p=>p[0])),Math.min(...points.map(p=>p[
 const stopXY=new Map(stops.map(s=>[s.id,point(s.lon,s.lat)]));
 const locationKey='ecobit-busan-stop-locations-v1', locationLimit=150;
 let savedLocations=new Map(), locationDraft=null, compareOutlines=false, locationSelection=null;
-let bridgeEnabled=true;
+let bridgeEnabled=true, treeEnabled=true;
 let locationMessage='', modelLoading=true;
 try {
  for(const [id,location] of Object.entries(JSON.parse(localStorage.getItem(locationKey)??'{}'))){
@@ -544,9 +561,14 @@ function locationPanel(){
  $('saveLocation').disabled=!validLocation(stop,locationDraft?.point);
  $('buildingStatus').hidden=!compareOutlines;
  $('bridgeShade').setAttribute('aria-pressed',String(bridgeEnabled));
+ $('treeShadeToggle').disabled=!treeModel;
+ $('treeShadeToggle').setAttribute('aria-pressed',String(treeEnabled&&Boolean(treeModel)));
  const bridges=infraSegments(stop,preview);
  $('bridgeStatus').hidden=!bridgeEnabled||!bridges.length;
  if(bridgeEnabled&&bridges.length)$('bridgeStatus').textContent='청록색은 음영 계산에 포함된 구조물입니다. 황토색 점선은 높이 확인이 필요한 시설입니다.';
+ const tree=treeInfo(stop);
+ $('treeStatus').hidden=!treeEnabled||!tree||!tree.clusters.length;
+ if(treeEnabled&&tree&&tree.clusters.length)$('treeStatus').textContent='초록색 원은 위성(CHMv2)으로 감지한 반경 28 m 내 3 m 이상 수관 추정 영역입니다. (촬영일 '+(tree.acqDate||'미상')+')';
  if(compareOutlines)$('buildingStatus').textContent='주황색 윤곽은 3D 분석에 사용하는 건물 데이터입니다. 점선은 높이 미상입니다.';
  $('locationStatus').textContent=locationMessage||(editing?'후보 위치 · '+locationLine(stop,preview)
   :adjusted?'보정 위치 · '+locationLine(stop,adjusted)+' · 빈 원은 원본 위치':'공공데이터 원본 위치');
@@ -590,6 +612,12 @@ for(const id of ['adjustLat','adjustLon'])$(id).addEventListener('input',()=>{
 });
 $('bridgeShade').addEventListener('click',()=>{
  bridgeEnabled=!bridgeEnabled;
+ refresh(false);
+});
+$('treeShadeToggle').addEventListener('click',()=>{
+ treeEnabled=!treeEnabled;
+ correctionCache=null;
+ paintedOutlineKey='';
  refresh(false);
 });
 $('compareBuildings').addEventListener('click',()=>{
@@ -834,6 +862,17 @@ function matchesModel(s,model){
  const kind=s.detailed?'detail':data.partialScenes?.[s.id]?'partial':'terrain';
  return model==='all'||model===kind;
 }
+function matchesTree(s,filter){
+ if(filter==='all'||!treeModel)return true;
+ const idx=treeIndex.get(s.id);
+ if(idx===undefined)return filter==='none'||filter==='safe';
+ const r=treeModel.risk[idx];
+ if(filter==='safe')return r<2;
+ if(filter==='risk')return r>=2;
+ if(filter==='high')return r===3;
+ if(filter==='none')return r===0;
+ return true;
+}
 function editedOutput(s){
  if(!structuresByStop.has(s.id)&&!savedLocations.has(s.id))return null;
  const {monthlyWh,loss}=siteGeneration(s);
@@ -842,11 +881,11 @@ function editedOutput(s){
 }
 function queryResults(){
  const raw=$('q').value.trim(), q=raw.toLowerCase().replace(/\s/g,'');
- const matchNumber=/^\d{5}$/.test(q), model=$('model').value, order=$('order').value;
+ const matchNumber=/^\d{5}$/.test(q), model=$('model').value, treeF=$('treeFilter').value, order=$('order').value;
  const winters=new Map();
  function winter(s){if(!winters.has(s.id))winters.set(s.id,editedOutput(s)?.winter??s.winter*generationScale());return winters.get(s.id);}
  return stops.filter(s=>(state.district===null||s.district===state.district)
-  && matchesModel(s,model)
+  && matchesModel(s,model) && matchesTree(s,treeF)
   && (!q||(matchNumber?s.ars===q:[s.ars,s.name,s.id].some(v=>v.toLowerCase().replace(/\s/g,'').includes(q)))))
  .sort((a,b)=>{
   if(order==='winter')return winter(a)-winter(b)||a.id.localeCompare(b.id);
@@ -867,6 +906,10 @@ function renderList(resetScroll){
   const measure=document.createElement('span');measure.className='measure';
   measure.textContent=decimal(editedOutput(s)?.winter??s.winter*scale)+' Wh/일';
   if(s.detailed){ const tag=document.createElement('span');tag.className='dot detail';tag.title='건물 음영 상세 분석';tag.setAttribute('aria-label','건물 음영 상세 분석');measure.prepend(tag); }
+  if(treeModel){
+   const r=treeModel.risk[treeIndex.get(s.id)]??0;
+   if(r>=2){ const ttag=document.createElement('span');ttag.className='dot '+(r===3?'tree-high':'tree-warn');ttag.title=treeRiskNames[r]+' (위성 추정)';ttag.setAttribute('aria-label',ttag.title);measure.prepend(ttag); }
+  }
   b.append(num,middle,measure);frag.append(b);
  }
  if(!slice.length){const p=document.createElement('p');p.className='empty-note';p.textContent='검색 조건에 맞는 정류장이 없습니다.';frag.append(p);}
@@ -878,8 +921,8 @@ function renderList(resetScroll){
 function refresh(resetScroll=true){
  results=queryResults();
  $('exportHorizon').disabled=!results.length;
- const model=$('model').value;
- const filtered=state.district!==null||Boolean($('q').value.trim())||model!=='all';
+ const model=$('model').value, treeF=$('treeFilter').value;
+ const filtered=state.district!==null||Boolean($('q').value.trim())||model!=='all'||treeF!=='all';
  $('clearConditions').hidden=!filtered;
  $('detailToggle').setAttribute('aria-pressed',String(model==='detail'));
  $('detailToggle').textContent=model==='detail'?'건물 포함 조건 해제':'건물 포함만 보기';
@@ -894,7 +937,7 @@ $('q').addEventListener('input',()=>{
  state.district=null;state.selection=null;state.page=0;state.view={...overall};
  const raw=$('q').value.trim();
  if(/^\d{5}$/.test(raw)){
-  const found=stops.filter(s=>s.ars===raw&&matchesModel(s,$('model').value));
+  const found=stops.filter(s=>s.ars===raw&&matchesModel(s,$('model').value)&&matchesTree(s,$('treeFilter').value));
   if(found.length===1){selectStop(found[0]);return;}
  }
  refresh();
@@ -905,10 +948,12 @@ function applyModelFilter(){
  refresh();
 }
 $('model').addEventListener('change',applyModelFilter);
+$('treeFilter').addEventListener('change',applyModelFilter);
 $('order').addEventListener('change',()=>{state.page=0;refresh();});
 $('results').addEventListener('click',e=>{const b=e.target.closest('button[data-stop]');if(b){selectStop(lookup.get(b.dataset.stop));[...$('results').children].find(n=>n.dataset.stop===b.dataset.stop)?.focus({preventScroll:true});}});
 function resetConditions(){
  $('model').value='all';
+ $('treeFilter').value='all';
  $('order').value='ars';
  chooseDistrict(null);
 }
@@ -997,23 +1042,43 @@ function drawProfile(updateScene=true){
  $('mode').textContent=s.detailed?'건물 음영 포함':'지형 기반 추정';$('mode').classList.toggle('detailed',s.detailed);
  const ars=document.createElement('strong'),tags=document.createElement('span');
  ars.className='ars';ars.textContent=s.ars||'번호 미제공';tags.className='sub';
- tags.textContent=(s.ars==='05718'?'부암역 방면 · ':'')+names(s.district)+' · '+s.id;$('stopMeta').replaceChildren(ars,tags);
+ tags.textContent=(s.ars==='05718'?'부암역 방면 · ':'')+names(s.district)+' · '+s.id;
+ const tree=treeInfo(s);
+ const metaNodes=[ars,tags];
+ if(tree){
+  const tbadge=document.createElement('span');
+  tbadge.className='tree-badge tree-risk-'+tree.risk;
+  tbadge.textContent=treeRiskNames[tree.risk];
+  metaNodes.push(tbadge);
+ }
+ $('stopMeta').replaceChildren(...metaNodes);
  $('stopCoords').textContent=adjusted?'보정 좌표 · '+locationLine(s,adjusted):'위도 '+s.lat.toFixed(6)+' · 경도 '+s.lon.toFixed(6)+(s.edge&&s.district>=0?' · 경계 인접 배정':'');
  const ref=lookup.get(s.reference);
  const refDistance=ref?Math.round(Math.hypot((s.lon-ref.lon)*91000,(s.lat-ref.lat)*111000)):0;
  $('source').textContent='일사량 기준 '+(ref?ref.name+(refDistance?' · 약 '+count(refDistance)+' m':''):'PVGIS ERA5');
+ $('treeDetail').hidden=!tree;
+ if(tree){
+  const acq=tree.acqDate?' · 위성 촬영 '+tree.acqDate:'';
+  const leafOffNote=tree.acqDate&&Number(tree.acqDate.slice(5,7))<=4?'(봄 낙엽기 영상)':'';
+  $('treeDetail').textContent=tree.risk>0
+   ?'수목(위성 1m 추정): 남측 최대 '+tree.southMaxH+' m · 반경 15 m 최대 '+tree.maxH15+' m · 남측 수관 피복 '+tree.southPct+'% · 최대 차폐각 '+decimal(tree.maxElev)+'°'+acq+leafOffNote
+   :'수목(위성 1m 추정): 반경 15 m 및 남측 25 m 내 3 m 이상 수관 미감지'+acq+leafOffNote;
+ }
  const {reference,monthlyWh}=generation;
  const winterWh=monthlyWh.slice(0,3).reduce((sum,wh)=>sum+wh,0)/daysByMonth.slice(0,3).reduce((sum,days)=>sum+days,0);
  const annualWh=monthlyWh.reduce((sum,wh)=>sum+wh,0);
  putUnit('annual',decimal(annualWh/1000),'kWh');putUnit('winter',decimal(winterWh),'Wh/일');putUnit('loss',decimal(generation.loss),'%');
  const enoughWinter=winterWh>=state.dailyConsumption;
  const balance='겨울 평균이 일일 소비량 '+state.dailyConsumption+' Wh/일 '+(enoughWinter?'이상입니다.':'미만입니다.');
- $('siteNote').textContent=balance+(adjusted?(generation.locationEstimate
-  ?' 보정 위치의 건물 차폐를 반영한 발전량 추정치입니다.'
-  :modelLoading?' 건물 데이터를 불러오는 동안 원본 발전량을 표시합니다.'
-  :' 활용 가능한 높이 자료 범위에서는 원본 발전량을 표시합니다.')
-  :generation.locationEstimate?' 교량·고가철도 상판 음영 추정을 포함했습니다.'
-  :s.detailed?'':' 인근 건물·수목 음영은 현장 확인이 필요합니다.');
+ const sceneModel=correctedScene(s);
+ const extraNotes=[];
+ if(adjusted){
+  extraNotes.push(generation.locationEstimate?'보정 위치의 건물 차폐를 반영한 발전량 추정치입니다.':modelLoading?'건물 데이터를 불러오는 동안 원본 발전량을 표시합니다.':'활용 가능한 높이 자료 범위에서는 원본 발전량을 표시합니다.');
+ }
+ if(sceneModel?.bridgeCount)extraNotes.push('교량·고가철도 상판 음영 추정을 포함했습니다.');
+ if(sceneModel?.hasTreeHorizon)extraNotes.push('위성 추정 수목 음영(착엽기 75%·낙엽기 35% 차폐)을 포함했습니다.');
+ if(!extraNotes.length&&!s.detailed)extraNotes.push('인근 건물·수목 음영은 현장 확인이 필요합니다.');
+ $('siteNote').textContent=balance+(extraNotes.length?' '+extraNotes.join(' '):'');
  const location=adjusted??s;
  $('externalMap').href='https://www.google.com/maps?q='+location.lat+','+location.lon;
  const limit=Math.max(...reference,...monthlyWh)*1.07||1;
@@ -1222,8 +1287,8 @@ $('resetSimulation').addEventListener('click',()=>{
 });
 $('export').addEventListener('click',()=>{
  const scale=generationScale();
- const header=['정류장번호(ARS)','내부ID','정류장명','구군','위도','경도','분석 유형','패널 W','연간 kWh','겨울 평균 Wh/일','연간 음영 손실 %','일사량 기준 ID',...monthNames.map(m=>m+'월 kWh'),'시스템 발전 효율 %'];
- const rows=results.map(s=>{const out=editedOutput(s),loc=savedLocations.get(s.id)??s;return [s.ars,s.id,s.name,names(s.district),loc.lat,loc.lon,s.detailed?'건물 음영 포함':'지형 추정',state.power*60,(out?.annual??s.annual*scale).toFixed(3),(out?.winter??s.winter*scale).toFixed(2),out?.loss??s.loss,s.reference,...(out?.months??s.months.map(x=>x*scale)).map(x=>x.toFixed(4)),state.efficiency]});
+ const header=['정류장번호(ARS)','내부ID','정류장명','구군','위도','경도','분석 유형','패널 W','연간 kWh','겨울 평균 Wh/일','연간 음영 손실 %','수목 음영 위험(위성)','남측 수목 최대높이(m)','남측 수관 피복(%)','수목 위성 촬영일','일사량 기준 ID',...monthNames.map(m=>m+'월 kWh'),'시스템 발전 효율 %'];
+ const rows=results.map(s=>{const out=editedOutput(s),loc=savedLocations.get(s.id)??s,tr=treeInfo(s);return [s.ars,s.id,s.name,names(s.district),loc.lat,loc.lon,s.detailed?'건물 음영 포함':'지형 추정',state.power*60,(out?.annual??s.annual*scale).toFixed(3),(out?.winter??s.winter*scale).toFixed(2),out?.loss??s.loss,tr?treeRiskNames[tr.risk]:'',tr?tr.southMaxH:'',tr?tr.southPct:'',tr?.acqDate??'',s.reference,...(out?.months??s.months.map(x=>x*scale)).map(x=>x.toFixed(4)),state.efficiency]});
  const csv=[header,...rows].map(row=>row.map(value=>'"'+String(value).replaceAll('"','""')+'"').join(',')).join('\r\n');
  const href=URL.createObjectURL(new Blob(['\ufeff',csv],{type:'text/csv;charset=utf-8'}));
  const a=document.createElement('a');a.href=href;a.download='ECOBIT_Busan_Stops_'+state.power*60+'W.csv';a.click();setTimeout(()=>URL.revokeObjectURL(href),3000);
@@ -1413,7 +1478,8 @@ function paintBuildingOutlines(stop){
  const location=stop&&(locationDraft?.point??selectedLocation(stop));
  const show=location&&compareOutlines&&vworld&&tileZoom(state.view.k)>=15;
  const showBridges=location&&(bridgeEnabled||structureOpen)&&tileZoom(state.view.k)>=15;
- const key=show||showBridges?[stop.id,location.lat,location.lon,show,showBridges,structureOpen,structureId,structureRevision].join(':'):'';
+ const showTrees=location&&treeEnabled&&treeModel&&tileZoom(state.view.k)>=15;
+ const key=show||showBridges||showTrees?[stop.id,location.lat,location.lon,show,showBridges,showTrees,structureOpen,structureId,structureRevision].join(':'):'';
  if(key===paintedOutlineKey){
   if(compareOutlines&&stop&&!show)$('buildingStatus').textContent='건물 윤곽을 보려면 지도를 확대하세요.';
   return;
@@ -1432,6 +1498,20 @@ function paintBuildingOutlines(stop){
  }
  const outlines=Object.entries(pathByMethod).filter(([,paths])=>paths.length)
   .map(([method,paths])=>svgEl('path',{d:paths.join(''),class:'analysis-building '+method}));
+ if(showTrees){
+  const tree=treeInfo(stop);
+  const treePaths=[];
+  for(const [dx,dy,r] of tree?.clusters??[]){
+   const pts=[];
+   for(let k=0;k<10;k++){
+    const ang=k*Math.PI/5;
+    const ll=offsetLocation(stop,dx+r*Math.cos(ang),dy+r*Math.sin(ang));
+    pts.push(point(ll.lon,ll.lat).map(n=>n.toFixed(4)).join(','));
+   }
+   treePaths.push('M'+pts.join('L')+'Z');
+  }
+  if(treePaths.length)outlines.push(svgEl('path',{d:treePaths.join(''),class:'analysis-tree'}));
+ }
  if(showBridges)for(const deck of infraSegments(stop,location).filter(deck=>deck.role==='body')){
   const coordinates=deck.ring.map(([x,y])=>{
    const ll=offsetLocation(stop,x+east,y+north);
@@ -1516,16 +1596,101 @@ function modeledSun(location,angles,blocks=()=>false){
  }));
 }
 
-function transmittedDirect(path){
+function transmittedDirect(path,month){
  let allowed=0,total=0;
- for(const [alt,az,blocked] of path){
+ const treeOpacity=month!=null?(month>=5&&month<=10?.75:.35):0;
+ for(const [alt,az,blocked,treeBlocked] of path){
   if(alt<=0)continue;
   const incidence=Math.sin(alt*rad)*Math.cos(30*rad)+Math.cos(alt*rad)*Math.sin(30*rad)*Math.cos((az-180)*rad);
   const weight=Math.max(0,incidence)*Math.sin(alt*rad);
   total+=weight;
-  if(!blocked)allowed+=weight;
+  if(!blocked)allowed+=treeBlocked?weight*(1-treeOpacity):weight;
  }
  return total?allowed/total:0;
+}
+
+const treeRiskNames=['수목 미감지','주변 수목 낮음','수목 음영 주의','수목 음영 높음'];
+let treeModel=null, treeIndex=new Map();
+async function loadTreeData(){
+ const packed=$('treeData')?.textContent?.trim();
+ if(!packed||typeof treeMeta==='undefined')throw new Error('Tree canopy data missing');
+ const bytes=Uint8Array.from(atob(packed),c=>c.charCodeAt(0));
+ const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+ const buffer=await new Response(stream).arrayBuffer();
+ const sizes=treeMeta.arrays;
+ let offset=0;
+ const parsed={acqDates:treeMeta.acqDates??[]};
+ for(const [key,type] of [['risk',Uint8Array],['maxH15',Uint8Array],['southMaxH',Uint8Array],['southPct',Uint8Array],
+  ['maxElev',Uint8Array],['winterBlk',Uint8Array],['summerBlk',Uint8Array],['acqIdx',Uint8Array],
+  ['horizon',Uint8Array],['clusterOffsets',Uint32Array],['clusters',Int8Array]]){
+  offset=Math.ceil(offset/4)*4;
+  parsed[key]=new type(buffer,offset,sizes[key]);
+  offset+=sizes[key]*type.BYTES_PER_ELEMENT;
+ }
+ treeIndex=new Map(stops.map((s,i)=>[s.id,i]));
+ treeModel=parsed;
+}
+
+function treeInfo(stop){
+ if(!treeModel||!stop)return null;
+ const i=treeIndex.get(stop.id);
+ if(i===undefined)return null;
+ const clusters=[];
+ const start=treeModel.clusterOffsets[i], end=treeModel.clusterOffsets[i+1];
+ for(let k=start;k<end;k++){
+  const o=k*4;
+  clusters.push([treeModel.clusters[o],treeModel.clusters[o+1],treeModel.clusters[o+2]/2,treeModel.clusters[o+3]]);
+ }
+ const horizon=Array.from({length:180},(_,j)=>treeModel.horizon[i*180+j]/2);
+ return {
+  risk:treeModel.risk[i], maxH15:treeModel.maxH15[i], southMaxH:treeModel.southMaxH[i],
+  southPct:treeModel.southPct[i], maxElev:treeModel.maxElev[i]/2,
+  winterBlk:treeModel.winterBlk[i], summerBlk:treeModel.summerBlk[i],
+  acqDate:treeModel.acqDates[treeModel.acqIdx[i]]??'', horizon, clusters
+ };
+}
+
+function treeAnglesAt(stop,location){
+ const info=treeInfo(stop);
+ if(!info)return null;
+ if(!savedLocations.has(stop.id))return info.horizon;
+ const [east,north]=stopOffset(stop,location);
+ const angles=Array(180).fill(0);
+ for(const [dx,dy,r,h] of info.clusters){
+  const rx=dx-east, ry=dy-north, rise=h-3;
+  if(rise<=0)continue;
+  const d=Math.hypot(rx,ry);
+  if(d>35)continue;
+  if(d<=r){angles.fill(Math.max(angles[0],Math.atan2(rise,Math.max(.6,d/2))/rad));continue;}
+  const centerAz=(Math.atan2(rx,ry)/rad+360)%360;
+  const halfSpan=Math.asin(Math.min(1,r/d))/rad;
+  const elev=Math.atan2(rise,Math.max(.6,d-r))/rad;
+  for(let b=0;b<180;b++){
+   let diff=Math.abs(((b*2-centerAz+540)%360)-180);
+   if(diff<=halfSpan+1)angles[b]=Math.max(angles[b],elev);
+  }
+ }
+ return angles;
+}
+
+function treeMeshesAt(stop,location,patch){
+ const info=treeInfo(stop);
+ if(!info||!info.clusters.length)return [];
+ const [east,north]=stopOffset(stop,location);
+ const meshes=[];
+ for(const [dx,dy,r,h] of info.clusters){
+  const cx=dx-east, cy=dy-north;
+  if(Math.hypot(cx,cy)>240)continue;
+  const ring=[];
+  for(let k=0;k<8;k++){
+   const ang=k*Math.PI/4;
+   ring.push([cx+r*Math.cos(ang),cy+r*Math.sin(ang)]);
+  }
+  const groundZ=patch?groundAt(patch,cx,cy):0;
+  const crownBase=Math.min(h-1,Math.max(1.2,h*.32));
+  meshes.push([ring,groundZ+crownBase,Math.max(1.2,h-crownBase),'tree']);
+ }
+ return meshes;
 }
 
 let infraWays=[], deckCache=null;
@@ -1794,8 +1959,11 @@ function correctedScene(stop){
  const location=adjusted??stop;
  const structures=bridgeEnabled?infraSegments(stop,location):[];
  const decks=structures.filter(deck=>deck.height>0);
- if(!structures.length&&(!adjusted||!vworld))return null;
- const key=[stop.id,location.lat,location.lon,bridgeEnabled,Boolean(vworld),structureRevision].join(':');
+ const treeAngles=treeEnabled&&treeModel?treeAnglesAt(stop,location):null;
+ const hasTreeHorizon=Boolean(treeAngles&&treeAngles.some(a=>a>0));
+ const treeClusterCount=treeEnabled&&treeModel?(treeInfo(stop)?.clusters.length??0):0;
+ if(!structures.length&&!hasTreeHorizon&&!treeClusterCount&&(!adjusted||!vworld))return null;
+ const key=[stop.id,location.lat,location.lon,bridgeEnabled,treeEnabled,Boolean(treeModel),Boolean(vworld),structureRevision].join(':');
  if(correctionCache?.locationKey===key)return correctionCache;
  const terrain=terrainScene(stop);
  const source=baseScene(stop);
@@ -1809,17 +1977,24 @@ function correctedScene(stop){
   model={...terrain,...moved,sun:modeledSun(location,moved.angles),registry:true};
  }
  const bridgeIsBlocked=(alt,az)=>decks.some(deck=>bridgeBlocks(deck,alt,az));
- const sun=decks.length?model.sun.map(month=>month.map(([alt,az,blocked])=>
-  [alt,az,blocked||(alt>0&&bridgeIsBlocked(alt,az))])):model.sun;
- const monthly=(model.known||decks.length)?stop.months.map((value,i)=>{
-  const change=transmittedDirect(sun[i])-transmittedDirect(baselineSun[i]);
+ const sun=(decks.length||hasTreeHorizon)?model.sun.map(month=>month.map(([alt,az,blocked])=>{
+  const solidBlocked=blocked||(alt>0&&decks.length&&bridgeIsBlocked(alt,az));
+  const treeBlocked=!solidBlocked&&alt>0&&hasTreeHorizon&&alt<=terrainObstruction(treeAngles,az);
+  return [alt,az,solidBlocked,treeBlocked];
+ })):model.sun;
+ const monthly=(model.known||decks.length||hasTreeHorizon)?stop.months.map((value,i)=>{
+  const monthNum=monthNames[i];
+  const change=transmittedDirect(sun[i],monthNum)-transmittedDirect(baselineSun[i],monthNum);
   return change===0?value:Math.max(0,Math.min(Math.max(value,stop.base[i]),value+stop.base[i]*change));
  }):null;
- const meshes=structures.length?[...model.meshes,...structures.filter(deck=>
+ const structMeshes=structures.length?structures.filter(deck=>
   Math.hypot(Math.max(deck.bounds[0],-deck.bounds[2],0),Math.max(deck.bounds[1],-deck.bounds[3],0))<=250)
-  .map(deck=>[deck.ring,deck.base,deck.height,!deck.height?'structure-outline':deck.role==='wall'||deck.way.custom?'barrier':'bridge',deck.gradient])]:model.meshes;
+  .map(deck=>[deck.ring,deck.base,deck.height,!deck.height?'structure-outline':deck.role==='wall'||deck.way.custom?'barrier':'bridge',deck.gradient]):[];
+ const tMeshes=treeClusterCount?treeMeshesAt(stop,location,model.patch):[];
+ const meshes=(structMeshes.length||tMeshes.length)?[...model.meshes,...structMeshes,...tMeshes]:model.meshes;
  return correctionCache={...model,meshes,locationKey:key,sun,monthly,moved:Boolean(adjusted&&vworld),
-  decks,outlineCount:new Set(structures.filter(deck=>!deck.height).map(deck=>deck.id)).size,structureBands:null,bridgeCount:new Set(decks.map(deck=>deck.id)).size};
+  decks,outlineCount:new Set(structures.filter(deck=>!deck.height).map(deck=>deck.id)).size,structureBands:null,
+  bridgeCount:new Set(decks.map(deck=>deck.id)).size,treeAngles:hasTreeHorizon?treeAngles:null,hasTreeHorizon,treeCount:tMeshes.length};
 }
 
 function drawTerrain(site,project,line){
@@ -1923,7 +2098,7 @@ function renderSolarScene(){
  const label=(stop.ars?stop.ars+' · ':'')+stop.name;
  $('sceneStation').textContent=label;
  $('sceneMonth').value=state.month;
- $('sceneType').textContent=model.moved?'보정 위치 3D':model.bridgeCount?'교량·고가철도 포함 3D':model.registry?'브이월드 건물 3D':stop.detailed?'건물 포함 3D':model.partial?'일부 건물 3D':'지형 기반 3D';
+ $('sceneType').textContent=model.moved?'보정 위치 3D':model.bridgeCount?'교량·고가철도 포함 3D':model.hasTreeHorizon?'수목 추정 포함 3D':model.registry?'브이월드 건물 3D':stop.detailed?'건물 포함 3D':model.partial?'일부 건물 3D':'지형 기반 3D';
  $('sceneType').classList.toggle('detailed',stop.detailed);
  $('sceneObstacle').textContent=model.bridgeCount?'교량·고가 포함':model.registry||stop.detailed||model.partial?'건물':'지형';
  $('unknownBuildingNote').hidden=!model.missing;
@@ -1933,6 +2108,7 @@ function renderSolarScene(){
   ?[model.moved?'보정 좌표에서 건물 차폐를 계산했습니다. 지형 차폐는 원본 기준입니다.':'',
     model.bridgeCount?'교량·고가철도 및 사용자가 추가한 구조물 '+count(model.bridgeCount)+'개 구간을 음영 계산에 포함했습니다. 3D 점선은 패널 지면 기준면에서 상판 밑면까지의 높이입니다. 보정한 상판은 진한 청록색 테두리로 표시합니다.':'',
     model.outlineCount?'높이 확인이 필요한 구조물 '+count(model.outlineCount)+'개를 황토색 점선으로 표시했습니다.':'',
+    model.treeCount?'위성(CHMv2)으로 감지한 반경 28 m 내 수목 클러스터 '+count(model.treeCount)+'곳을 초록색으로 표시했습니다.':'',
     model.moved&&model.overlap?'현재 위치가 건물 윤곽 '+count(model.overlap)+'동과 겹칩니다. 패널이 실제로 지붕 위에 있다면 높이 3 m 가정과 함께 확인하세요.':''].filter(Boolean).join(' ')
   :model.registry
   ?'정류장 좌표와 겹치는 건물 '+count(model.overlap)+'동을 제외했습니다.'
@@ -1994,10 +2170,11 @@ function drawScene(){
  sunTimeline.value=sceneTime;
  sunTimeline.setAttribute('aria-valuetext',time+' KST');
  $('playbackTime').textContent=time+' KST';
- const description=sun[0]<=0?'지평선 아래':sun[2]?'직달광 차폐':'직달광 통과';
+ const description=sun[0]<=0?'지평선 아래':sun[2]?'직달광 차폐':sun[3]?'수목 차폐(위성 추정)':'직달광 통과';
  $('solarDate').textContent=monthNames[state.month]+'월 15일 '+time+' KST';
- $('sunState').textContent=site.patch&&!site.registry&&!site.bridgeCount&&sun[0]>0?(sun[2]?'지형에 가림':'지형 차폐 없음'):description;
+ $('sunState').textContent=site.patch&&!site.registry&&!site.bridgeCount&&!site.hasTreeHorizon&&sun[0]>0?(sun[2]?'지형에 가림':'지형 차폐 없음'):description;
  $('sunState').classList.toggle('blocked',sun[0]>0 && sun[2]);
+ $('sunState').classList.toggle('tree-blocked',sun[0]>0 && !sun[2] && Boolean(sun[3]));
  $('sunAltitude').textContent='태양 고도 '+decimal(sun[0])+'° · 방위각 '+decimal(sun[1])+'°';
  drawHorizonProfile(sun,site.angles,path,site);
  const a=Number(orbit.value)*rad,ca=Math.cos(a),sa=Math.sin(a);
@@ -2048,7 +2225,7 @@ function drawScene(){
   }
   if(method==='unknown'){line(ring.map(([x,y])=>project(x,y,base)),'#7794bf',1,'#e8edf6');continue;}
   const top=ring.map(([x,y])=>project(x,y,base+gx*x+gy*y+height)),bottom=ring.map(([x,y])=>project(x,y,base+gx*x+gy*y));
-  const colors=method==='barrier'?['#396367','#80acaf']:method==='bridge'?['#2a7767','#a5d6cb']:method==='height'?['#5573a1','#afc5e7']:method==='floors'?['#7796c3','#bbceed']:['#93a9cd','#d1def0'];
+  const colors=method==='tree'?['#2e7d47','#78c68b']:method==='barrier'?['#396367','#80acaf']:method==='bridge'?['#2a7767','#a5d6cb']:method==='height'?['#5573a1','#afc5e7']:method==='floors'?['#7796c3','#bbceed']:['#93a9cd','#d1def0'];
   const face=(pts,color)=>faces.push([pts.reduce((total,p)=>total+p[2],0)/pts.length,pts,color]);
   for(let i=0;i<ring.length;i++){const j=(i+1)%ring.length;face([bottom[i],bottom[j],top[j],top[i]],colors[0]);}
   face(top,colors[1]);
@@ -2085,11 +2262,11 @@ function drawScene(){
  const sky=([alt,az])=>project(142*Math.cos(alt*rad)*Math.sin(az*rad),142*Math.cos(alt*rad)*Math.cos(az*rad),3+142*Math.sin(alt*rad));
  for(let i=1;i<path.length;i++){
   const prev=path[i-1],next=path[i];
-  if(prev[0]>0&&next[0]>0)line([sky(prev),sky(next)],next[2]?'#ab4d38':'#b5781f',2);
+  if(prev[0]>0&&next[0]>0)line([sky(prev),sky(next)],next[2]?'#ab4d38':next[3]?'#2b7a46':'#b5781f',2);
  }
  const center=project(0,0,3);
  if(sun[0]>0){
-  const target=sky(sun);c.setLineDash([5,4]);line([center,target],sun[2]?'#ab4d38':'#b7811d',2);c.setLineDash([]);
+  const target=sky(sun);c.setLineDash([5,4]);line([center,target],sun[2]?'#ab4d38':sun[3]?'#2b7a46':'#b7811d',2);c.setLineDash([]);
   dot(target,8,'#fff9df');dot(target,5,'#d9931c');
  }
  dot(center,7,'#fdfdf9');dot(center,4,'#285fdb');
@@ -2111,11 +2288,17 @@ function drawHorizonProfile(sun,merged,path,site){
   :'태양이 지평선 아래에 있어 직달광이 없습니다.';
  $('horizonSummary').textContent='최대 '+decimal(peak)+'°'+(peak?' · 방위각 '+bearing+'°':'')+' · 2° 간격';
  const filterCount=results.length;
+ const treeAngles=site.treeAngles;
+ const treePeak=treeAngles?Math.max(...treeAngles):0;
  if(decks.length){
   $('horizonSummary').textContent+=' · 구조물 상단 최대 '+decimal(peakDeck)+'°';
   if(aboveHorizon)$('terrainCheck').textContent+=' · '+(decks.some(d=>bridgeBlocks(d,sun[0],sun[1]))?'구조물에 가림':'구조물 직달광 통과');
  }
- $('horizonExportScope').textContent='파랑은 지형, 진한 선은 건물 포함 차폐선입니다. 청록색 띠는 구조물이 가리는 고도 범위입니다. 주황색 점은 현재 태양 위치입니다. 지형 차폐 CSV 대상 '+filterCount.toLocaleString()+'곳';
+ if(treeAngles&&treePeak>0){
+  $('horizonSummary').textContent+=' · 수목 최대 '+decimal(treePeak)+'°';
+  if(aboveHorizon)$('terrainCheck').textContent+=' · '+(sun[0]<=terrainObstruction(treeAngles,sun[1])?'수목 차폐(추정)':'수목 차폐 없음');
+ }
+ $('horizonExportScope').textContent='파랑은 지형, 진한 선은 건물 포함 차폐선, 초록 점선은 위성 추정 수목 차폐선입니다. 청록색 띠는 구조물이 가리는 고도 범위입니다. 주황색 점은 현재 태양 위치입니다. 지형 차폐 CSV 대상 '+filterCount.toLocaleString()+'곳';
  horizonCanvas.setAttribute('aria-label','방위별 차폐 고도. '+$('horizonSummary').textContent+'. '+$('terrainCheck').textContent);
  const w=horizonCanvas.clientWidth,h=horizonCanvas.clientHeight,dpr=Math.min(devicePixelRatio||1,2);
  if(!w||!h)return;
@@ -2124,7 +2307,7 @@ function drawHorizonProfile(sun,merged,path,site){
  const left=34,right=w-28,top=10,bottom=h-23;
  const mergedPeak=merged?Math.max(...merged):peak;
  if(merged)$('horizonSummary').textContent+=' · 건물 포함 최대 '+decimal(mergedPeak)+'°';
- const topAngle=Math.max(15,Math.ceil(Math.max(peakDeck,mergedPeak,...path.map(point=>point[0]))/15)*15);
+ const topAngle=Math.max(15,Math.ceil(Math.max(peakDeck,mergedPeak,treePeak,...path.map(point=>point[0]))/15)*15);
  const x=deg=>left+(right-left)*deg/360,y=deg=>bottom-(bottom-top)*deg/topAngle;
  c.font='11px "Pretendard Variable", system-ui';
  for(const value of [0,topAngle/3,2*topAngle/3,topAngle]){
@@ -2145,6 +2328,14 @@ function drawHorizonProfile(sun,merged,path,site){
   c.beginPath();c.moveTo(left,y(merged[0]));
   for(let i=1;i<=horizonSamples;i++)c.lineTo(x(i*2),y(merged[i%horizonSamples]));
   c.strokeStyle='#10234b';c.lineWidth=1.5;c.stroke();
+ }
+ if(treeAngles&&treePeak>0){
+  c.beginPath();c.moveTo(left,y(treeAngles[0]));
+  for(let i=1;i<=horizonSamples;i++)c.lineTo(x(i*2),y(treeAngles[i%horizonSamples]));
+  c.lineTo(right,bottom);c.lineTo(left,bottom);c.closePath();c.fillStyle='rgba(45,138,78,.16)';c.fill();
+  c.beginPath();c.moveTo(left,y(treeAngles[0]));
+  for(let i=1;i<=horizonSamples;i++)c.lineTo(x(i*2),y(treeAngles[i%horizonSamples]));
+  c.setLineDash([4,2]);c.strokeStyle='#227a42';c.lineWidth=1.6;c.stroke();c.setLineDash([]);
  }
  c.fillStyle='rgba(19,139,116,.52)';
  bands.forEach((group,i)=>{
@@ -2186,6 +2377,15 @@ loadInfra().catch(error=>{
  $('bridgeShade').disabled=true;
  $('bridgeStatus').hidden=false;
  $('bridgeStatus').textContent='교량·고가철도 데이터를 불러오지 못했습니다.';
+ console.error(error);
+});
+loadTreeData().then(()=>{
+ correctionCache=null;
+ paintedOutlineKey='';
+ refresh(false);
+}).catch(error=>{
+ $('treeShadeToggle').disabled=true;
+ $('treeFilter').disabled=true;
  console.error(error);
 });
 loadVworld().then(()=>{
