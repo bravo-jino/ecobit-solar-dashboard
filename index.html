@@ -311,6 +311,34 @@ body{padding-left:164px}
 #batteryResults .simulation-output{margin:0;border-radius:13px;background:#f7f9fc;padding:var(--card-space)}
 .column i{border-radius:999px;background:repeating-linear-gradient(135deg,#c6d6ee 0 2px,#eff3fa 2px 6px)}
 .column .net{border-radius:999px;background:#4879de}
+/* Fill the right-hand card to the map height in the initial desktop layout. */
+@media(min-width:901px){
+ #explore:not(.has-selection){align-items:stretch}
+ #explore:not(.has-selection) .results{flex:1 1 0;height:0;max-height:none}
+}
+.stop-context-anchor{position:sticky;top:10px;z-index:11;height:0}
+.stop-context{
+ position:absolute;inset:0 0 auto;
+ display:flex;align-items:center;gap:8px;min-width:0;
+ padding:7px var(--card-space);
+ border:1px solid #d3dff7;border-radius:11px;background:#fff;
+ box-shadow:0 4px 15px #26365a20;
+}
+.stop-context .badge{flex:none}
+.stop-context strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stop-context .ars{flex:none;font-size:13px}
+.stop-context a{margin-left:auto;flex:none;color:#194db6;font-size:12px;font-weight:700;text-decoration:none}
+.stop-context a:hover{text-decoration:underline}
+#explore.has-selection ~ :is(#battery,#shadowScene,#method),
+#explore.has-selection ~ #battery :is(#monthlyGeneration,#batteryOperation){scroll-margin-top:64px}
+@media(max-width:600px){
+ .stop-context-anchor{top:calc(var(--mobile-nav-height, 44px) + 6px)}
+ #explore.has-selection ~ :is(#battery,#shadowScene,#method),
+ #explore.has-selection ~ #battery :is(#monthlyGeneration,#batteryOperation){
+  scroll-margin-top:calc(var(--mobile-nav-height, 44px) + 58px)
+ }
+}
+@media(max-width:375px){.stop-context .badge{display:none}}
 </style>
 </head>
 <body>
@@ -399,6 +427,14 @@ body{padding-left:164px}
  <p class="note" id="siteNote"></p><div class="links"><a id="externalMap" target="_blank" rel="noopener">지도에서 위치 확인 ↗</a><a href="#battery">발전·배터리 시뮬레이션 ↓</a><a href="#shadowScene" id="sceneLink">3D 음영·태양 경로 ↓</a></div>
  </div>
  </div></section>
+<div class="stop-context-anchor" id="stopContextAnchor">
+ <div class="stop-context" id="stopContext" aria-label="선택 정류장" hidden>
+  <span class="badge">선택 정류장</span>
+  <strong id="stopContextName"></strong>
+  <span class="ars" id="stopContextNumber"></span>
+  <a href="#insight">상세 보기 ↑</a>
+ </div>
+</div>
 <section class="card pad insight battery-section" id="battery" aria-labelledby="batteryTitle">
  <div class="row">
   <div><h2 id="batteryTitle">발전·배터리 시뮬레이션</h2><p class="sub" id="batteryStation" hidden></p></div>
@@ -1173,6 +1209,26 @@ const barButtons=monthNames.map((m,i)=>{
  track.className='column';net.className='net';label.textContent=m+'월';track.append(base,net);button.append(track,label,average);$('chart').append(button);
  button.addEventListener('click',()=>{state.month=i;drawProfile();});return {button,base,net,average};
 });
+const stopInsight=$('insight'), stopContextAnchor=$('stopContextAnchor'), stopContext=$('stopContext');
+const dashboardRail=document.querySelector('.rail');
+
+function syncStopContext(){
+ const pastInsight=stopContextAnchor.getBoundingClientRect().top>stopInsight.getBoundingClientRect().bottom+1;
+ stopContext.hidden=!state.selection||!pastInsight;
+}
+
+addEventListener('scroll',syncStopContext,{passive:true});
+const stopContextObserver=new ResizeObserver(entries=>{
+ for(const entry of entries){
+  if(entry.target===dashboardRail){
+   document.documentElement.style.setProperty('--mobile-nav-height',dashboardRail.offsetHeight+'px');
+  }
+ }
+ syncStopContext();
+});
+stopContextObserver.observe(stopInsight);
+stopContextObserver.observe(dashboardRail);
+
 function drawProfile(updateScene=true){
  if(updateScene)renderSolarScene();
  const s=lookup.get(state.selection);
@@ -1181,8 +1237,13 @@ function drawProfile(updateScene=true){
  drawBattery(s,generation);
  boundaryHint.hidden=Boolean(s);
  $('pending').hidden=Boolean(s);$('profile').hidden=!s;
- if(!s)return;
+ $('explore').classList.toggle('has-selection',Boolean(s));
+ if(!s){stopContext.hidden=true;return;}
  $('stopTitle').textContent=s.name;
+ $('stopContextName').textContent=s.name;
+ $('stopContextName').title=s.name;
+ $('stopContextNumber').textContent=s.ars||'';
+ syncStopContext();
  $('mode').textContent=s.detailed?'건물 음영 포함':'지형 기반 추정';$('mode').classList.toggle('detailed',s.detailed);
  const ars=document.createElement('strong'),tags=document.createElement('span');
  ars.className='ars';ars.textContent=s.ars||'번호 미제공';tags.className='sub';
