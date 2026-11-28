@@ -40,47 +40,144 @@
 #horizonChart{display:block;width:100%;height:130px;margin:7px 0 4px}
 #exportHorizon:disabled{opacity:.55;cursor:not-allowed}
 
-:root{--page:#f2f5f9;--rail:#10234b;--line:#e2e8f2}
-body{padding-left:164px}
-.rail{position:fixed;inset:0 auto 0 0;width:164px;z-index:12;background:var(--rail);padding:21px 12px;color:white}
-.rail nav{display:flex;flex-direction:column;gap:7px}
-.rail nav a{display:flex;align-items:center;gap:10px;color:#d9e6fc;text-decoration:none;border-radius:9px;padding:9px 10px;font-size:13px;font-weight:700;white-space:nowrap}
-.rail nav a span{display:grid;place-items:center;width:22px;height:22px;font-size:16px;line-height:1}
-.rail nav a:hover{background:#233d72;color:white}
-.rail nav a[aria-current]{background:#285fdb;color:white}
-.dashboard-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding:28px 0 17px}
-.dashboard-head h1{font-size:clamp(24px,3vw,36px);margin:0 0 4px;line-height:1.25;letter-spacing:-.045em}
-.data-date{font-size:12px;color:#566882;background:white;border:1px solid var(--line);border-radius:8px;padding:6px 9px;white-space:nowrap}
-.main{margin:0 auto;padding-bottom:24px}
-.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:0;background:none;border:0;box-shadow:none;border-radius:0;overflow:visible;margin-bottom:16px}
-.summary>div,.summary>div+div{border:1px solid var(--line);border-radius:12px;background:white;box-shadow:0 2px 6px #162a4809;padding:13px 15px;min-width:0}
-.summary>div:first-child{border-top:3px solid #285fdb;padding-top:11px}
-.summary span{margin-bottom:4px}
-.card{border-radius:14px;box-shadow:0 2px 10px #18305008}
-.layout{gap:14px;grid-template-columns:minmax(0,1.45fr) minmax(300px,1fr)}
-.map{max-height:490px}
-.solar-header{background:white}.marker.partial,.dot.partial{fill:#8098cb;background:#8098cb}
-.solar-section,.insight{margin-top:16px}
+/* Dashboard frame and navigation */
+:root{
+ --accent:#285fdb;
+ --page:#e9edf3;
+ --surface:#f3f5f8;
+ --line:#e0e6ef;
+ --ink:#172238;
+ --muted:#52627b;
+}
+body{padding:clamp(10px,2.8vw,44px)}
+.dashboard{
+ display:grid;
+ grid-template-columns:204px minmax(0,1fr);
+ gap:14px;
+ max-width:1600px;
+ margin:auto;
+ padding:14px;
+ border:1px solid #fff;
+ border-radius:30px;
+ background:#fff;
+ box-shadow:0 20px 56px #202f4d16;
+}
+.workspace{min-width:0}
+.rail{
+ position:sticky;
+ top:14px;
+ z-index:12;
+ align-self:start;
+ display:flex;
+ flex-direction:column;
+ gap:22px;
+ min-height:min(740px,calc(100dvh - 56px));
+ padding:21px 12px 14px;
+ border-radius:20px;
+ background:var(--surface);
+}
+.rail-brand{display:flex;align-items:center;justify-content:flex-start;padding:4px 10px;text-decoration:none}
+.rail-brand img{display:block;width:128px;max-width:100%;height:auto}
+.rail nav{display:flex;flex-direction:column;gap:4px}
+.rail nav a{
+ display:flex;align-items:center;gap:9px;padding:10px 11px;
+ border-radius:11px;color:var(--muted);text-decoration:none;font-size:13px;font-weight:680;
+ white-space:nowrap;
+}
+.rail nav a span{display:grid;place-items:center;width:22px;height:22px;font-size:17px;line-height:1}
+.rail nav a:hover,.rail nav a[aria-current]{background:#e1eaff;color:#194db6}
+.rail nav a[aria-current]{box-shadow:inset 3px 0 var(--accent)}
+.rail-simulation{
+ display:grid;
+ gap:5px;
+ margin-top:auto;
+ padding:16px 13px;
+ border-radius:15px;
+ color:white;
+ text-decoration:none;
+ background:radial-gradient(ellipse at 96% 100%,#346cdf,transparent 78%),#193d93;
+}
+.rail-simulation:hover{background:#214eb7}
+.rail-simulation span{color:#e8f0ff;font-size:11px}
+.topbar{
+ display:flex;align-items:center;justify-content:space-between;gap:14px;
+ margin-bottom:12px;padding:12px 16px;border-radius:17px;background:var(--surface);
+}
+.quick-search{
+ display:flex;align-items:center;gap:6px;width:min(100%,460px);
+ padding:3px 4px 3px 13px;border:1px solid var(--line);border-radius:999px;background:white;
+}
+.quick-search input{width:100%;min-width:0;padding:6px 0;background:transparent;border:0}
+.quick-search button{padding:5px 12px;border-radius:999px;background:#ebf1ff;color:#194db6;font-weight:700;flex-shrink:0}
+.quick-search button:hover{background:#dce8fe}
+.data-date{font-size:12px;color:var(--muted);white-space:nowrap}
+.dashboard-content{padding:clamp(12px,1.6vw,24px);border-radius:19px;background:var(--surface)}
+.dashboard-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:20px}
+.dashboard-head h1{font-size:clamp(23px,2.5vw,37px);line-height:1.18;font-weight:800}
+.dashboard-head p{margin-top:7px}
+.dashboard-actions{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.dashboard-actions a{
+ display:inline-flex;align-items:center;justify-content:center;min-height:37px;padding:6px 13px;
+ border:1px solid #c5d3ec;border-radius:999px;background:white;color:#194db6;
+ text-decoration:none;font-size:12px;font-weight:750;white-space:nowrap;
+}
+.dashboard-actions a:first-child{background:var(--accent);border-color:var(--accent);color:white}
+.dashboard-actions a:hover{background:#e4edff}
+.dashboard-actions a:first-child:hover{background:#1e4fbf}
+.main{width:100%;margin:0;padding:0}
+.summary{
+ grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;
+ margin:0 0 14px;background:none;border:0;box-shadow:none;overflow:visible;
+}
+.summary>div,.summary>div+div{min-width:0;min-height:108px;padding:15px 16px;border:1px solid var(--line);border-radius:17px;background:white}
+.summary>div:first-child{border-color:transparent;background:linear-gradient(135deg,#173e9c,var(--accent));color:white}
+.summary>div:first-child :is(span,small){color:#eaf1ff}
+.summary b{margin-top:7px;font-size:clamp(23px,2.35vw,36px)}
+.card{border-radius:17px;box-shadow:0 3px 12px #293a5808}
+.layout{gap:14px;grid-template-columns:minmax(0,1.55fr) minmax(290px,1fr)}
+.layout .map{width:auto;max-height:490px;margin:0 12px;border-radius:12px}
+.layout .barline{border-bottom:0}
+.list-area .filters{grid-template-columns:repeat(2,minmax(0,1fr))}
+.filters select,.control,.export,.links a,.links button{border-radius:999px}
+.result{padding-block:9px}
+.solar-header{background:white}
+.marker.partial,.dot.partial{fill:#8098cb;background:#8098cb}
+.solar-section,.insight{margin-top:14px}
 .horizon-profile{background:#fff}
 .model-stage canvas{height:390px}
-#overview,#explore,#insight,#shadowScene,#method{scroll-margin-top:16px}
-@media(min-width:1350px){.shell{width:min(1510px,calc(100% - 48px))}}
-@media(max-width:1110px){.shell{width:calc(100% - 30px)}.layout{grid-template-columns:minmax(0,1.05fr) minmax(280px,1fr)}}
-@media(max-width:900px){body{padding-left:60px}.rail{width:60px;padding:10px 5px}.rail nav a{padding:8px 0;gap:0;justify-content:center;font-size:0}.rail nav a span{font-size:17px}.layout{grid-template-columns:1fr}}
-@media(max-width:600px){body{padding-left:0}.rail{position:sticky;top:0;width:100%;display:flex;gap:7px;align-items:center;padding:5px 7px;overflow:auto}.rail nav{flex-direction:row;gap:3px}.rail nav a{padding:4px 6px;font-size:11px}.rail nav a span{display:none}.shell{width:calc(100% - 20px)}.dashboard-head{display:block;padding:16px 0 10px}.data-date{display:inline-block;margin-top:7px}.summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.summary>div,.summary>div+div{padding:9px}.summary>div:first-child{padding-top:7px}.model-stage canvas{height:300px}#overview,#explore,#insight,#shadowScene,#method{scroll-margin-top:52px}}
+#overview,#explore,#insight,#battery,#shadowScene,#method{scroll-margin-top:18px}
 
-.dashboard-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:23px;margin-bottom:16px;padding:20px 24px;background:#eaf0fb;border-radius:14px;overflow:hidden}
-.dashboard-intro{min-width:0}
-.dashboard-head .data-date{margin:0;flex-shrink:0}
-.rail-brand{display:flex;align-items:center;justify-content:center;background:#fff;padding:14px 10px;margin:-21px -12px 18px;text-decoration:none}
-.rail-brand img{display:block;width:119px;max-width:100%;height:auto}
-.rail-brand:focus-visible{outline:2px solid #285fdb;outline-offset:-4px}
-@media(max-width:900px){.rail-brand{margin:-10px -5px 10px;padding:9px 4px}}
+@media(max-width:1180px){
+ .dashboard{grid-template-columns:160px minmax(0,1fr)}
+ .dashboard-head{align-items:flex-start;flex-direction:column}
+ .layout{grid-template-columns:minmax(0,1.15fr) minmax(270px,1fr)}
+}
+@media(max-width:940px){
+ .dashboard{grid-template-columns:62px minmax(0,1fr);gap:9px}
+ .rail{padding:12px 5px;min-height:0}
+ .rail-brand{padding:4px 0}
+ .rail nav a{padding:8px 0;gap:0;justify-content:center;font-size:0}
+ .rail-simulation{display:none}
+}
+@media(max-width:760px){.layout{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:600px){
- .rail-brand{flex:0 0 62px;margin:-5px 1px -5px -7px;padding:7px 4px;align-self:stretch}
- .rail nav{flex-shrink:0}
- .dashboard-head{align-items:flex-start;flex-direction:column;gap:7px}
- .dashboard-head .data-date{font-size:11px}
+ .dashboard{display:block;padding:6px;border-radius:19px}
+ .rail{
+  top:0;flex-direction:row;align-items:center;gap:6px;
+  margin-bottom:8px;padding:6px;overflow-x:auto;border-radius:13px;
+ }
+ .rail-brand{flex:0 0 66px}
+ .rail nav{flex-direction:row;gap:2px}
+ .rail nav a{padding:6px;font-size:11px}
+ .rail nav a span{display:none}
+ .topbar{flex-wrap:wrap;gap:5px;padding:9px;margin-bottom:8px}
+ .topbar .data-date{font-size:11px;padding-left:7px}
+ .dashboard-head{gap:9px;margin-bottom:12px}
+ .summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .summary>div,.summary>div+div{min-height:82px;padding:10px}
+ .layout .map{margin:0 7px;min-height:265px}
+ .model-stage canvas{height:280px}
+ #overview,#explore,#insight,#battery,#shadowScene,#method{scroll-margin-top:64px}
 }
 .solar-playback{display:grid;grid-template-columns:auto minmax(115px,1fr) auto;align-items:center;gap:12px;padding:10px 16px;background:#f1f5fd;border-bottom:1px solid var(--line)}
 .solar-playback .control{display:inline-flex;justify-content:center;align-items:center;gap:7px;min-width:91px;background:#285fdb;border-color:#285fdb;color:#fff;font-weight:700;min-height:35px}
@@ -89,7 +186,6 @@ body{padding-left:164px}
 .playback-time{color:#173b83;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
 .solar-playback :focus-visible{outline:2px solid #285fdb;outline-offset:3px}
 @media(max-width:600px){
- .dashboard-head{margin-top:12px;margin-bottom:12px;padding:12px}
  .dashboard-head h1{font-size:21px}
  .solar-playback{grid-template-columns:auto minmax(55px,1fr) auto;padding:8px 12px;gap:8px}
  .solar-playback .control{min-width:78px}
@@ -203,10 +299,17 @@ body{padding-left:164px}
 .original-stop{fill:white;stroke:#294367;stroke-width:2;pointer-events:none}
 .adjusted-stop{fill:#285fdb;stroke:white;stroke-width:2.5;pointer-events:none}
 .location-line{stroke:#294367;stroke-width:1.5;stroke-dasharray:4 3;pointer-events:none}
+/* The striped reference and filled forecast share one scale. */
+#batteryResults{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:12px;margin-top:12px;align-items:start}
+#batteryResults .simulation-output{margin:0;border-radius:13px;background:#f7f9fc;padding:12px}
+#batteryResults .battery-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+.column i{border-radius:999px;background:repeating-linear-gradient(135deg,#c6d6ee 0 2px,#eff3fa 2px 6px)}
+.column .net{border-radius:999px;background:#4879de}
+@media(max-width:1220px){#batteryResults{grid-template-columns:minmax(0,1fr)}}
 </style>
 </head>
 <body>
-
+<div class="dashboard">
 <aside class="rail">
   <a class="rail-brand" href="#overview" aria-label="ECOBIT 대시보드 처음으로"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOoAAABtCAYAAACvIf0uAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAydpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDkuMS1jMDAyIDc5LmViYzgzMDYyNywgMjAyNS8wMi8xNy0yMDo0MTozOCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NTE4QzdCRUY5NDRBMTFGMDlGREVEM0U3MkU5RDI0MjMiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NTE4QzdCRUU5NDRBMTFGMDlGREVEM0U3MkU5RDI0MjMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIDI1LjEyIChXaW5kb3dzKSI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjc0OTc1MzZBNzY1MTExRjBBNjNCQUU1OEQ5RDJBNzdCIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjc0OTc1MzZCNzY1MTExRjBBNjNCQUU1OEQ5RDJBNzdCIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+JRwm6wAAIIJJREFUeNrs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" alt="ECOBIT" width="124" height="58"></a>
  <nav aria-label="대시보드 탐색">
@@ -217,12 +320,22 @@ body{padding-left:164px}
   <a href="#shadowScene"><span aria-hidden="true">☀</span>3D 음영</a>
   <a href="#method"><span aria-hidden="true">ⓘ</span>자료 출처</a>
  </nav>
+ <a class="rail-simulation" href="#battery"><strong>발전·배터리 설정 ↗</strong><span>패널 출력·효율·일일 소비량</span></a>
 </aside>
-<header class="shell dashboard-head" id="overview">
- <div class="dashboard-intro"><h1>부산광역시 버스정류장 태양광 시뮬레이터</h1><p class="sub">정류장별 예상 발전량과 3D 태양 경로를 비교합니다.</p></div>
+<div class="workspace">
+ <div class="topbar">
+  <form class="quick-search" id="quickSearch" role="search" aria-label="정류장 검색">
+   <input id="q" type="search" aria-label="5자리 정류장 번호 또는 정류장명" placeholder="5자리 정류장 번호 또는 정류장명">
+   <button type="submit">검색</button>
+  </form>
   <span class="data-date">정류장 자료 기준 2026.11.09</span>
+ </div>
+ <div class="dashboard-content">
+<header class="dashboard-head" id="overview">
+ <div><h1>부산광역시 버스정류장 태양광 시뮬레이터</h1><p class="sub">정류장별 예상 발전량과 3D 태양 경로를 비교합니다.</p></div>
+ <div class="dashboard-actions"><a href="#explore">정류장 탐색</a><a href="#battery">배터리 시뮬레이션</a></div>
 </header>
-<main class="shell main">
+<main class="main">
 <section class="summary" aria-label="정류장 집계"><div><span>부산 버스 정류장 목록</span><b id="total"></b></div><div><span>5자리 공개 번호 확인</span><b id="withArs"></b></div><div><span>건물 음영 상세 분석</span><b id="withDetail"></b></div><div><span>3D 태양 경로</span><b id="with3D"></b></div></section>
 <div class="layout" id="explore">
 <section class="card" aria-labelledby="mapTitle"><div class="pad barline"><div class="row"><div><h2 id="mapTitle">부산 전체</h2><p class="sub" id="mapHint">지도나 오른쪽 목록에서 구·군을 선택하세요.</p></div><button type="button" class="control" id="reset">부산 전체 보기</button></div></div>
@@ -271,7 +384,7 @@ body{padding-left:164px}
 </div>
 </section>
 <section class="card list-area" aria-labelledby="listTitle"><div class="pad barline"><div class="row"><h2 id="listTitle">정류장 찾기</h2><div class="list-actions"><button type="button" class="control" id="clearConditions" hidden>조건 초기화</button><button type="button" class="export" id="export">조회 결과 CSV</button></div></div>
-<div class="filters"><input id="q" type="search" aria-label="5자리 정류장 번호 또는 정류장명" placeholder="5자리 정류장 번호 또는 정류장명"><select id="model" aria-label="분석 유형"><option value="all">전체 유형</option><option value="detail">건물 포함 3D</option><option value="partial">일부 건물 3D</option><option value="terrain">지형 기반 3D</option></select><select id="treeFilter" aria-label="수목 음영 필터"><option value="all">수목 전체</option><option value="safe">수목 주의·높음 제외</option><option value="risk">수목 주의·높음만</option><option value="high">수목 높음만</option><option value="none">수목 미감지</option></select></div>
+<div class="filters"><select id="model" aria-label="분석 유형"><option value="all">전체 유형</option><option value="detail">건물 포함 3D</option><option value="partial">일부 건물 3D</option><option value="terrain">지형 기반 3D</option></select><select id="treeFilter" aria-label="수목 음영 필터"><option value="all">수목 전체</option><option value="safe">수목 주의·높음 제외</option><option value="risk">수목 주의·높음만</option><option value="high">수목 높음만</option><option value="none">수목 미감지</option></select></div>
 <div class="tags" id="districts" role="group" aria-label="구·군 선택"></div></div>
 <div class="pad row"><span id="resultCount" class="sub" aria-live="polite"></span><select id="order" class="sort" aria-label="정류장 정렬"><option value="ars">정류장 번호순</option><option value="name">정류장명순</option><option value="winter">겨울 발전량 낮은순</option></select></div>
 <div class="results" id="results" tabindex="0" aria-label="정류장 검색 결과"></div>
@@ -295,13 +408,13 @@ body{padding-left:164px}
    <fieldset>
     <legend>발전 조건</legend>
     <label>패널 정격 출력 <select class="sort" id="power"><option value="1">60 W</option><option value="2">120 W</option></select></label>
-    <label>시스템 발전 효율 (%) <input class="sort" type="number" id="efficiency" min="0" max="100" step="0.1" value="75" required aria-describedby="efficiencyHint"></label>
+    <label>시스템 발전 효율 (%) <input class="sort" type="number" id="efficiency" min="0" max="100" step="0.1" value="60" required aria-describedby="efficiencyHint"></label>
     <p class="sub" id="efficiencyHint">온도·배선·충전 등으로 인한 손실을 반영합니다.</p>
    </fieldset>
    <fieldset>
     <legend>배터리·소비 조건</legend>
     <label>배터리 용량 (Wh) <input class="sort" type="number" id="batteryCapacity" min="0.1" max="1000000" step="0.1" value="972.8" required></label>
-    <label>일일 소비량 (Wh/일) <input class="sort" type="number" id="dailyConsumption" min="0" max="1000000" step="0.1" value="28" required></label>
+    <label>일일 소비량 (Wh/일) <input class="sort" type="number" id="dailyConsumption" min="0" max="1000000" step="0.1" value="40" required></label>
    </fieldset>
    <fieldset>
     <legend>정류장별 추가 손실</legend>
@@ -320,7 +433,7 @@ body{padding-left:164px}
  <p class="empty-note" id="batteryPending">정류장을 선택하면 월별 발전량과 배터리 잔량을 확인할 수 있습니다.</p>
  <div id="batteryResults" hidden>
   <div class="chart simulation-output" id="monthlyGeneration">
-   <div class="row"><h3>월별 발전량 <small>(kWh)</small></h3><div class="legend"><span><i class="dot"></i>시뮬레이션</span><span><i class="dot" style="background:#d9e6fc"></i>무음영 모델</span></div></div>
+   <div class="row"><h3>월별 발전량 <small>(kWh)</small></h3><div class="legend"><span><i class="dot"></i>시뮬레이션</span><span><i class="dot" style="background:repeating-linear-gradient(135deg,#9db5d9 0 2px,#eff3fa 2px 4px)"></i>무음영 모델</span></div></div>
    <p class="sub chart-units">막대는 월 합계(kWh), 월 아래 숫자는 시뮬레이션 일평균(Wh/일)입니다.</p>
    <div class="bars" id="chart"></div><p class="chart-info" id="monthDetail"></p>
   </div>
@@ -403,16 +516,19 @@ body{padding-left:164px}
 <li>2D 지도의 도로와 건물 윤곽은 OpenStreetMap 기반 OpenFreeMap 공개 벡터 타일을 표시합니다. 벡터 지도를 사용할 수 없으면 OpenStreetMap 공개 이미지 타일을 표시합니다. 타일의 건물 윤곽은 정류장 주변 위치 확인에 사용합니다.</li>
 <li>표시 경계와 정류장 구·군 분류는 <a href="https://www.openstreetmap.org/relation/2396450">OpenStreetMap 부산광역시 하위 행정구역</a>을 사용합니다. <a href="./busan-district-boundaries.js">구·군 경계 데이터</a> © OpenStreetMap contributors, <a href="https://www.openstreetmap.org/copyright">ODbL 1.0</a>. 2026.11.23 기준입니다. 경계에서 120 m 이내의 바깥 좌표는 가까운 구·군에 배치하고, 나머지는 ‘시 경계 밖’에 표시합니다. 초기 확대 범위는 육지 중심이며, 경계 데이터를 불러오지 못하면 통계청 SGIS 기반 기존 경계를 표시합니다.</li>
 <li>지형 추정은 Copernicus DEM GLO-30과 가까운 기준 정류장 30곳의 PVGIS ERA5 일사량·태양 위치를 사용한 1차 추정입니다. 정류장별 DSM 차폐는 약 90 m~15 km 범위에서 계산했습니다. 가까운 건물·가로수·승강장에 의한 음영은 상세 확인이 필요합니다.</li>
-<li>국토교통부 <a href="https://www.data.go.kr/data/15083092/fileData.do">GIS건물통합정보</a> 부산 원본(2026.11.09, 공공누리 제1유형)을 적용한 3D는 9,268개 정류장에서 볼 수 있습니다. 높이값을 사용할 수 있는 정류장 9,264곳의 발전량을 다시 계산했습니다. 건축물대장 높이를 우선 사용하고, 높이값이 없으면 층수×3.2m로 추정합니다. 건물 바닥 고도는 DSM 주변 표고로 추정합니다. 건물의 지붕 세부 형상과 안뜰은 단순화했습니다. 계산 반경 400m, 건물 표시 약 250m, 방향 간격 2°입니다. 브이월드 부산 자료 밖 건물, 근거리 수목과 승강장은 모델 범위에 포함되지 않습니다. 일부 건물 3D는 자료가 확보된 건물의 차폐를 보여주고, 연간·월간 발전량에는 지형 모델을 사용합니다. 지형 기반 3D는 정류장 주변 약 300m의 지형과 2° 간격의 지형 차폐를 사용합니다. 모든 모델에서 수목·승강장에 의한 근거리 음영은 반영하지 않습니다. 모든 발전량은 2021.12~2022.11의 과거 기상 조건, 정남향·경사 30°·높이 3 m·시스템 발전 효율 75%를 기본으로 가정했습니다. 사용자가 입력한 효율은 기본값 대비 비율로 발전량에 적용합니다. 겨울은 12~2월 90일 기준입니다. </li>
+<li>국토교통부 <a href="https://www.data.go.kr/data/15083092/fileData.do">GIS건물통합정보</a> 부산 원본(2026.11.09, 공공누리 제1유형)을 적용한 3D는 9,268개 정류장에서 볼 수 있습니다. 높이값을 사용할 수 있는 정류장 9,264곳의 발전량을 다시 계산했습니다. 건축물대장 높이를 우선 사용하고, 높이값이 없으면 층수×3.2m로 추정합니다. 건물 바닥 고도는 DSM 주변 표고로 추정합니다. 건물의 지붕 세부 형상과 안뜰은 단순화했습니다. 계산 반경 400m, 건물 표시 약 250m, 방향 간격 2°입니다. 브이월드 부산 자료 밖 건물, 근거리 수목과 승강장은 모델 범위에 포함되지 않습니다. 일부 건물 3D는 자료가 확보된 건물의 차폐를 보여주고, 연간·월간 발전량에는 지형 모델을 사용합니다. 지형 기반 3D는 정류장 주변 약 300m의 지형과 2° 간격의 지형 차폐를 사용합니다. 모든 모델에서 수목·승강장에 의한 근거리 음영은 반영하지 않습니다. 기준 발전량 데이터는 2021.12~2022.11 기상 조건과 정남향·경사 30°·높이 3 m·시스템 효율 75% 기준입니다. 화면의 기본 효율은 60%이며, 입력한 효율을 데이터 기준인 75%와 비교해 발전량에 적용합니다. 겨울은 12~2월 90일 기준입니다. </li>
 <li>교량·고가철도 음영은 <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors · ODbL</a>의 <a href="https://download.geofabrik.de/asia/south-korea.html">한국 지도 추출본</a>(2026.11.24 KST)에서 교량으로 표시된 도로·철도·보행교를 사용합니다. 청록색은 상판의 추정 폭입니다. <a href="./bridge-expanded.js">교량 모델 데이터</a>는 ODbL에 따라 제공합니다. 기본 밑면 높이는 도로교 6 m, 고가철도 8 m, 보행교 5 m로 추정합니다. 전수 점검에서 확인한 역사·승강장·교량 면과 고가 후보를 보완했습니다. 기존 고가 구간과 이어지는 후보는 도로교 6 m, 철도교 8 m 밑면을 추정 적용합니다. 높이 근거가 부족한 시설은 황토색 점선으로 표시하며, 구조물 높이를 입력하면 음영을 계산합니다. 역사와 승강장은 공개지도 윤곽을 사용합니다. 구조물 높이 보정은 정류장별로 저장되며, 시작·끝 높이로 경사를 만들고 차음벽이나 별도로 그린 역사·벽체도 계산에 넣습니다. 수동 추가 구조물은 직육면체 형태로 단순화합니다. 30분 간격의 월 대표일 직달광 변화로 기존 발전량을 보정하며, 버튼으로 교량 반영 전후를 비교할 수 있습니다.</li>
 <li>위치 보정은 같은 브라우저에 저장됩니다. 보정 위치에서 400 m 이내 건물 차폐를 다시 계산합니다. 지형 차폐는 원본 정류장의 모델을 사용하고, 패널 지면 높이는 주변 지형 격자에서 보간합니다. 보정 발전량은 월 대표일의 정남향 30° 패널에 입사하는 직달광 변화로 기존 월별 발전량을 보정한 추정치입니다. 위치·구조물을 보정한 정류장은 목록과 발전량 CSV에도 보정 결과를 표시합니다. 지형 차폐 CSV는 지형만 포함합니다.</li>
 <li>건물 윤곽 비교는 지도 위에 3D 모델의 GIS건물통합정보 외곽선을 표시합니다. 점선은 높이 미상, 주황색 면은 높이 또는 층수가 있는 경우이며, 범위 내 윤곽은 높이와 관계없이 표시합니다. 배경지도나 로드뷰의 시점과 원본 자료의 시점에 따라 차이가 날 수 있습니다.</li>
 <li>높이와 층수가 모두 미상인 건물은 지면에 윤곽만 표시하며 건물 차폐 계산에서 제외합니다.<span id="unknownBuildingNote" hidden></span></li>
 <li>태양 경로는 선택한 월의 15일을 기준으로 00:00~23:30(KST)을 30분 단위로 표시합니다. 기존 시각별 차폐 자료만 있는 모형은 가장 가까운 기존 계산 시각의 차폐 여부를 사용합니다.</li>
 <li>수목(가로수·주변 수관) 음영 추정은 <a href="https://registry.opendata.aws/dataforgood-fb-forests/">Meta &amp; World Resources Institute(WRI) Canopy Height Maps v2 (DINOv3, 약 1 m 해상도)</a> 공개 데이터(CC BY 4.0)를 <a href="./scripts/build_tree_data.py">전수 자동화 스크립트</a>로 추출한 <a href="./tree-data.js">수목 모델 데이터</a>를 사용합니다. 정류장 반경 30 m 내 패널 높이(3 m) 초과 수관의 2° 방위별 차폐 고도와 반경 28 m 내 수관 클러스터를 계산합니다. ‘수목 음영(위성)’을 켜면 지형·건물·교량에 가리지 않은 직달광 중 수목 차폐 고도 이하 구간에 수목 유형별 계절 차폐율을 적용해 발전량을 보정합니다(기본값 낙엽수: 5~10월 75%·11~4월 20%, 혼합: 75%·35%, 상록수: 80%·75%, 정류장별 브라우저 저장). 원천 위성영상(주로 2018~2019년, 부산 일부 구역은 3~4월 촬영) 특성상 신설·전정 가로수나 3월 낙엽기 소형 가로수는 누락될 수 있으므로 최종 후보지는 로드뷰와 현장 확인이 필요합니다.</li>
-<li>배터리 용량 기본값은 972.8 Wh, 일일 소비량은 28 Wh/일입니다. 연속 흐림, 시간대별 충방전, 배터리 노화와 방전 제한은 반영하지 않습니다. 조회 결과 CSV는 정류장별 추가 손실과 월별 직접 입력값을 적용하기 전의 모델 값을 내보냅니다.</li>
+<li>배터리 용량 기본값은 972.8 Wh, 일일 소비량은 40 Wh/일입니다. 연속 흐림, 시간대별 충방전, 배터리 노화와 방전 제한은 반영하지 않습니다. 조회 결과 CSV는 정류장별 추가 손실과 월별 직접 입력값을 적용하기 전의 모델 값을 내보냅니다.</li>
 </ul></details></footer>
 </main>
+ </div>
+</div>
+</div>
 <script type="application/octet-stream" id="bridgeData"></script>
 <script src="./bridge-expanded.js"></script>
 <script type="application/octet-stream" id="treeData"></script>
@@ -474,9 +590,9 @@ const stops=data.stops.map(row=>{
 if(hasOsmBoundaries)$('mapCredit').hidden=false;
 const districtsTotal=districts.map((_,i)=>stops.filter(s=>s.district===i).length);
 const outside=stops.filter(s=>s.district<0).length, lookup=new Map(stops.map(s=>[s.id,s]));
-const baselineEfficiency=75;
-const defaultBatteryCapacity=972.8, defaultDailyConsumption=28;
-const state={district:null,selection:null,power:1,efficiency:baselineEfficiency,
+const baselineEfficiency=75, defaultEfficiency=60;
+const defaultBatteryCapacity=972.8, defaultDailyConsumption=40;
+const state={district:null,selection:null,power:1,efficiency:defaultEfficiency,
  batteryCapacity:defaultBatteryCapacity,dailyConsumption:defaultDailyConsumption,month:0,page:0,view:null};
 const generationScale=()=>state.power*state.efficiency/baselineEfficiency;
 const locale=new Intl.NumberFormat('ko-KR'), count=n=>locale.format(n);
@@ -956,6 +1072,12 @@ $('q').addEventListener('input',()=>{
  }
  refresh();
 });
+$('quickSearch').addEventListener('submit',event=>{
+ event.preventDefault();
+ const target=state.selection?'insight':'explore';
+ location.hash=target;
+ $(target).scrollIntoView();
+});
 function applyModelFilter(){
  if(state.selection&&!queryResults().some(s=>s.id===state.selection))state.selection=null;
  state.page=0;
@@ -1295,7 +1417,7 @@ for(const [id,key,redraw] of [['efficiency','efficiency',renderGeneration],
  });
 }
 $('resetSimulation').addEventListener('click',()=>{
- state.power=1;state.efficiency=baselineEfficiency;
+ state.power=1;state.efficiency=defaultEfficiency;
  state.dailyConsumption=defaultDailyConsumption;state.batteryCapacity=defaultBatteryCapacity;
  for(const id of ['power','efficiency','dailyConsumption','batteryCapacity'])$(id).value=state[id];
  defaultTreeShade=[0,0];
