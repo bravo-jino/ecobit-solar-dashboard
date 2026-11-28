@@ -99,31 +99,11 @@ body{padding:clamp(10px,2.8vw,44px)}
 }
 .rail-simulation:hover{background:#214eb7}
 .rail-simulation span{color:#e8f0ff;font-size:11px}
-.topbar{
- display:flex;align-items:center;justify-content:space-between;gap:14px;
- margin-bottom:12px;padding:12px 16px;border-radius:17px;background:var(--surface);
-}
-.quick-search{
- display:flex;align-items:center;gap:6px;width:min(100%,460px);
- padding:3px 4px 3px 13px;border:1px solid var(--line);border-radius:999px;background:white;
-}
-.quick-search input{width:100%;min-width:0;padding:6px 0;background:transparent;border:0}
-.quick-search button{padding:5px 12px;border-radius:999px;background:#ebf1ff;color:#194db6;font-weight:700;flex-shrink:0}
-.quick-search button:hover{background:#dce8fe}
 .data-date{font-size:12px;color:var(--muted);white-space:nowrap}
 .dashboard-content{padding:clamp(12px,1.6vw,24px);border-radius:19px;background:var(--surface)}
 .dashboard-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:20px}
 .dashboard-head h1{font-size:clamp(23px,2.5vw,37px);line-height:1.18;font-weight:800}
 .dashboard-head p{margin-top:7px}
-.dashboard-actions{display:flex;align-items:center;gap:7px;flex-shrink:0}
-.dashboard-actions a{
- display:inline-flex;align-items:center;justify-content:center;min-height:37px;padding:6px 13px;
- border:1px solid #c5d3ec;border-radius:999px;background:white;color:#194db6;
- text-decoration:none;font-size:12px;font-weight:750;white-space:nowrap;
-}
-.dashboard-actions a:first-child{background:var(--accent);border-color:var(--accent);color:white}
-.dashboard-actions a:hover{background:#e4edff}
-.dashboard-actions a:first-child:hover{background:#1e4fbf}
 .main{width:100%;margin:0;padding:0}
 .summary{
  grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;
@@ -170,8 +150,6 @@ body{padding:clamp(10px,2.8vw,44px)}
  .rail nav{flex-direction:row;gap:2px}
  .rail nav a{padding:6px;font-size:11px}
  .rail nav a span{display:none}
- .topbar{flex-wrap:wrap;gap:5px;padding:9px;margin-bottom:8px}
- .topbar .data-date{font-size:11px;padding-left:7px}
  .dashboard-head{gap:9px;margin-bottom:12px}
  .summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
  .summary>div,.summary>div+div{min-height:82px;padding:10px}
@@ -300,12 +278,58 @@ body{padding:clamp(10px,2.8vw,44px)}
 .adjusted-stop{fill:#285fdb;stroke:white;stroke-width:2.5;pointer-events:none}
 .location-line{stroke:#294367;stroke-width:1.5;stroke-dasharray:4 3;pointer-events:none}
 /* The striped reference and filled forecast share one scale. */
-#batteryResults{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:12px;margin-top:12px;align-items:start}
+/* Search and its live results are one panel. */
+.dashboard-head{margin-bottom:14px}
+.dashboard-head .data-date{display:inline-block;margin-left:7px;white-space:normal}
+.rail{min-height:0}
+.rail-simulation{margin-top:8px}
+.layout{grid-template-columns:minmax(320px,.83fr) minmax(0,1.17fr);align-items:start}
+.explore-side{display:grid;min-width:0;gap:10px}
+.list-area .pad{padding:11px 14px}
+.quick-search{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px;margin-top:9px;padding:3px 4px 3px 12px;border:1px solid #bdccea;border-radius:12px;background:#f7f9fe}
+.quick-search:focus-within{border-color:var(--accent)}
+.quick-search input{width:100%;min-width:0;padding:6px 0;background:transparent;border:0}
+.quick-search button{padding:5px 12px;border-radius:8px;background:var(--accent);color:#fff;font-weight:700}
+.quick-search button:hover{background:#1f4fb9}
+.stop-filters{margin-top:7px}
+.stop-filters summary,.simulation-advanced summary,.monthly-inputs summary{cursor:pointer;color:#194db6;font-size:13px;font-weight:700}
+.list-area .result-toolbar{padding-block:4px 8px}
+.list-area .results{height:auto;max-height:236px;min-height:42px;scroll-padding-block:5px}
+.list-area .pagination{padding-block:6px}
+.stop-insight{padding:11px 14px}
+.stop-insight .empty-note{padding:0}
+.stop-insight .metrics{margin:8px 0;gap:5px}
+.stop-insight .metrics b{font-size:clamp(15px,1.6vw,24px);white-space:normal}
+.map-card .map{aspect-ratio:1.43;min-height:300px;max-height:480px}
+.map-card .guide{padding-block:8px}
+.simulation-form{margin:8px 0 0}
+.simulation-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.simulation-fields fieldset{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 9px;padding:6px 9px 9px}
+.simulation-fields label+label{margin:0}
+.simulation-fields p{grid-column:1/-1;margin:0}
+.simulation-advanced,.monthly-inputs{margin-top:7px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:#f8faff}
+.simulation-advanced fieldset{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 9px;border:0;margin:6px 0 0;padding:0}
+.simulation-advanced legend{padding:0;font-size:12px;color:var(--muted)}
+.simulation-advanced label{display:grid;gap:4px;font-size:13px}
+.simulation-advanced input{width:100%}
+.simulation-advanced p{grid-column:1/-1;margin:0}
+#batteryResults{display:grid;gap:10px;margin-top:10px}
+.analysis-charts{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+#batteryResults .battery-metrics{margin-bottom:0}
+#batteryHistory .battery-chart{max-height:195px}
+.scene-pending{min-height:0;padding-block:7px 12px}
+@media(min-width:1350px){.analysis-charts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:940px){.layout{grid-template-columns:minmax(285px,.94fr) minmax(0,1.06fr)}}
+@media(max-width:760px){.layout{grid-template-columns:minmax(0,1fr);min-height:0}}
+@media(max-width:680px){.simulation-fields{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){
+ .dashboard-head .data-date{display:block;margin:3px 0 0}
+ .map-card .map{min-height:250px}
+ .list-area .results{max-height:194px}
+}
 #batteryResults .simulation-output{margin:0;border-radius:13px;background:#f7f9fc;padding:12px}
-#batteryResults .battery-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
 .column i{border-radius:999px;background:repeating-linear-gradient(135deg,#c6d6ee 0 2px,#eff3fa 2px 6px)}
 .column .net{border-radius:999px;background:#4879de}
-@media(max-width:1220px){#batteryResults{grid-template-columns:minmax(0,1fr)}}
 </style>
 </head>
 <body>
@@ -323,26 +347,39 @@ body{padding:clamp(10px,2.8vw,44px)}
  <a class="rail-simulation" href="#battery"><strong>발전·배터리 설정 ↗</strong><span>패널 출력·효율·일일 소비량</span></a>
 </aside>
 <div class="workspace">
- <div class="topbar">
-  <form class="quick-search" id="quickSearch" role="search" aria-label="정류장 검색">
-   <input id="q" type="search" aria-label="5자리 정류장 번호 또는 정류장명" placeholder="5자리 정류장 번호 또는 정류장명">
-   <button type="submit">검색</button>
-  </form>
-  <span class="data-date">정류장 자료 기준 2026.11.09</span>
- </div>
  <div class="dashboard-content">
 <header class="dashboard-head" id="overview">
- <div><h1>부산광역시 버스정류장 태양광 시뮬레이터</h1><p class="sub">정류장별 예상 발전량과 3D 태양 경로를 비교합니다.</p></div>
- <div class="dashboard-actions"><a href="#explore">정류장 탐색</a><a href="#battery">배터리 시뮬레이션</a></div>
+ <div><h1>부산광역시 버스정류장 태양광 시뮬레이터</h1><p class="sub">정류장별 예상 발전량과 3D 태양 경로를 비교합니다. <span class="data-date">자료 기준 2026.11.09</span></p></div>
 </header>
 <main class="main">
 <section class="summary" aria-label="정류장 집계"><div><span>부산 버스 정류장 목록</span><b id="total"></b></div><div><span>5자리 공개 번호 확인</span><b id="withArs"></b></div><div><span>건물 음영 상세 분석</span><b id="withDetail"></b></div><div><span>3D 태양 경로</span><b id="with3D"></b></div></section>
 <div class="layout" id="explore">
-<section class="card" aria-labelledby="mapTitle"><div class="pad barline"><div class="row"><div><h2 id="mapTitle">부산 전체</h2><p class="sub" id="mapHint">지도나 오른쪽 목록에서 구·군을 선택하세요.</p></div><button type="button" class="control" id="reset">부산 전체 보기</button></div></div>
+<div class="explore-side">
+<section class="card list-area" aria-labelledby="listTitle"><div class="pad barline"><div class="row"><h2 id="listTitle">정류장 찾기</h2><div class="list-actions"><button type="button" class="control" id="clearConditions" hidden>조건 초기화</button><button type="button" class="export" id="export">조회 결과 CSV</button><button type="button" class="export" id="exportHorizon" title="현재 검색·필터 결과의 방위별 차폐 고도">지형 차폐 CSV</button></div></div>
+  <form class="quick-search" id="quickSearch" role="search" aria-label="정류장 검색">
+   <input id="q" type="search" aria-controls="results" aria-label="5자리 정류장 번호 또는 정류장명" placeholder="5자리 정류장 번호 또는 정류장명">
+   <button type="submit">검색</button>
+  </form>
+<details class="stop-filters"><summary>구·군·음영 필터</summary>
+<div class="filters"><select id="model" aria-label="분석 유형"><option value="all">전체 유형</option><option value="detail">건물 포함 3D</option><option value="partial">일부 건물 3D</option><option value="terrain">지형 기반 3D</option></select><select id="treeFilter" aria-label="수목 음영 필터"><option value="all">수목 전체</option><option value="safe">수목 주의·높음 제외</option><option value="risk">수목 주의·높음만</option><option value="high">수목 높음만</option><option value="none">수목 미감지</option></select></div>
+<div class="tags" id="districts" role="group" aria-label="구·군 선택"></div></details></div>
+<div class="pad row result-toolbar"><span id="resultCount" class="sub" aria-live="polite"></span><select id="order" class="sort" aria-label="정류장 정렬"><option value="ars">정류장 번호순</option><option value="name">정류장명순</option><option value="winter">겨울 발전량 낮은순</option></select></div>
+<div class="results" id="results" tabindex="0" aria-label="정류장 검색 결과"></div>
+<div class="pagination"><button type="button" id="back">이전</button><span id="page"></span><button type="button" id="next">다음</button></div></section>
+<section class="card pad stop-insight" id="insight" aria-label="정류장 발전량"><div id="pending" class="empty-note"><strong>정류장을 선택해 주세요</strong><p class="sub">목록이나 지도에서 선택하면 발전량과 배터리 결과를 확인할 수 있습니다.</p></div>
+<div id="profile" class="profile" hidden>
+ <div><div class="row"><h2 id="stopTitle" class="detail-title" tabindex="-1"></h2><span class="badge" id="mode"></span></div>
+ <div id="stopMeta" class="idline"></div><p class="sub" id="stopCoords"></p><p class="sub" id="source"></p><p class="sub" id="treeDetail" hidden></p>
+ <div class="metrics"><div><span>연간 발전량</span><b id="annual"></b></div><div><span>겨울 일평균</span><b id="winter"></b></div><div><span>모델 음영 손실</span><b id="loss"></b></div></div>
+ <p class="note" id="siteNote"></p><div class="links"><a id="externalMap" target="_blank" rel="noopener">지도에서 위치 확인 ↗</a><a href="#battery">발전·배터리 시뮬레이션 ↓</a><a href="#shadowScene" id="sceneLink">3D 음영·태양 경로 ↓</a></div>
+ </div>
+ </div></section>
+</div>
+<section class="card map-card" aria-labelledby="mapTitle"><div class="pad barline"><div class="row"><div><h2 id="mapTitle">부산 전체</h2><p class="sub" id="mapHint">지도나 목록에서 구·군을 선택하세요.</p></div><button type="button" class="control" id="reset">부산 전체 보기</button></div></div>
 <div class="map" id="map"><div id="rasterMap" class="base-map raster-map" aria-hidden="true"></div><div id="baseMap" class="base-map vector-map" aria-hidden="true"></div><svg id="geo" viewBox="0 0 960 630" preserveAspectRatio="none" aria-label="부산 구군 및 정류장 지도"><g id="world"><image id="terrain" class="terrain"/><g id="areas"></g><g id="analysisBuildings" aria-hidden="true"></g></g><g id="markers"></g><g id="labels"></g></svg>
 <div class="map-tools"><button type="button" id="zoomIn" title="지도 확대" aria-label="지도 확대">+</button><button type="button" id="zoomOut" title="지도 축소" aria-label="지도 축소">−</button></div><div class="north" aria-hidden="true">▲<br>N</div>
 <div class="map-credit" id="mapCredit" hidden><span id="vectorCredit" hidden><a href="https://openfreemap.org/">OpenFreeMap</a> · © <a href="https://openmaptiles.org/">OpenMapTiles</a> · </span>© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a></div></div>
-<div class="guide"><div class="legend"><span><i class="dot"></i>지형 추정</span><span><i class="dot detail"></i>건물 포함</span><span><i class="dot partial"></i>일부 건물</span><span><i class="dot current"></i>선택 정류장</span></div><a class="sub" href="#insight" id="jumpDetail" hidden>선택 정류장의 발전량 보기 ↓</a><span class="sub" id="boundaryHint">구·군 경계는 탐색용</span></div>
+<div class="guide"><div class="legend"><span><i class="dot"></i>지형 추정</span><span><i class="dot detail"></i>건물 포함</span><span><i class="dot partial"></i>일부 건물</span><span><i class="dot current"></i>선택 정류장</span></div><span class="sub" id="boundaryHint">구·군 경계는 탐색용</span></div>
 <div class="location-panel" id="locationPanel" hidden>
  <div class="row"><strong>정류장 분석 위치</strong><div class="location-actions">
   <button type="button" class="control" id="adjustLocation" aria-expanded="false">정류장 위치 보정</button>
@@ -383,21 +420,7 @@ body{padding:clamp(10px,2.8vw,44px)}
  </div>
 </div>
 </section>
-<section class="card list-area" aria-labelledby="listTitle"><div class="pad barline"><div class="row"><h2 id="listTitle">정류장 찾기</h2><div class="list-actions"><button type="button" class="control" id="clearConditions" hidden>조건 초기화</button><button type="button" class="export" id="export">조회 결과 CSV</button></div></div>
-<div class="filters"><select id="model" aria-label="분석 유형"><option value="all">전체 유형</option><option value="detail">건물 포함 3D</option><option value="partial">일부 건물 3D</option><option value="terrain">지형 기반 3D</option></select><select id="treeFilter" aria-label="수목 음영 필터"><option value="all">수목 전체</option><option value="safe">수목 주의·높음 제외</option><option value="risk">수목 주의·높음만</option><option value="high">수목 높음만</option><option value="none">수목 미감지</option></select></div>
-<div class="tags" id="districts" role="group" aria-label="구·군 선택"></div></div>
-<div class="pad row"><span id="resultCount" class="sub" aria-live="polite"></span><select id="order" class="sort" aria-label="정류장 정렬"><option value="ars">정류장 번호순</option><option value="name">정류장명순</option><option value="winter">겨울 발전량 낮은순</option></select></div>
-<div class="results" id="results" tabindex="0" aria-label="정류장 검색 결과"></div>
-<div class="pagination"><button type="button" id="back">이전</button><span id="page"></span><button type="button" id="next">다음</button></div></section>
 </div>
-<section class="card pad insight" id="insight" aria-label="정류장 발전량"><div id="pending" class="empty-note"><strong>정류장을 선택해 주세요</strong><p class="sub">정류장을 선택하면 연간·월별 발전량을 확인할 수 있습니다.</p></div>
-<div id="profile" class="profile" hidden>
- <div><div class="row"><h2 id="stopTitle" class="detail-title"></h2><span class="badge" id="mode"></span></div>
- <div id="stopMeta" class="idline"></div><p class="sub" id="stopCoords"></p><p class="sub" id="source"></p><p class="sub" id="treeDetail" hidden></p>
- <div class="metrics"><div><span>연간 발전량</span><b id="annual"></b></div><div><span>겨울 일평균</span><b id="winter"></b></div><div><span>모델 음영 손실</span><b id="loss"></b></div></div>
- <p class="note" id="siteNote"></p><div class="links"><a id="externalMap" target="_blank" rel="noopener">지도에서 위치 확인 ↗</a><a href="#battery">발전·배터리 시뮬레이션 ↓</a><a href="#shadowScene" id="sceneLink">3D 음영·태양 경로 ↓</a></div>
- </div>
- </div></section>
 <section class="card pad insight battery-section" id="battery" aria-labelledby="batteryTitle">
  <div class="row">
   <div><h2 id="batteryTitle">발전·배터리 시뮬레이션</h2><p class="sub" id="batteryStation" hidden></p></div>
@@ -416,27 +439,23 @@ body{padding:clamp(10px,2.8vw,44px)}
     <label>배터리 용량 (Wh) <input class="sort" type="number" id="batteryCapacity" min="0.1" max="1000000" step="0.1" value="972.8" required></label>
     <label>일일 소비량 (Wh/일) <input class="sort" type="number" id="dailyConsumption" min="0" max="1000000" step="0.1" value="40" required></label>
    </fieldset>
+  </div>
+  <details class="simulation-advanced"><summary>추가 손실 설정</summary>
    <fieldset>
-    <legend>정류장별 추가 손실</legend>
+    <legend>계절별 차폐</legend>
     <label>5~10월 추가 손실 (%) <input class="sort" id="treeShadeLeafOn" type="number" min="0" max="100" step="0.1" value="0" required aria-describedby="treeShadeHelp"></label>
     <label>11~4월 추가 손실 (%) <input class="sort" id="treeShadeLeafOff" type="number" min="0" max="100" step="0.1" value="0" required aria-describedby="treeShadeHelp"></label>
     <p class="sub" id="treeShadeHelp">가로수·승강장 등으로 더 줄어드는 비율입니다. 정류장 선택 전에는 기본값을, 선택 후에는 해당 정류장의 값을 수정합니다.</p>
     <p class="sub tree-roadview" id="roadviewHint" hidden><a id="treeRoadview" target="_blank" rel="noopener noreferrer">정류장 주변 로드뷰 ↗</a></p>
    </fieldset>
-  </div>
+  </details>
   <details class="monthly-inputs" id="monthlyInputs" hidden>
    <summary>정류장별 월 발전량 직접 입력 (kWh/월)</summary>
    <p class="sub" id="monthlyInputHelp">실측값이나 별도 추정값을 입력하면 해당 월의 최종 발전량으로 사용합니다. 빈칸은 현재 설정의 추정값을 사용합니다.</p>
    <div class="monthly-grid" id="monthlyOverrides"></div>
   </details>
  </div>
- <p class="empty-note" id="batteryPending">정류장을 선택하면 월별 발전량과 배터리 잔량을 확인할 수 있습니다.</p>
  <div id="batteryResults" hidden>
-  <div class="chart simulation-output" id="monthlyGeneration">
-   <div class="row"><h3>월별 발전량 <small>(kWh)</small></h3><div class="legend"><span><i class="dot"></i>시뮬레이션</span><span><i class="dot" style="background:repeating-linear-gradient(135deg,#9db5d9 0 2px,#eff3fa 2px 4px)"></i>무음영 모델</span></div></div>
-   <p class="sub chart-units">막대는 월 합계(kWh), 월 아래 숫자는 시뮬레이션 일평균(Wh/일)입니다.</p>
-   <div class="bars" id="chart"></div><p class="chart-info" id="monthDetail"></p>
-  </div>
   <div class="simulation-output" id="batteryOperation">
    <h3>배터리 운용 결과</h3>
    <div class="tree-comparison" id="treeShadeComparison" hidden>
@@ -456,11 +475,20 @@ body{padding:clamp(10px,2.8vw,44px)}
     <div><dt>2년간 공급 부족 일수</dt><dd id="batteryShortage"></dd></div>
     <div><dt>완충 후 발전 없이 운용</dt><dd id="batteryAutonomy"></dd></div>
    </dl>
+  </div>
+  <div class="analysis-charts">
+  <div class="chart simulation-output" id="monthlyGeneration">
+   <div class="row"><h3>월별 발전량 <small>(kWh)</small></h3><div class="legend"><span><i class="dot"></i>시뮬레이션</span><span><i class="dot" style="background:repeating-linear-gradient(135deg,#9db5d9 0 2px,#eff3fa 2px 4px)"></i>무음영 모델</span></div></div>
+   <p class="sub chart-units">막대는 월 합계(kWh), 월 아래 숫자는 시뮬레이션 일평균(Wh/일)입니다.</p>
+   <div class="bars" id="chart"></div><p class="chart-info" id="monthDetail"></p>
+  </div>
+  <div class="simulation-output" id="batteryHistory">
    <div class="row battery-graph-heading"><h3>일별 배터리 잔량 <small>(Wh)</small></h3>
     <div class="legend battery-legend"><span><i class="battery-key"></i>1년 차</span><span><i class="battery-key next"></i>2년 차</span></div>
    </div>
    <svg id="batteryChart" class="battery-chart" viewBox="0 0 640 185" role="img" aria-label="1년 차와 2년 차의 일별 배터리 잔량"></svg>
    <p class="sub battery-method">설정한 용량만큼 완충된 상태에서 시작합니다. 각 월의 발전량을 일수로 나눠 매일 동일하게 적용하고, 12월부터 11월까지 같은 패턴을 2년간 반복합니다.</p>
+  </div>
   </div>
  </div>
 </section>
@@ -478,7 +506,7 @@ body{padding:clamp(10px,2.8vw,44px)}
     </div>
   </header>
   <div id="scenePending" class="pad solar-empty scene-pending">
-    <div><strong>정류장을 선택해 주세요</strong><p class="sub">지도나 검색 결과에서 정류장을 선택하면 3D 음영과 태양 경로를 볼 수 있습니다.</p></div>
+    <p class="sub">정류장을 선택하면 시간대별 음영을 볼 수 있습니다.</p>
     <a href="#explore" class="control" id="findStop">정류장 찾기 ↑</a>
   </div>
   <div class="solar-playback" id="scenePlayback" hidden>
@@ -502,10 +530,9 @@ body{padding:clamp(10px,2.8vw,44px)}
       <p class="sub scene-note" id="sceneNote" hidden></p>
     </aside>
   </div>
-  <div class="pad horizon-profile">
+  <div class="pad horizon-profile" id="horizonProfile" hidden>
     <div class="row horizon-heading">
       <div><h3>방위별 차폐 고도</h3><p class="sub" id="horizonSummary"></p></div>
-      <button type="button" class="export" id="exportHorizon" title="현재 검색·필터 결과의 방위별 차폐 고도">지형 차폐 CSV</button>
     </div>
     <canvas id="horizonChart" hidden role="img" aria-label="북쪽 0도에서 시계 방향으로 표시한 지형 차폐 고도 그래프"></canvas>
     <p class="sub" id="horizonExportScope" hidden></p>
@@ -1059,11 +1086,12 @@ function refresh(resetScroll=true){
  state.page=Math.min(state.page,Math.max(0,Math.ceil(results.length/pageSize)-1));
  for(const button of $('districts').children)button.setAttribute('aria-pressed',String(button.dataset.district===String(state.district??'all')));
  $('mapTitle').textContent=state.district===null?'부산 전체':names(state.district);
- $('mapHint').textContent=state.district===null?'지도나 오른쪽 목록에서 구·군을 선택하세요.':
+ $('mapHint').textContent=state.district===null?'지도나 목록에서 구·군을 선택하세요.':
    count(state.district<0?outside:districtsTotal[state.district])+'곳 · 지도에서 정류장을 살펴보세요.';
  paintMap();renderList(resetScroll);drawProfile();
 }
 $('q').addEventListener('input',()=>{
+ $('results').scrollTop=0;
  state.district=null;state.selection=null;state.page=0;state.view={...overall};
  const raw=$('q').value.trim();
  if(/^\d{5}$/.test(raw)){
@@ -1074,9 +1102,13 @@ $('q').addEventListener('input',()=>{
 });
 $('quickSearch').addEventListener('submit',event=>{
  event.preventDefault();
- const target=state.selection?'insight':'explore';
- location.hash=target;
- $(target).scrollIntoView();
+ if(!state.selection&&results.length===1)selectStop(results[0]);
+ if(state.selection){
+  $('insight').scrollIntoView();
+  $('stopTitle').focus({preventScroll:true});
+ }else{
+  $('results').focus();
+ }
 });
 function applyModelFilter(){
  if(state.selection&&!queryResults().some(s=>s.id===state.selection))state.selection=null;
@@ -1170,7 +1202,6 @@ function drawProfile(updateScene=true){
  const generation=s?siteGeneration(s):null;
  const adjusted=s&&savedLocations.get(s.id);
  drawBattery(s,generation);
- jumpDetail.hidden=!s;
  boundaryHint.hidden=Boolean(s);
  $('pending').hidden=Boolean(s);$('profile').hidden=!s;
  if(!s)return;
@@ -1327,7 +1358,6 @@ function batteryScenario(monthlyWh,dailyWh,batteryCapacity){
 }
 
 function drawBattery(stop,generation){
- $('batteryPending').hidden=Boolean(stop);
  for(const id of ['batteryResults','batteryStation','monthlyInputs','roadviewHint'])$(id).hidden=!stop;
  const rates=generation?.rates??defaultTreeShade;
  treeShadeInputs.forEach((input,index)=>{
@@ -2234,7 +2264,7 @@ playSun.addEventListener('click',()=>{
 
 function renderSolarScene(){
  const stop=lookup.get(state.selection);
- for(const id of ['sceneStation','siteSceneControls','scenePlayback','sceneBody','horizonSummary','horizonChart','horizonExportScope'])$(id).hidden=!stop;
+ for(const id of ['sceneStation','siteSceneControls','scenePlayback','sceneBody','horizonProfile','horizonSummary','horizonChart','horizonExportScope'])$(id).hidden=!stop;
  $('scenePending').hidden=Boolean(stop);
  $('unknownBuildingNote').hidden=true;
  if(!stop){
