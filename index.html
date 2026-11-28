@@ -280,7 +280,7 @@ body{padding-left:164px}
 .list-area .results{height:auto;max-height:300px;min-height:42px;scroll-padding-block:5px}
 .list-area .pagination{padding-block:6px}
 .stop-insight .empty-note{padding:0}
-.stop-insight .metrics{margin:12px 0;gap:8px}
+.stop-insight .metrics{grid-template-columns:repeat(4,minmax(0,1fr));margin:12px 0;gap:8px}
 .stop-insight .metrics div{padding:10px 12px}
 .stop-insight .metrics span,.battery-metrics dt{font-size:var(--card-text)}
 .stop-insight .metrics b{font-size:clamp(15px,1.6vw,24px);white-space:normal}
@@ -327,18 +327,34 @@ body{padding-left:164px}
 .stop-context .badge{flex:none}
 .stop-context strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .stop-context .ars{flex:none;font-size:13px}
+.stop-context-metrics{display:flex;flex:none;gap:clamp(8px,1.6vw,22px);margin:0;padding-left:10px;border-left:1px solid var(--line)}
+.stop-context-metrics div{min-width:0}
+.stop-context-metrics dt{font-size:11px;color:var(--muted)}
+.stop-context-metrics dd{margin:0;font-size:13px;font-weight:750;font-variant-numeric:tabular-nums;white-space:nowrap}
+.stop-context-metrics small{margin-left:3px;font-size:10px;color:var(--muted)}
 .stop-context a{margin-left:auto;flex:none;color:#194db6;font-size:12px;font-weight:700;text-decoration:none}
 .stop-context a:hover{text-decoration:underline}
 #explore.has-selection ~ :is(#battery,#shadowScene,#method),
-#explore.has-selection ~ #battery :is(#monthlyGeneration,#batteryOperation){scroll-margin-top:64px}
+#explore.has-selection ~ #battery :is(#monthlyGeneration,#batteryOperation){scroll-margin-top:72px}
+@media(max-width:740px){
+ .stop-insight .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .stop-context{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:3px 8px}
+ .stop-context .badge{display:none}
+ .stop-context-metrics{
+  grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:4px;padding:3px 0 0;border-left:0;border-top:1px solid var(--line)
+ }
+ .stop-context a{grid-column:3;grid-row:1}
+ #explore.has-selection ~ :is(#battery,#shadowScene,#method),
+ #explore.has-selection ~ #battery :is(#monthlyGeneration,#batteryOperation){scroll-margin-top:94px}
+}
 @media(max-width:600px){
  .stop-context-anchor{top:calc(var(--mobile-nav-height, 44px) + 6px)}
  #explore.has-selection ~ :is(#battery,#shadowScene,#method),
  #explore.has-selection ~ #battery :is(#monthlyGeneration,#batteryOperation){
-  scroll-margin-top:calc(var(--mobile-nav-height, 44px) + 58px)
+  scroll-margin-top:calc(var(--mobile-nav-height, 44px) + 90px)
  }
 }
-@media(max-width:375px){.stop-context .badge{display:none}}
 </style>
 </head>
 <body>
@@ -423,7 +439,12 @@ body{padding-left:164px}
 <div id="profile" class="profile" hidden>
  <div><div class="row"><h2 id="stopTitle" tabindex="-1"></h2><span class="badge" id="mode"></span></div>
  <div id="stopMeta" class="idline"></div><p class="sub" id="stopCoords"></p><p class="sub" id="source"></p><p class="sub" id="treeDetail" hidden></p>
- <div class="metrics"><div><span>연간 발전량</span><b id="annual"></b></div><div><span>겨울 일평균</span><b id="winter"></b></div><div><span>모델 음영 손실</span><b id="loss"></b></div></div>
+ <div class="metrics">
+  <div><span>연간 발전량</span><b id="annual"></b></div>
+  <div><span>연평균 일 발전량</span><b id="dailyAnnual"></b></div>
+  <div><span>겨울 일평균 (12~2월)</span><b id="winter"></b></div>
+  <div><span>모델 음영 손실률</span><b id="loss"></b></div>
+ </div>
  <p class="note" id="siteNote"></p><div class="links"><a id="externalMap" target="_blank" rel="noopener">지도에서 위치 확인 ↗</a><a href="#battery">발전·배터리 시뮬레이션 ↓</a><a href="#shadowScene" id="sceneLink">3D 음영·태양 경로 ↓</a></div>
  </div>
  </div></section>
@@ -432,6 +453,11 @@ body{padding-left:164px}
   <span class="badge">선택 정류장</span>
   <strong id="stopContextName"></strong>
   <span class="ars" id="stopContextNumber"></span>
+  <dl class="stop-context-metrics">
+   <div><dt>연평균 일 발전량</dt><dd id="stopDailyAnnual"></dd></div>
+   <div><dt>겨울 일평균</dt><dd id="stopWinter"></dd></div>
+   <div><dt>모델 음영 손실률</dt><dd id="stopLoss"></dd></div>
+  </dl>
   <a href="#insight">상세 보기 ↑</a>
  </div>
 </div>
@@ -1272,7 +1298,17 @@ function drawProfile(updateScene=true){
  const {reference,monthlyWh}=generation;
  const winterWh=monthlyWh.slice(0,3).reduce((sum,wh)=>sum+wh,0)/daysByMonth.slice(0,3).reduce((sum,days)=>sum+days,0);
  const annualWh=monthlyWh.reduce((sum,wh)=>sum+wh,0);
- putUnit('annual',decimal(annualWh/1000),'kWh');putUnit('winter',decimal(winterWh),'Wh/일');putUnit('loss',decimal(generation.loss),'%');
+ const dailyAnnualWh=annualWh/daysByMonth.reduce((sum,days)=>sum+days,0);
+ putUnit('annual',decimal(annualWh/1000),'kWh');
+ for(const [detail,compact,value,unit] of [
+  ['dailyAnnual','stopDailyAnnual',dailyAnnualWh,'Wh/일'],
+  ['winter','stopWinter',winterWh,'Wh/일'],
+  ['loss','stopLoss',generation.loss,'%']
+ ]){
+  const formatted=decimal(value);
+  putUnit(detail,formatted,unit);
+  putUnit(compact,formatted,unit);
+ }
  const enoughWinter=winterWh>=state.dailyConsumption;
  const balance='겨울 평균이 일일 소비량 '+state.dailyConsumption+' Wh/일 '+(enoughWinter?'이상입니다.':'미만입니다.');
  const sceneModel=correctedScene(s);
